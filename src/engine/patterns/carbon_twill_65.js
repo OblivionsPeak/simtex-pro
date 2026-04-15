@@ -1,11 +1,11 @@
 export default {
   id: 'carbon_twill_65',
-  name: 'Twill Pattern 65',
+  name: 'Carbon Twill 65',
   category: 'Racing',
-  description: 'Procedural generation 65 of twill pattern 65.',
-  shader: \vec3 generate() { float d = step(0.5, fract(v_uv.x * u_scale + v_uv.y * 0.5)); return mix(u_secondary_color, u_primary_color, d); }\,
+  description: 'High-quality procedural carbon twill variation 65.',
+  shader: `vec3 generate() { float d = step(0.5, fract(v_uv.x * u_scale + v_uv.y * 0.5)); return mix(u_secondary_color, u_primary_color, d); }`,
   uniforms: [
-    { id: 'u_scale', name: 'Scale', type: 'float', min: 1.0, max: 500.0, default: 42.5 },
+    { id: 'u_scale', name: 'Scale', type: 'float', min: 1.0, max: 1000.0, default: 42.5 },
     { id: 'u_primary_color', name: 'Primary', type: 'color', default: [0.35, 0.35, 0.4] },
     { id: 'u_secondary_color', name: 'Secondary', type: 'color', default: [0.1, 0.1, 0.12] }
   ]
