@@ -308,7 +308,7 @@ function App() {
           </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v2.1.2</span>
+          <span className="version-label">v2.1.3</span>
           {window.electronAPI && (
             <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
               Check for Updates
@@ -372,10 +372,11 @@ function App() {
           z-index: 110;
         }
         .sidebar-top { border-bottom: 1px solid var(--color-border); }
-        .sidebar-bottom { 
-          border-top: 1px solid var(--color-border); 
+        .sidebar-bottom {
+          border-top: 1px solid var(--color-border);
           box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
           max-height: 50vh;
+          overflow-y: auto;
           display: flex;
           flex-direction: column;
         }
