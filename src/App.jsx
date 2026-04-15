@@ -302,12 +302,14 @@ function App() {
             </section>
           )}
 
-          <div className="sidebar-footer">
-            <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
-              Check for Updates
-            </button>
-            <span className="version-label">v1.0.0</span>
           </div>
+        </div>
+
+        <div className="sidebar-footer">
+          <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
+            Check for Updates
+          </button>
+          <span className="version-label">v1.1.0</span>
         </div>
       </aside>
 
