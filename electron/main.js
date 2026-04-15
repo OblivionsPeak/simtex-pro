@@ -78,7 +78,7 @@ autoUpdater.on('update-not-available', (info) => {
 
 autoUpdater.on('error', (err) => {
   log.error('Error in auto-updater: ' + err);
-  mainWindow?.webContents.send('update-status', 'Update error');
+  mainWindow?.webContents.send('update-status', 'Update error: ' + (err.message || 'Unknown error'));
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
