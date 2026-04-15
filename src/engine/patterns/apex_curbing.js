@@ -1,24 +1,22 @@
 export default {
-  id: 'apex_curb_pro',
-  name: 'Apex Curbing',
+  id: 'apex_curbing_artisan',
+  name: 'Track Curbing',
   category: 'Racing',
-  description: 'Alternating track-side curb pattern with adjustable curve intensity.',
+  description: 'Classic circuit apex curbing with tire wear marks.',
   shader: `
-    vec3 generate() {
-      // Warp the UV to simulate a curve
-      float warp = sin(v_uv.x * 2.0) * u_curve;
-      float val = fract((v_uv.y + warp) * u_scale);
-      float mask = step(0.5, val);
-      
-      vec3 color = mix(u_secondary_color, u_primary_color, mask);
-      if (u_is_spec > 0.5) return vec3(0.0, 0.0, 0.0);
+    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+    vec4 generate() {
+      vec2 uv = v_uv * u_scale;
+      float mask = step(0.5, fract(uv.x));
+      float wear = hash(v_uv * 10.0) * 0.2;
+      vec4 color = mix(u_secondary_color, u_primary_color, mask);
+      color.rgb -= wear;
       return color;
     }
   `,
   uniforms: [
-    { id: 'u_scale', name: 'Segments', type: 'float', min: 2.0, max: 20.0, default: 8.0 },
-    { id: 'u_curve', name: 'Curve Warping', type: 'float', min: 0.0, max: 0.5, default: 0.1 },
-    { id: 'u_primary_color', name: 'Color A', type: 'color', default: [1.0, 0.0, 0.0] },
-    { id: 'u_secondary_color', name: 'Color B', type: 'color', default: [1.0, 1.0, 1.0] }
+    { id: 'u_scale', name: 'Curb Count', type: 'float', min: 2.0, max: 20.0, default: 8.0 },
+    { id: 'u_primary_color', name: 'Color A', type: 'color', default: [0.8, 0.1, 0.1, 1.0] },
+    { id: 'u_secondary_color', name: 'Color B', type: 'color', default: [1.0, 1.0, 1.0, 1.0] }
   ]
 };

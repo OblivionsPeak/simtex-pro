@@ -1,24 +1,20 @@
 export default {
-  id: 'polka_dot_pro',
-  name: 'Polka Dot',
-  category: 'Geometric',
-  description: 'Precision industrial dot pattern with adjustable spacing.',
+  id: 'polka_dot_artisan',
+  name: 'Pro Polka Dots',
+  category: 'Organic',
+  description: 'Precision uniform polka dots with adjustable spacing and edge softness.',
   shader: `
-    vec3 generate() {
-      vec2 uv = v_uv * u_scale;
-      vec2 gv = fract(uv) - 0.5;
-      float d = length(gv);
-      float mask = step(u_size, d);
-      
-      vec3 color = mix(u_primary_color, u_secondary_color, mask);
-      if (u_is_spec > 0.5) return vec3(0.0, 0.0, 0.0);
-      return color;
+    vec4 generate() {
+      vec2 uv = fract(v_uv * u_scale) - 0.5;
+      float d = length(uv);
+      float mask = smoothstep(u_radius, u_radius - 0.02, d);
+      return mix(u_secondary_color, u_primary_color, mask);
     }
   `,
   uniforms: [
-    { id: 'u_scale', name: 'Density', type: 'float', min: 10.0, max: 200.0, default: 40.0 },
-    { id: 'u_size', name: 'Dot Size', type: 'float', min: 0.1, max: 0.5, default: 0.25 },
-    { id: 'u_primary_color', name: 'Dot', type: 'color', default: [1.0, 0.0, 0.0] },
-    { id: 'u_secondary_color', name: 'Base', type: 'color', default: [1.0, 1.0, 1.0] }
+    { id: 'u_scale', name: 'Dot Count', type: 'float', min: 2.0, max: 50.0, default: 10.0 },
+    { id: 'u_radius', name: 'Dot Size', type: 'float', min: 0.1, max: 0.5, default: 0.3 },
+    { id: 'u_primary_color', name: 'Dot Color', type: 'color', default: [1.0, 1.0, 1.0, 1.0] },
+    { id: 'u_secondary_color', name: 'Base Color', type: 'color', default: [0.05, 0.05, 0.1, 1.0] }
   ]
 };

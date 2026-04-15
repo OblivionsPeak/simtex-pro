@@ -116,11 +116,11 @@ function App() {
     return `#${toHex(rgb[0])}${toHex(rgb[1])}${toHex(rgb[2])}`;
   };
 
-  const hexToRgb = (hex) => {
+  const hexToRgb = (hex, alpha = 1.0) => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;
     const b = parseInt(hex.slice(5, 7), 16) / 255;
-    return [r, g, b];
+    return [r, g, b, alpha];
   };
 
   return (
@@ -227,12 +227,28 @@ function App() {
                       onChange={(e) => handleUniformChange(u.id, parseFloat(e.target.value))}
                     />
                   ) : (
-                    <input 
-                      type="color"
-                      className="color-input"
-                      value={uniforms[u.id] ? rgbToHex(uniforms[u.id]) : '#ffffff'}
-                      onChange={(e) => handleUniformChange(u.id, hexToRgb(e.target.value))}
-                    />
+                    <div className="color-control-stack">
+                      <input 
+                        type="color"
+                        className="color-input"
+                        value={uniforms[u.id] ? rgbToHex(uniforms[u.id]) : '#ffffff'}
+                        onChange={(e) => handleUniformChange(u.id, hexToRgb(e.target.value, uniforms[u.id] ? uniforms[u.id][3] : 1.0))}
+                      />
+                      <div className="alpha-slider-row">
+                        <span className="alpha-label">Alpha</span>
+                        <input 
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={uniforms[u.id] ? uniforms[u.id][3] : 1.0}
+                          onChange={(e) => {
+                            const current = uniforms[u.id] || [1,1,1,1];
+                            handleUniformChange(u.id, [current[0], current[1], current[2], parseFloat(e.target.value)]);
+                          }}
+                        />
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}
@@ -389,6 +405,11 @@ function App() {
         .control-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text); font-weight: 500; }
         .control-value { color: var(--color-accent); font-family: var(--font-mono); font-size: 10px; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 4px; }
         .color-input { width: 100%; height: 36px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: #1a1a20; cursor: pointer; padding: 4px; }
+        
+        .color-control-stack { display: flex; flex-direction: column; gap: 8px; }
+        .alpha-slider-row { display: flex; align-items: center; gap: 10px; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 4px; }
+        .alpha-label { font-size: 9px; font-weight: 800; color: var(--color-text-dim); text-transform: uppercase; }
+        .alpha-slider-row input { flex: 1; height: 12px; }
 
         .mode-toggle { display: flex; background: #1a1a20; padding: 4px; border-radius: 8px; gap: 4px; }
         .toggle-btn { flex: 1; padding: 10px; font-size: 11px; font-weight: 700; border-radius: 6px; color: var(--color-text-dim); }

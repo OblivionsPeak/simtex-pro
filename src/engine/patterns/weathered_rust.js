@@ -11,27 +11,16 @@ export default {
       return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
     }
     
-    vec3 generate() {
+    vec4 generate() {
       vec2 uv = v_uv * u_scale;
-      
-      // Multi-layer noise for rust pitting
       float n1 = noise(uv);
       float n2 = noise(uv * 2.5 + n1);
-      float n3 = noise(uv * 5.0 + n2);
+      float mask = smoothstep(0.4, 0.6, n1 * 0.5 + n2 * 0.3);
       
-      float rustMask = smoothstep(0.4, 0.6, n1 * 0.5 + n2 * 0.3 + n3 * 0.2);
-      float pitting = step(0.8, n3) * 0.2;
+      vec4 steel = vec4(0.4, 0.4, 0.42, 1.0);
+      vec4 rust = vec4(0.5, 0.2, 0.1, 1.0);
       
-      vec3 steel = vec3(0.4, 0.4, 0.42);
-      vec3 rustBase = vec3(0.4, 0.15, 0.05);
-      vec3 rustHighlight = vec3(0.6, 0.3, 0.1);
-      
-      vec3 rustColor = mix(rustBase, rustHighlight, n2);
-      vec3 finalColor = mix(steel, rustColor, rustMask);
-      finalColor -= pitting; // Add depth to pitting
-      
-      if (u_is_spec > 0.5) return vec3(0.1, 0.9, 0.0);
-      return finalColor;
+      return mix(steel, rust, mask);
     }
   `,
   uniforms: [

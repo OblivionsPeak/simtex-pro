@@ -1,8 +1,8 @@
 export default {
-  id: 'marble_vein_pro',
+  id: 'marble_stone_artisan',
   name: 'Marbled Stone',
-  category: 'Natural',
-  description: 'Elegant polished stone with organic mineral veining.',
+  category: 'Organic',
+  description: 'Natural stone texture with randomized crystalline veins.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     float noise(vec2 p) {
@@ -10,20 +10,16 @@ export default {
       f = f*f*(3.0-2.0*f);
       return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
     }
-    vec3 generate() {
+    vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = noise(uv + noise(uv * 2.0));
-      float vein = smoothstep(0.45, 0.5, abs(n - 0.5));
-      
-      vec3 base = vec3(0.9, 0.9, 0.92);
-      vec3 veinColor = vec3(0.2, 0.2, 0.25);
-      
-      vec3 color = mix(base, veinColor, 1.0 - vein);
-      if (u_is_spec > 0.5) return vec3(0.0, 0.1, 0.0);
-      return color;
+      float mask = smoothstep(0.4, 0.6, n);
+      return mix(u_secondary_color, u_primary_color, mask);
     }
   `,
   uniforms: [
-    { id: 'u_scale', name: 'Vein Complexity', type: 'float', min: 1.0, max: 10.0, default: 3.0 }
+    { id: 'u_scale', name: 'Vein Density', type: 'float', min: 1.0, max: 10.0, default: 4.0 },
+    { id: 'u_primary_color', name: 'Vein Color', type: 'color', default: [0.95, 0.95, 1.0, 1.0] },
+    { id: 'u_secondary_color', name: 'Stone Base', type: 'color', default: [0.3, 0.3, 0.35, 1.0] }
   ]
 };

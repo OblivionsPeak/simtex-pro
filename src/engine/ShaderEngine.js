@@ -6,7 +6,7 @@ export class ShaderEngine {
 
     this.program = null;
     this.uniforms = {};
-    this.currentValues = { u_opacity: 1.0 }; // Default to opaque
+    this.currentValues = { u_opacity: 1.0 }; 
     this.startTime = Date.now();
     
     this.initBuffers();
@@ -21,7 +21,6 @@ export class ShaderEngine {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     this.buffer = buffer;
 
-    // Enable alpha blending for the preview
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   }
@@ -47,12 +46,15 @@ export class ShaderEngine {
     `;
 
     pattern.uniforms.forEach(u => {
-      if (u.type === 'color') fragmentSource += `uniform vec3 ${u.id};\n`;
+      if (u.type === 'color') fragmentSource += `uniform vec4 ${u.id};\n`; // RGBA
       else fragmentSource += `uniform float ${u.id};\n`;
     });
 
     fragmentSource += pattern.shader;
-    fragmentSource += `\nvoid main() { gl_FragColor = vec4(generate(), u_opacity); }`;
+    fragmentSource += `\nvoid main() { 
+      vec4 res = generate();
+      gl_FragColor = vec4(res.rgb, res.a * u_opacity); 
+    }`;
 
     const newProgram = this.createProgram(vertexSource, fragmentSource);
     if (!newProgram) return;
@@ -88,7 +90,6 @@ export class ShaderEngine {
     const gl = this.gl;
 
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    // Clear color should be transparent to show background checkerboard
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -100,9 +101,10 @@ export class ShaderEngine {
 
     Object.entries(this.currentValues).forEach(([name, value]) => {
       const loc = this.uniforms[name];
-      if (!loc || name === 'u_opacity') return; // Handled specially
+      if (!loc || name === 'u_opacity') return;
       if (Array.isArray(value)) {
-        if (value.length === 3) gl.uniform3fv(loc, value);
+        if (value.length === 4) gl.uniform4fv(loc, value);
+        else if (value.length === 3) gl.uniform3fv(loc, value);
         else if (value.length === 2) gl.uniform2fv(loc, value);
       } else {
         gl.uniform1f(loc, value);
