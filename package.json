@@ -1,7 +1,7 @@
 {
   "name": "simtex-pro",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.9.1",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
@@ -19,11 +19,15 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "certificateFile": null,
+      "certificatePassword": null
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
     "publish": {
       "provider": "github",
