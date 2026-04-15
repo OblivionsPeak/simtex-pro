@@ -18,6 +18,8 @@ export default {
     }
   `,
   uniforms: [
-    { id: 'u_scale', name: 'Weave Size', type: 'float', min: 2.0, max: 100.0, default: 20.0 }
+    { id: 'u_scale', name: 'Weave Size', type: 'float', min: 2.0, max: 100.0, default: 20.0 },
+    { id: 'u_primary_color', name: 'Primary Weave', type: 'color', default: [0.1, 0.1, 0.1] },
+    { id: 'u_secondary_color', name: 'Secondary Weave', type: 'color', default: [0.05, 0.05, 0.05] }
   ]
 };
