@@ -214,6 +214,21 @@ function App() {
             </div>
           </section>
 
+          <section className="sidebar-section">
+            <div className="section-title">
+              <Zap size={16} />
+              <span>MATERIAL MODE</span>
+            </div>
+            <div className="mode-toggle">
+              <button className={`toggle-btn ${!isSpecMap ? 'active' : ''}`} onClick={() => setIsSpecMap(false)}>Standard</button>
+              <button className={`toggle-btn ${isSpecMap ? 'active' : ''}`} onClick={() => setIsSpecMap(true)}>iRacing Spec</button>
+            </div>
+            {isSpecMap && (
+              <div className="info-box">
+                <Info size={14} />
+                <p>R: Metallic | G: Roughness</p>
+              </div>
+            )}
           </section>
 
           {/* Update Progress/Status Notification */}
