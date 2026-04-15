@@ -58,7 +58,12 @@ function App() {
   useEffect(() => {
     if (!window.electronAPI) return;
 
-    window.electronAPI.onUpdateStatus((status) => setUpdateStatus(status));
+    window.electronAPI.onUpdateStatus((status) => {
+        setUpdateStatus(status);
+        if (status === 'Your system is up to date.') {
+            setTimeout(() => setUpdateStatus(''), 3000);
+        }
+    });
     window.electronAPI.onUpdateProgress((percent) => setUpdateProgress(percent));
     window.electronAPI.onUpdateDownloaded(() => setIsUpdateReady(true));
   }, []);

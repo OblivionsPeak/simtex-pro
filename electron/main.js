@@ -73,7 +73,7 @@ autoUpdater.on('update-available', (info) => {
 
 autoUpdater.on('update-not-available', (info) => {
   log.info('Update not available.');
-  mainWindow?.webContents.send('update-status', '');
+  mainWindow?.webContents.send('update-status', 'Your system is up to date.');
 });
 
 autoUpdater.on('error', (err) => {
