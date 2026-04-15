@@ -19,6 +19,6 @@ export default {
     { id: 'u_scale', name: 'Density', type: 'float', min: 10.0, max: 200.0, default: 40.0 },
     { id: 'u_size', name: 'Dot Size', type: 'float', min: 0.1, max: 0.5, default: 0.25 },
     { id: 'u_primary_color', name: 'Dot', type: 'color', default: [1.0, 0.0, 0.0] },
-    { id: 'u_secondary_color', name: 'Base', type: 'color', default: [ white, white, white ] }
+    { id: 'u_secondary_color', name: 'Base', type: 'color', default: [1.0, 1.0, 1.0] }
   ]
 };
