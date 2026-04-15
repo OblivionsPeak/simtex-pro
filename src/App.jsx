@@ -19,6 +19,7 @@ function App() {
   // Update State
   const [updateStatus, setUpdateStatus] = useState('');
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [isUpdateReady, setIsUpdateReady] = useState(false);
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateLog, setUpdateLog] = useState([]);
   const [masterOpacity, setMasterOpacity] = useState(1.0);
@@ -68,6 +69,12 @@ function App() {
       setIsUpdateAvailable(true);
       setUpdateInfo(info);
       setUpdateLog(prev => [...prev.slice(-4), `v${info.version} found on GitHub`]);
+    });
+
+    window.electronAPI.onUpdateDownloaded(() => {
+      setIsUpdateReady(true);
+      setIsUpdateAvailable(false);
+      setUpdateLog(prev => [...prev.slice(-4), 'Update ready — click to install']);
     });
   }, []);
 
@@ -290,6 +297,11 @@ function App() {
                   Download v{updateInfo?.version}
                 </button>
               )}
+              {isUpdateReady && (
+                <button className="btn-update-action install" onClick={() => window.electronAPI.restartAndInstall()}>
+                  Install &amp; Restart
+                </button>
+              )}
             </div>
           )}
 
@@ -297,6 +309,11 @@ function App() {
 
         <div className="sidebar-footer">
           <span className="version-label">v2.1.1</span>
+          {window.electronAPI && (
+            <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
+              Check for Updates
+            </button>
+          )}
         </div>
       </aside>
 
@@ -461,6 +478,11 @@ function App() {
         .progress-bar { height: 100%; background: var(--color-accent); transition: width 0.3s; }
         .btn-update-install { width: 100%; background: #fff; color: #000; font-weight: 800; font-size: 11px; padding: 10px; border-radius: 8px; transition: all 0.2s; }
         .btn-update-install:hover { transform: scale(1.02); background: var(--color-accent); color: #fff; }
+        .btn-update-action { width: 100%; font-weight: 700; font-size: 11px; padding: 8px; border-radius: 8px; margin-top: 6px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-update-action.download { background: var(--color-accent); color: #000; }
+        .btn-update-action.download:hover { filter: brightness(1.15); }
+        .btn-update-action.install { background: #fff; color: #000; }
+        .btn-update-action.install:hover { transform: scale(1.02); background: var(--color-accent); color: #fff; }
         
         .sidebar-footer { 
           margin-top: 16px; 

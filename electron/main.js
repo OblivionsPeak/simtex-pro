@@ -33,9 +33,10 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
-  // Check for updates
+  // Check for updates after a short delay so the renderer's IPC listeners
+  // are registered before any update-status messages arrive.
   mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+    setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 3000);
   });
 }
 
