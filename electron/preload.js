@@ -4,7 +4,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_event, value) => callback(value)),
   onUpdateProgress: (callback) => ipcRenderer.on('update-progress', (_event, value) => callback(value)),
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-ready', (_event, value) => callback(value)),
-  restartAndInstall: () => ipcRenderer.send('restart-app')
+  restartAndInstall: () => ipcRenderer.send('restart-app'),
+  checkForUpdates: () => ipcRenderer.send('check-for-updates')
 });
 
 window.addEventListener('DOMContentLoaded', () => {

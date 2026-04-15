@@ -280,7 +280,7 @@ function App() {
                   <Zap size={14} className={isUpdateReady ? 'glow' : ''} />
                   <span>{isUpdateReady ? 'UPDATE READY' : 'SYSTEM UPDATE'}</span>
                 </div>
-                <p>{isUpdateReady ? 'V0.5.0 downloaded and ready to install.' : updateStatus}</p>
+                <p>{isUpdateReady ? `New version is downloaded and ready to install.` : updateStatus}</p>
                 
                 {updateProgress > 0 && !isUpdateReady && (
                   <div className="progress-bar-container">
@@ -296,6 +296,13 @@ function App() {
               </div>
             </section>
           )}
+
+          <div className="sidebar-footer">
+            <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
+              Check for Updates
+            </button>
+            <span className="version-label">v0.7.2</span>
+          </div>
         </div>
       </aside>
 
@@ -447,6 +454,18 @@ function App() {
         .btn-update-install { width: 100%; background: #fff; color: #000; font-weight: 800; font-size: 11px; padding: 10px; border-radius: 8px; transition: all 0.2s; }
         .btn-update-install:hover { transform: scale(1.02); background: var(--color-accent); color: #fff; }
         
+        .sidebar-footer { 
+          margin-top: 16px; 
+          padding-top: 16px; 
+          border-top: 1px solid rgba(255,255,255,0.05); 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+        }
+        .check-updates-link { font-size: 10px; color: var(--color-text-dim); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+        .check-updates-link:hover { color: var(--color-accent); }
+        .version-label { font-size: 10px; color: rgba(255,255,255,0.2); font-family: var(--font-mono); }
+
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
       `}</style>
     </div>

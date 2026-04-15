@@ -56,6 +56,10 @@ ipcMain.on('restart-app', () => {
   autoUpdater.quitAndInstall();
 });
 
+ipcMain.on('check-for-updates', () => {
+  autoUpdater.checkForUpdates();
+});
+
 // Auto-update events linked to UI
 autoUpdater.on('checking-for-update', () => {
   log.info('Checking for update...');
