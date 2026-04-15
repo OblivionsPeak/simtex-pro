@@ -2,7 +2,7 @@ export default {
   id: 'solar_flare_pro',
   name: 'Solar Flare',
   category: 'Abstract',
-  description: 'Pulsing plasma energy flux with high-intensity radiation centers.',
+  description: 'Static plasma energy flux with high-intensity radiation centers.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
@@ -12,7 +12,8 @@ export default {
     }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
-      float n = noise(uv - u_time * 0.5);
+      // Removed time dependency
+      float n = noise(uv);
       float flare = pow(n, 3.0) * 2.0;
       return mix(u_secondary_color, u_primary_color, flare);
     }

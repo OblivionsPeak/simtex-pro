@@ -198,7 +198,7 @@ function App() {
               <Settings size={16} />
               <span>CONTROLS</span>
             </div>
-            <div className="controls-list">
+            <div className="controls-list pro-scrollbar">
               <div className="control-group master-control">
                 <div className="control-label">
                   <span>Master Opacity</span>
@@ -306,7 +306,7 @@ function App() {
             <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
               Check for Updates
             </button>
-            <span className="version-label">v0.7.2</span>
+            <span className="version-label">v0.8.2</span>
           </div>
         </div>
       </aside>
@@ -361,12 +361,18 @@ function App() {
         
         .sidebar-top, .sidebar-bottom { 
           flex-shrink: 0; 
-          padding: 24px; 
+          padding: 16px 24px; 
           background: #0a0a0c;
           z-index: 110;
         }
         .sidebar-top { border-bottom: 1px solid var(--color-border); }
-        .sidebar-bottom { border-top: 1px solid var(--color-border); box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+        .sidebar-bottom { 
+          border-top: 1px solid var(--color-border); 
+          box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+          max-height: 50vh;
+          display: flex;
+          flex-direction: column;
+        }
 
         .patterns-container { 
           flex: 1; 
@@ -412,8 +418,16 @@ function App() {
         .pattern-desc { font-size: 11px; color: var(--color-text-dim); line-height: 1.4; }
         .no-results { font-size: 12px; color: var(--color-text-dim); text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); }
 
-        .controls-list { display: flex; flex-direction: column; gap: 18px; }
-        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .controls-list { 
+          display: flex; 
+          flex-direction: column; 
+          gap: 16px; 
+          overflow-y: auto;
+          flex: 1;
+          margin-right: -8px;
+          padding-right: 8px;
+        }
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
         .control-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text); font-weight: 500; }
         .control-value { color: var(--color-accent); font-family: var(--font-mono); font-size: 10px; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 4px; }
         .color-input { width: 100%; height: 36px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: #1a1a20; cursor: pointer; padding: 4px; }

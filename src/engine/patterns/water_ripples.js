@@ -2,12 +2,13 @@ export default {
   id: 'water_ripples_artisan',
   name: 'Water Ripples',
   category: 'Natural',
-  description: 'Concentric liquid wave interference patterns.',
+  description: 'Static concentric liquid wave interference patterns.',
   shader: `
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float d = length(uv);
-      float ripple = sin(d * 20.0 - u_time * 2.0);
+      // Removed time from ripple function
+      float ripple = sin(d * 20.0);
       float mask = smoothstep(-0.1, 0.1, ripple);
       return mix(u_secondary_color, u_primary_color, mask);
     }

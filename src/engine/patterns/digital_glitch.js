@@ -2,12 +2,13 @@ export default {
   id: 'digital_glitch_pro',
   name: 'Digital Glitch',
   category: 'Abstract',
-  description: 'Structured pixel shift and signal interference simulation.',
+  description: 'Static pixel shift and signal interference simulation.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
-      float shift = hash(y + floor(u_time * 10.0)) * 0.2;
+      // Removed time dependency from shift
+      float shift = hash(y) * 0.2;
       float x = v_uv.x + shift;
       
       float mask = step(0.9, hash(floor(x * 10.0) + y));

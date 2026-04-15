@@ -2,7 +2,7 @@ export default {
   id: 'lava_crust_pro',
   name: 'Lava Crust',
   category: 'Natural',
-  description: 'Flowing volcanic cooling patterns with high-heat emission cracks.',
+  description: 'Static volcanic cooling patterns with high-heat emission cracks.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
@@ -12,7 +12,8 @@ export default {
     }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
-      float n = noise(uv + u_time * 0.2);
+      // Removed time from noise offset
+      float n = noise(uv);
       float mask = smoothstep(0.4, 0.6, n);
       
       vec4 heat = vec4(1.0, 0.2, 0.0, 1.0);

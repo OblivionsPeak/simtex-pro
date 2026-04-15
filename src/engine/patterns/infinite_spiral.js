@@ -2,14 +2,15 @@ export default {
   id: 'infinite_spiral_pro',
   name: 'Infinite Spiral',
   category: 'Abstract',
-  description: 'Hypnotic mathematical spirograph with interlocking floral loops.',
+  description: 'Mathematical spirograph with static interlocking floral loops.',
   shader: `
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float r = length(uv);
       float a = atan(uv.y, uv.x);
       
-      float spiral = sin(r * 10.0 - a * 5.0 + u_time);
+      // Removed time from spiral function
+      float spiral = sin(r * 10.0 - a * 5.0);
       float mask = smoothstep(0.0, 0.1, abs(spiral) - 0.1);
       
       return mix(u_secondary_color, u_primary_color, 1.0 - mask);

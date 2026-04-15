@@ -2,7 +2,7 @@ export default {
   id: 'fluid_marbling_pro',
   name: 'Fluid Marbling',
   category: 'Abstract',
-  description: 'Organic liquid flow simulation with colorful mineral-like marbling.',
+  description: 'Organic static liquid flow with colorful mineral-like marbling.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
@@ -12,8 +12,9 @@ export default {
     }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
-      float n = noise(uv + u_time * 0.1);
-      float n2 = noise(uv * 2.0 - n + u_time * 0.05);
+      // Removed time from noise offsets
+      float n = noise(uv);
+      float n2 = noise(uv * 2.0 - n);
       float mask = smoothstep(0.3, 0.7, n * 0.5 + n2 * 0.5);
       return mix(u_secondary_color, u_primary_color, mask);
     }
