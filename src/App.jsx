@@ -15,6 +15,11 @@ function App() {
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  
+  // Update State
+  const [updateStatus, setUpdateStatus] = useState('');
+  const [updateProgress, setUpdateProgress] = useState(0);
+  const [isUpdateReady, setIsUpdateReady] = useState(false);
 
   // Filtered Patterns
   const filteredPatterns = useMemo(() => {
@@ -47,6 +52,15 @@ function App() {
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, [isSidebarOpen]);
+
+  // Handle Update Events
+  useEffect(() => {
+    if (!window.electronAPI) return;
+
+    window.electronAPI.onUpdateStatus((status) => setUpdateStatus(status));
+    window.electronAPI.onUpdateProgress((percent) => setUpdateProgress(percent));
+    window.electronAPI.onUpdateDownloaded(() => setIsUpdateReady(true));
+  }, []);
 
   const updateShader = async (pattern) => {
     if (!engineRef.current) return;
@@ -200,22 +214,32 @@ function App() {
             </div>
           </section>
 
-          <section className="sidebar-section">
-            <div className="section-title">
-              <Zap size={16} />
-              <span>MATERIAL MODE</span>
-            </div>
-            <div className="mode-toggle">
-              <button className={`toggle-btn ${!isSpecMap ? 'active' : ''}`} onClick={() => setIsSpecMap(false)}>Standard</button>
-              <button className={`toggle-btn ${isSpecMap ? 'active' : ''}`} onClick={() => setIsSpecMap(true)}>iRacing Spec</button>
-            </div>
-            {isSpecMap && (
-              <div className="info-box">
-                <Info size={14} />
-                <p>R: Metallic | G: Roughness</p>
-              </div>
-            )}
           </section>
+
+          {/* Update Progress/Status Notification */}
+          {(updateStatus || isUpdateReady) && (
+            <section className="sidebar-section update-section">
+              <div className="update-card glass-panel">
+                <div className="update-header">
+                  <Zap size={14} className={isUpdateReady ? 'glow' : ''} />
+                  <span>{isUpdateReady ? 'UPDATE READY' : 'SYSTEM UPDATE'}</span>
+                </div>
+                <p>{isUpdateReady ? 'V0.5.0 downloaded and ready to install.' : updateStatus}</p>
+                
+                {updateProgress > 0 && !isUpdateReady && (
+                  <div className="progress-bar-container">
+                    <div className="progress-bar" style={{ width: `${updateProgress}%` }}></div>
+                  </div>
+                )}
+                
+                {isUpdateReady && (
+                  <button className="btn-update-install" onClick={() => window.electronAPI.restartAndInstall()}>
+                    Restart & Install
+                  </button>
+                )}
+              </div>
+            </section>
+          )}
         </div>
       </aside>
 
@@ -348,6 +372,19 @@ function App() {
           background-size: 60px 60px; background-position: 0 0, 0 30px, 30px -30px, -30px 0px; }
         .canvas-wrapper { position: relative; box-shadow: 0 60px 120px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.05); }
         .canvas-overlay { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text-dim); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Update UI Styles */
+        .update-section { margin-top: 10px; }
+        .update-card { background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); padding: 16px; border-radius: 12px; }
+        .update-header { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .update-header .glow { color: var(--color-accent); filter: drop-shadow(0 0 5px var(--color-accent)); animation: pulse 2s infinite; }
+        .update-card p { font-size: 11px; color: var(--color-text-dim); line-height: 1.4; margin-bottom: 12px; }
+        .progress-bar-container { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+        .progress-bar { height: 100%; background: var(--color-accent); transition: width 0.3s; }
+        .btn-update-install { width: 100%; background: #fff; color: #000; font-weight: 800; font-size: 11px; padding: 10px; border-radius: 8px; transition: all 0.2s; }
+        .btn-update-install:hover { transform: scale(1.02); background: var(--color-accent); color: #fff; }
+        
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
       `}</style>
     </div>
   );
