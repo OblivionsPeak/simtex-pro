@@ -285,7 +285,7 @@ function App() {
                   <Zap size={14} className={isUpdateReady ? 'glow' : ''} />
                   <span>{isUpdateReady ? 'UPDATE READY' : 'SYSTEM UPDATE'}</span>
                 </div>
-                <p>{isUpdateReady ? `New version is downloaded and ready to install.` : updateStatus}</p>
+                <p>{isUpdateReady ? 'New version is downloaded and ready to install.' : updateStatus}</p>
                 
                 {updateProgress > 0 && !isUpdateReady && (
                   <div className="progress-bar-container">
@@ -303,13 +303,12 @@ function App() {
           )}
 
           </div>
-        </div>
 
         <div className="sidebar-footer">
           <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
             Check for Updates
           </button>
-          <span className="version-label">v1.1.0</span>
+          <span className="version-label">v1.1.1</span>
         </div>
       </aside>
 
