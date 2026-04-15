@@ -18,8 +18,9 @@ function App() {
   
   // Update State
   const [updateStatus, setUpdateStatus] = useState('');
-  const [updateProgress, setUpdateProgress] = useState(0);
-  const [isUpdateReady, setIsUpdateReady] = useState(false);
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [updateLog, setUpdateLog] = useState([]);
   const [masterOpacity, setMasterOpacity] = useState(1.0);
 
   // Filtered Patterns
@@ -59,13 +60,15 @@ function App() {
     if (!window.electronAPI) return;
 
     window.electronAPI.onUpdateStatus((status) => {
-        setUpdateStatus(status);
-        if (status === 'Your system is up to date.') {
-            setTimeout(() => setUpdateStatus(''), 3000);
-        }
+      setUpdateStatus(status);
+      setUpdateLog(prev => [...prev.slice(-4), status]);
     });
-    window.electronAPI.onUpdateProgress((percent) => setUpdateProgress(percent));
-    window.electronAPI.onUpdateDownloaded(() => setIsUpdateReady(true));
+
+    window.electronAPI.onUpdateAvailableData((info) => {
+      setIsUpdateAvailable(true);
+      setUpdateInfo(info);
+      setUpdateLog(prev => [...prev.slice(-4), `v${info.version} found on GitHub`]);
+    });
   }, []);
 
   // Update Opacity in Engine
@@ -277,29 +280,17 @@ function App() {
             )}
           </section>
 
-          {/* Update Progress/Status Notification */}
-          {(updateStatus || isUpdateReady) && (
-            <section className="sidebar-section update-section">
-              <div className="update-card glass-panel">
-                <div className="update-header">
-                  <Zap size={14} className={isUpdateReady ? 'glow' : ''} />
-                  <span>{isUpdateReady ? 'UPDATE READY' : 'SYSTEM UPDATE'}</span>
-                </div>
-                <p>{isUpdateReady ? 'New version is downloaded and ready to install.' : updateStatus}</p>
-                
-                {updateProgress > 0 && !isUpdateReady && (
-                  <div className="progress-bar-container">
-                    <div className="progress-bar" style={{ width: `${updateProgress}%` }}></div>
-                  </div>
-                )}
-                
-                {isUpdateReady && (
-                  <button className="btn-update-install" onClick={() => window.electronAPI.restartAndInstall()}>
-                    Restart & Install
-                  </button>
-                )}
-              </div>
-            </section>
+          {updateLog.length > 0 && (
+            <div className="update-console">
+              {updateLog.map((log, i) => (
+                <div key={i} className="log-entry">{log}</div>
+              ))}
+              {isUpdateAvailable && (
+                <button className="btn-update-action download" onClick={() => window.electronAPI.downloadUpdate()}>
+                  Download v{updateInfo?.version}
+                </button>
+              )}
+            </div>
           )}
 
           </div>
@@ -308,7 +299,7 @@ function App() {
           <button className="check-updates-link" onClick={() => window.electronAPI.checkForUpdates()}>
             Check for Updates
           </button>
-          <span className="version-label">v2.0.0</span>
+          <span className="version-label">v2.0.1</span>
         </div>
       </aside>
 

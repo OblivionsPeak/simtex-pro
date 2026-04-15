@@ -5,6 +5,8 @@ const log = require('electron-log');
 
 // Configure logging
 autoUpdater.logger = log;
+autoUpdater.autoDownload = false;
+autoUpdater.allowPrerelease = true;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
@@ -52,6 +54,10 @@ app.on('activate', () => {
 });
 
 // IPC communication
+ipcMain.on('download-update', () => {
+  autoUpdater.downloadUpdate();
+});
+
 ipcMain.on('restart-app', () => {
   autoUpdater.quitAndInstall();
 });
@@ -67,8 +73,9 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
-  log.info('Update available:', info.version);
-  mainWindow?.webContents.send('update-status', `New version ${info.version} available!`);
+  log.info('Update available: ' + info.version);
+  mainWindow?.webContents.send('update-status', 'Update available: ' + info.version);
+  mainWindow?.webContents.send('update-available-data', info);
 });
 
 autoUpdater.on('update-not-available', (info) => {
