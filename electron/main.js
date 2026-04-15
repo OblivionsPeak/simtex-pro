@@ -1,11 +1,7 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 // Configure logging
 autoUpdater.logger = log;
@@ -20,7 +16,7 @@ function createWindow() {
     height: 800,
     icon: path.join(__dirname, '../build/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: true,
       contextIsolation: false,
     },
