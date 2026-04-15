@@ -63,7 +63,13 @@ ipcMain.on('restart-app', () => {
 });
 
 ipcMain.on('check-for-updates', () => {
-  autoUpdater.checkForUpdates();
+  try {
+    mainWindow?.webContents.send('update-status', 'Starting update check...');
+    autoUpdater.checkForUpdates();
+  } catch (err) {
+    log.error('Failed to start update check:', err);
+    mainWindow?.webContents.send('update-status', 'Fatal error starting engine: ' + err.message);
+  }
 });
 
 // Auto-update events linked to UI
