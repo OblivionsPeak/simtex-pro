@@ -70,6 +70,7 @@ function App() {
     });
     setUniforms(defaults);
     await engineRef.current.setShader(pattern);
+    // The engine handles its own loop now, just update initial values
     engineRef.current.render({ ...defaults, u_is_spec: isSpecMap ? 1.0 : 0.0 });
   };
 
@@ -82,15 +83,16 @@ function App() {
     const newUniforms = { ...uniforms, [id]: value };
     setUniforms(newUniforms);
     if (engineRef.current) {
+      // Just update values, loop picks it up
       engineRef.current.render({ ...newUniforms, u_is_spec: isSpecMap ? 1.0 : 0.0 });
     }
   };
 
   useEffect(() => {
     if (engineRef.current) {
-        engineRef.current.render({ ...uniforms, u_is_spec: isSpecMap ? 1.0 : 0.0 });
+        engineRef.current.render({ u_is_spec: isSpecMap ? 1.0 : 0.0 });
     }
-  }, [isSpecMap, uniforms]);
+  }, [isSpecMap]);
 
   const downloadTexture = () => {
     if (!engineRef.current) return;
