@@ -1,16 +1,27 @@
-# React + Vite
+# SimTex Pro 🏁
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**SimTex Pro** is high-performance procedural texture generator designed specifically for sim racing liveries. Generate premium carbon fiber, hexagonal grids, racing stripes, and aggressive geometric patterns in real-time, then export them as high-quality 4K PNGs.
 
-Currently, two official plugins are available:
+![SimTex Pro Logo](./build/icon.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
+- **Procedural Pattern Database**: 25+ high-end racing patterns.
+- **iRacing Spec Map Support**: Native Metallic/Roughness mapping (Red/Green channels).
+- **High-Res Export**: 1K, 2K, and 4K output support.
+- **Desktop Application**: Packaged as a native Windows EXE.
+- **Auto-Updates**: Seamlessly stay up to date with new patterns as they are released.
 
-## React Compiler
+## Installation (Windows)
+1. Download the latest `SimTex Pro Setup.exe` from the [Releases](https://github.com/onegu/simtex-pro/releases) page.
+2. Run the installer.
+3. Launch **SimTex Pro** from your desktop or start menu.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## For Developers
+If you want to contribute or build from source:
+1. Clone the repository: `git clone https://github.com/onegu/simtex-pro.git`
+2. Install dependencies: `npm install`
+3. Run in dev mode: `npm run dev`
+4. Build the executable: `npm run dist`
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## License
+MIT License. See `LICENSE` for details.
