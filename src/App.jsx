@@ -55,7 +55,7 @@ function App() {
       defaults[u.id] = u.default;
     });
     setUniforms(defaults);
-    await engineRef.current.setShader(pattern.shader);
+    await engineRef.current.setShader(pattern);
     engineRef.current.render({ ...defaults, u_is_spec: isSpecMap ? 1.0 : 0.0 });
   };
 

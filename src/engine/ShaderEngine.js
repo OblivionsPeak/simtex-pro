@@ -27,13 +27,43 @@ export class ShaderEngine {
     this.buffer = buffer;
   }
 
-  async setShader(fragmentSource) {
+  async setShader(pattern) {
     const gl = this.gl;
     const vertexSource = `
       attribute vec2 position;
+      varying vec2 v_uv;
       void main() {
+        v_uv = position * 0.5 + 0.5;
         gl_Position = vec4(position, 0.0, 1.0);
       }
+    `;
+
+    // Construct the fragment shader with all declarations
+    let fragmentSource = `
+precision highp float;
+varying vec2 v_uv;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_is_spec;
+`;
+
+    // Inject dynamic uniforms from pattern config
+    pattern.uniforms.forEach(u => {
+      if (u.type === 'color') {
+        fragmentSource += `uniform vec3 ${u.id};\n`;
+      } else {
+        fragmentSource += `uniform float ${u.id};\n`;
+      }
+    });
+
+    // Add pattern body
+    fragmentSource += pattern.shader;
+
+    // Add main function
+    fragmentSource += `
+void main() {
+  gl_FragColor = vec4(generate(), 1.0);
+}
     `;
 
     const program = this.createProgram(vertexSource, fragmentSource);
