@@ -1,12 +1,12 @@
 export class ShaderEngine {
   constructor(canvas) {
     this.canvas = canvas;
-    this.gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
+    this.gl = canvas.getContext('webgl', { preserveDrawingBuffer: true, alpha: true });
     if (!this.gl) throw new Error('WebGL not supported');
 
     this.program = null;
     this.uniforms = {};
-    this.currentValues = {};
+    this.currentValues = { u_opacity: 1.0 }; // Default to opaque
     this.startTime = Date.now();
     
     this.initBuffers();
@@ -20,6 +20,10 @@ export class ShaderEngine {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     this.buffer = buffer;
+
+    // Enable alpha blending for the preview
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   }
 
   async setShader(pattern) {
@@ -39,6 +43,7 @@ export class ShaderEngine {
       uniform vec2 u_resolution;
       uniform float u_time;
       uniform float u_is_spec;
+      uniform float u_opacity;
     `;
 
     pattern.uniforms.forEach(u => {
@@ -47,12 +52,11 @@ export class ShaderEngine {
     });
 
     fragmentSource += pattern.shader;
-    fragmentSource += `\nvoid main() { gl_FragColor = vec4(generate(), 1.0); }`;
+    fragmentSource += `\nvoid main() { gl_FragColor = vec4(generate(), u_opacity); }`;
 
     const newProgram = this.createProgram(vertexSource, fragmentSource);
     if (!newProgram) return;
 
-    // Safely switch programs
     this.program = newProgram;
     this.mapUniforms();
   }
@@ -76,7 +80,6 @@ export class ShaderEngine {
   }
 
   render(uniformValues = {}) {
-    // Just update the values, the continuous loop will pick them up
     this.currentValues = { ...this.currentValues, ...uniformValues };
   }
 
@@ -85,19 +88,19 @@ export class ShaderEngine {
     const gl = this.gl;
 
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    gl.clearColor(0, 0, 0, 1);
+    // Clear color should be transparent to show background checkerboard
+    gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(this.program);
 
-    // Common uniforms
     if (this.uniforms.u_resolution) gl.uniform2f(this.uniforms.u_resolution, this.canvas.width, this.canvas.height);
     if (this.uniforms.u_time) gl.uniform1f(this.uniforms.u_time, (Date.now() - this.startTime) / 1000);
+    if (this.uniforms.u_opacity) gl.uniform1f(this.uniforms.u_opacity, this.currentValues.u_opacity);
 
-    // Bound custom uniforms
     Object.entries(this.currentValues).forEach(([name, value]) => {
       const loc = this.uniforms[name];
-      if (!loc) return;
+      if (!loc || name === 'u_opacity') return; // Handled specially
       if (Array.isArray(value)) {
         if (value.length === 3) gl.uniform3fv(loc, value);
         else if (value.length === 2) gl.uniform2fv(loc, value);
@@ -141,10 +144,15 @@ export class ShaderEngine {
   }
 
   export(width, height, uniforms) {
+    const oldW = this.canvas.width;
+    const oldH = this.canvas.height;
     this.canvas.width = width;
     this.canvas.height = height;
     this.currentValues = { ...this.currentValues, ...uniforms };
-    this.draw(); // One manual draw at export res
-    return this.canvas.toDataURL('image/png');
+    this.draw();
+    const dataUrl = this.canvas.toDataURL('image/png');
+    this.canvas.width = oldW;
+    this.canvas.height = oldH;
+    return dataUrl;
   }
 }

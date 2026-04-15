@@ -20,6 +20,7 @@ function App() {
   const [updateStatus, setUpdateStatus] = useState('');
   const [updateProgress, setUpdateProgress] = useState(0);
   const [isUpdateReady, setIsUpdateReady] = useState(false);
+  const [masterOpacity, setMasterOpacity] = useState(1.0);
 
   // Filtered Patterns
   const filteredPatterns = useMemo(() => {
@@ -61,6 +62,13 @@ function App() {
     window.electronAPI.onUpdateProgress((percent) => setUpdateProgress(percent));
     window.electronAPI.onUpdateDownloaded(() => setIsUpdateReady(true));
   }, []);
+
+  // Update Opacity in Engine
+  useEffect(() => {
+    if (engineRef.current) {
+        engineRef.current.render({ u_opacity: masterOpacity });
+    }
+  }, [masterOpacity]);
 
   const updateShader = async (pattern) => {
     if (!engineRef.current) return;
@@ -186,6 +194,21 @@ function App() {
               <span>CONTROLS</span>
             </div>
             <div className="controls-list">
+              <div className="control-group master-control">
+                <div className="control-label">
+                  <span>Master Opacity</span>
+                  <span className="control-value">{(masterOpacity * 100).toFixed(0)}%</span>
+                </div>
+                <input 
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={masterOpacity}
+                  onChange={(e) => setMasterOpacity(parseFloat(e.target.value))}
+                />
+              </div>
+
               {activePattern.uniforms.map(u => (
                 <div key={u.id} className="control-group">
                   <div className="control-label">
@@ -389,6 +412,8 @@ function App() {
           background-size: 60px 60px; background-position: 0 0, 0 30px, 30px -30px, -30px 0px; }
         .canvas-wrapper { position: relative; box-shadow: 0 60px 120px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.05); }
         .canvas-overlay { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text-dim); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); }
+
+        .master-control { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         /* Update UI Styles */
         .update-section { margin-top: 10px; }
