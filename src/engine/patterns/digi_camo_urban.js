@@ -5,13 +5,13 @@ export default {
   description: 'High-contrast city digital camouflage.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-    vec3 generate() {
+    vec4 generate() {
       vec2 uv = floor(v_uv * u_scale);
       float n = hash(uv);
-      vec3 color = vec3(0.5);
-      if (n > 0.8) color = vec3(0.1);
-      else if (n > 0.5) color = vec3(0.3);
-      else if (n > 0.2) color = vec3(0.7);
+      vec4 color = vec4(0.5, 0.5, 0.5, 1.0);
+      if (n > 0.8) color = vec4(0.1, 0.1, 0.1, 1.0);
+      else if (n > 0.5) color = vec4(0.3, 0.3, 0.3, 1.0);
+      else if (n > 0.2) color = vec4(0.7, 0.7, 0.7, 1.0);
       return color;
     }
   `,

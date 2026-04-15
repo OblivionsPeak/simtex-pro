@@ -4,7 +4,7 @@ export default {
   category: 'Racing',
   description: 'Deep directional grooves for wet weather conditions.',
   shader: `
-    vec3 generate() {
+    vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float x = abs(fract(uv.x) - 0.5);
       float y = fract(uv.y);
@@ -14,7 +14,7 @@ export default {
   `,
   uniforms: [
     { id: 'u_scale', name: 'Density', type: 'float', min: 2.0, max: 20.0, default: 8.0 },
-    { id: 'u_primary_color', name: 'Rubber', type: 'color', default: [0.15, 0.15, 0.15] },
-    { id: 'u_secondary_color', name: 'Groove', type: 'color', default: [0.05, 0.05, 0.05] }
+    { id: 'u_primary_color', name: 'Rubber', type: 'color', default: [0.15, 0.15, 0.15, 1.0] },
+    { id: 'u_secondary_color', name: 'Groove', type: 'color', default: [0.05, 0.05, 0.05, 1.0] }
   ]
 };
