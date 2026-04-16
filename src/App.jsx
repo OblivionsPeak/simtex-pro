@@ -147,7 +147,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.0</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.1</small></h1>
             </div>
           </div>
 
@@ -309,7 +309,7 @@ function App() {
           </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.0.0</span>
+          <span className="version-label">v3.0.1</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
