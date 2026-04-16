@@ -309,7 +309,7 @@ function App() {
           </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v2.1.4</span>
+          <span className="version-label">v3.0.0</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
