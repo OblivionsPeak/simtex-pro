@@ -147,7 +147,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v2.1.1</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.0</small></h1>
             </div>
           </div>
 
