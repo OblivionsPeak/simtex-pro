@@ -147,7 +147,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.1</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.2</small></h1>
             </div>
           </div>
 
@@ -309,7 +309,7 @@ function App() {
           </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.0.1</span>
+          <span className="version-label">v3.0.2</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -404,28 +404,42 @@ function App() {
         
         .category-tabs { 
           display: flex; 
-          gap: 8px; 
+          gap: 10px; 
           margin-top: 12px; 
-          padding-bottom: 4px; 
+          padding-bottom: 10px; 
           overflow-x: auto; 
           white-space: nowrap; 
           -webkit-overflow-scrolling: touch;
-          scrollbar-width: none; /* Hide for Clean look */
-          -ms-overflow-style: none;
-          mask-image: linear-gradient(to right, black 85%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+          mask-image: linear-gradient(to right, black 90%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+          scrollbar-width: thin;
+          scrollbar-color: var(--color-accent) transparent;
         }
-        .category-tabs::-webkit-scrollbar { display: none; }
         
+        /* Styled sub-scrollbar for categories */
+        .category-tabs::-webkit-scrollbar {
+          height: 3px;
+        }
+        .category-tabs::-webkit-scrollbar-track {
+          background: rgba(255,255,255,0.02);
+          border-radius: 10px;
+        }
+        .category-tabs::-webkit-scrollbar-thumb {
+          background: var(--color-accent);
+          border-radius: 10px;
+          opacity: 0.5;
+        }
+
         .category-tab { 
           flex-shrink: 0;
-          padding: 6px 14px; 
+          padding: 6px 16px; 
           font-size: 11px; 
           font-weight: 700; 
           border-radius: 20px; 
           background: rgba(255,255,255,0.05); 
           color: var(--color-text-dim); 
           transition: all 0.2s; 
+          margin-bottom: 2px;
         }
         .category-tab.active { background: var(--color-accent); color: #fff; box-shadow: var(--shadow-glow); }
         .category-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: #fff; }
