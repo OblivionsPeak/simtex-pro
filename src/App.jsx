@@ -402,8 +402,31 @@ function App() {
         .search-input { width: 100%; background: #1a1a20; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px 10px 36px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s; }
         .search-input:focus { border-color: var(--color-accent); }
         
-        .category-tabs { display: flex; gap: 8px; margin-top: 12px; padding-bottom: 8px; overflow-x: auto; white-space: nowrap; }
-        .category-tab { padding: 5px 14px; font-size: 11px; font-weight: 700; border-radius: 20px; background: rgba(255,255,255,0.05); color: var(--color-text-dim); transition: all 0.2s; }
+        .category-tabs { 
+          display: flex; 
+          gap: 8px; 
+          margin-top: 12px; 
+          padding-bottom: 4px; 
+          overflow-x: auto; 
+          white-space: nowrap; 
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none; /* Hide for Clean look */
+          -ms-overflow-style: none;
+          mask-image: linear-gradient(to right, black 85%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        
+        .category-tab { 
+          flex-shrink: 0;
+          padding: 6px 14px; 
+          font-size: 11px; 
+          font-weight: 700; 
+          border-radius: 20px; 
+          background: rgba(255,255,255,0.05); 
+          color: var(--color-text-dim); 
+          transition: all 0.2s; 
+        }
         .category-tab.active { background: var(--color-accent); color: #fff; box-shadow: var(--shadow-glow); }
         .category-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: #fff; }
 
