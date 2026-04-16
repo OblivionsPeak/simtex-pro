@@ -11,6 +11,7 @@ function App() {
   const [isSpecMap, setIsSpecMap] = useState(false);
   const [resolution, setResolution] = useState(2048);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const isElectron = window.electronAPI !== undefined;
   
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -146,7 +147,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v2.1.1</small></h1>
             </div>
           </div>
 
@@ -309,9 +310,11 @@ function App() {
 
         <div className="sidebar-footer">
           <span className="version-label">v2.1.4</span>
-          <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
-            Check for Updates
-          </button>
+          {isElectron && (
+            <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
+              Check for Updates
+            </button>
+          )}
         </div>
       </aside>
 

@@ -1,6 +1,16 @@
-# SimTex Pro 🏁
+# SimTex Pro v2.1.1 (The Web Milestone)
 
-**SimTex Pro** is high-performance procedural texture generator designed specifically for sim racing liveries. Generate premium carbon fiber, hexagonal grids, racing stripes, and aggressive geometric patterns in real-time, then export them as high-quality 4K PNGs.
+**Instant Access**: [Explore the 120-Pattern Library Live](https://OblivionsPeak.github.io/simtex-pro)
+
+SimTex Pro is a high-fidelity shader engine for racing simulation livery creation. It features 120 artisan templates ranging from racing materials to realistic scales and industrial finishes.
+
+## 🌐 Distribution
+- **Web App**: Always up-to-date. No download required. Preferred for pattern exploration.
+- **Desktop (Win)**: High-performance version with integrated update engine.
+
+## 🎨 Features
+- **120 Unique Patterns**: Including the 'Realistic Series' (Crocodile, Dragon, Fish Scales).
+ Generate premium carbon fiber, hexagonal grids, racing stripes, and aggressive geometric patterns in real-time, then export them as high-quality 4K PNGs.
 
 ![SimTex Pro Logo](./build/icon.png)
 

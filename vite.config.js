@@ -4,14 +4,15 @@ import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import path from 'path'
 
+const isElectron = process.env.ELECTRON === 'true'
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './', // CRITICAL for Electron to find assets
+  base: './',
   plugins: [
     react(),
-    electron([
+    isElectron && electron([
       {
-        // Main-process entry file of the Electron App.
         entry: 'electron/main.js',
         vite: {
           build: {
@@ -41,8 +42,8 @@ export default defineConfig({
         },
       },
     ]),
-    renderer(),
-  ],
+    isElectron && renderer(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

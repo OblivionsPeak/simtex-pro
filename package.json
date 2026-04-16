@@ -1,13 +1,16 @@
 {
   "name": "simtex-pro",
   "private": true,
-  "version": "2.1.4",
+  "version": "2.1.1",
+  "homepage": "https://OblivionsPeak.github.io/simtex-pro",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "dist": "npm run build && electron-builder",
+    "build:electron": "cross-env ELECTRON=true vite build",
+    "dist": "cross-env ELECTRON=true npm run build:electron && electron-builder",
+    "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },
