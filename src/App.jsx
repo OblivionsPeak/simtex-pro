@@ -44,6 +44,12 @@ function App() {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
 
+  // UV Transform
+  const [uvScale, setUvScale] = useState([1.0, 1.0]);
+  const [uvRotation, setUvRotation] = useState(0.0);
+  const [uvOffset, setUvOffset] = useState([0.0, 0.0]);
+  const [tilingPreview, setTilingPreview] = useState(false);
+
   // Extended categories including Favorites
   const allCategories = useMemo(() => ['All', 'Favorites', ...CATEGORIES.filter(c => c !== 'All')], []);
 
@@ -111,6 +117,19 @@ function App() {
     }
   }, [masterOpacity]);
 
+  // Sync UV transform to engine
+  useEffect(() => {
+    if (!engineRef.current) return;
+    const effectiveScale = tilingPreview
+      ? [uvScale[0] * 2, uvScale[1] * 2]
+      : uvScale;
+    engineRef.current.render({
+      u_uv_scale: effectiveScale,
+      u_uv_rotation: uvRotation * (Math.PI / 180),
+      u_uv_offset: uvOffset,
+    });
+  }, [uvScale, uvRotation, uvOffset, tilingPreview]);
+
   // Bug 1 fix: use masterOpacityRef.current so stale closure never loses the current opacity
   const updateShader = async (pattern) => {
     if (!engineRef.current) return;
@@ -163,6 +182,19 @@ function App() {
     });
     const link = document.createElement('a');
     link.download = `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}_${resolution}.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const downloadNormalMap = () => {
+    if (!engineRef.current) return;
+    const dataUrl = engineRef.current.exportNormalMap(resolution, resolution, {
+      ...uniforms,
+      u_is_spec: 0.0,
+      u_opacity: 1.0,
+    });
+    const link = document.createElement('a');
+    link.download = `simtex_${activePattern.id}_normal_${resolution}.png`;
     link.href = dataUrl;
     link.click();
   };
@@ -338,7 +370,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.3</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.4</small></h1>
             </div>
           </div>
 
@@ -541,6 +573,76 @@ function App() {
 
           <section className="sidebar-section">
             <div className="section-title">
+              <Settings size={16} />
+              <span>UV TRANSFORM</span>
+            </div>
+            <div className="uv-controls">
+              <div className="uv-row">
+                <div className="uv-col">
+                  <div className="control-label">
+                    <span>Scale X</span>
+                    <span className="control-value">{uvScale[0].toFixed(2)}×</span>
+                  </div>
+                  <input type="range" min="0.1" max="4.0" step="0.05"
+                    value={uvScale[0]}
+                    onChange={e => setUvScale([parseFloat(e.target.value), uvScale[1]])} />
+                </div>
+                <div className="uv-col">
+                  <div className="control-label">
+                    <span>Scale Y</span>
+                    <span className="control-value">{uvScale[1].toFixed(2)}×</span>
+                  </div>
+                  <input type="range" min="0.1" max="4.0" step="0.05"
+                    value={uvScale[1]}
+                    onChange={e => setUvScale([uvScale[0], parseFloat(e.target.value)])} />
+                </div>
+              </div>
+              <div className="control-label" style={{marginTop:'8px'}}>
+                <span>Rotation</span>
+                <span className="control-value">{uvRotation.toFixed(0)}°</span>
+              </div>
+              <input type="range" min="-180" max="180" step="1"
+                value={uvRotation}
+                onChange={e => setUvRotation(parseFloat(e.target.value))} />
+              <div className="uv-row" style={{marginTop:'8px'}}>
+                <div className="uv-col">
+                  <div className="control-label">
+                    <span>Offset X</span>
+                    <span className="control-value">{uvOffset[0].toFixed(2)}</span>
+                  </div>
+                  <input type="range" min="-1" max="1" step="0.01"
+                    value={uvOffset[0]}
+                    onChange={e => setUvOffset([parseFloat(e.target.value), uvOffset[1]])} />
+                </div>
+                <div className="uv-col">
+                  <div className="control-label">
+                    <span>Offset Y</span>
+                    <span className="control-value">{uvOffset[1].toFixed(2)}</span>
+                  </div>
+                  <input type="range" min="-1" max="1" step="0.01"
+                    value={uvOffset[1]}
+                    onChange={e => setUvOffset([uvOffset[0], parseFloat(e.target.value)])} />
+                </div>
+              </div>
+              <div className="uv-actions">
+                <button
+                  className={`uv-btn ${tilingPreview ? 'active' : ''}`}
+                  onClick={() => setTilingPreview(p => !p)}
+                >
+                  2×2 Tile Preview
+                </button>
+                <button
+                  className="uv-btn"
+                  onClick={() => { setUvScale([1.0, 1.0]); setUvRotation(0); setUvOffset([0.0, 0.0]); setTilingPreview(false); }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section className="sidebar-section">
+            <div className="section-title">
               <Zap size={16} />
               <span>MATERIAL MODE</span>
             </div>
@@ -577,7 +679,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.0.3</span>
+          <span className="version-label">v3.0.4</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -601,6 +703,9 @@ function App() {
             <button className="btn-secondary" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <Maximize size={18} />
             </button>
+            <button className="btn-secondary btn-normal" onClick={downloadNormalMap} title="Export Normal Map">
+              <span style={{fontSize:'11px', fontWeight:800, letterSpacing:'0.05em'}}>NRM</span>
+            </button>
             <button className="btn-primary" onClick={downloadTexture}>
               <Download size={18} />
               <span>Export PNG</span>
@@ -612,6 +717,7 @@ function App() {
           <div className="canvas-wrapper">
             <canvas ref={canvasRef} />
             <div className="canvas-overlay">
+              {tilingPreview && <span className="tile-badge">TILING 2×2</span>}
               <span>{resolution} x {resolution} PREVIEW</span>
             </div>
           </div>
@@ -919,6 +1025,17 @@ function App() {
           transition: background 0.2s;
         }
         .preset-cancel-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .uv-controls { display: flex; flex-direction: column; gap: 6px; }
+        .uv-row { display: flex; gap: 12px; }
+        .uv-col { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .uv-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .uv-btn { flex: 1; padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; background: rgba(255,255,255,0.06); color: var(--color-text-dim); transition: all 0.2s; letter-spacing: 0.05em; text-transform: uppercase; }
+        .uv-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .uv-btn.active { background: rgba(37,99,235,0.25); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.4); }
+        .btn-normal { width: 42px; height: 42px; font-size: 10px; }
+        .tile-badge { background: var(--color-accent); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.08em; }
+        .canvas-overlay { display: flex; align-items: center; gap: 8px; }
       `}</style>
     </div>
   );

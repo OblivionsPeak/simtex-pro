@@ -6,7 +6,12 @@ export class ShaderEngine {
 
     this.program = null;
     this.uniforms = {};
-    this.currentValues = { u_opacity: 1.0 }; 
+    this.currentValues = {
+      u_opacity: 1.0,
+      u_uv_scale: [1.0, 1.0],
+      u_uv_rotation: 0.0,
+      u_uv_offset: [0.0, 0.0],
+    };
     this.startTime = Date.now();
     
     this.initBuffers();
@@ -30,8 +35,18 @@ export class ShaderEngine {
     const vertexSource = `
       attribute vec2 position;
       varying vec2 v_uv;
+      uniform vec2 u_uv_scale;
+      uniform float u_uv_rotation;
+      uniform vec2 u_uv_offset;
       void main() {
-        v_uv = position * 0.5 + 0.5;
+        vec2 uv = position * 0.5 + 0.5;
+        uv -= 0.5;
+        float c = cos(u_uv_rotation);
+        float s = sin(u_uv_rotation);
+        uv = mat2(c, -s, s, c) * uv;
+        uv /= u_uv_scale;
+        uv += u_uv_offset;
+        v_uv = uv + 0.5;
         gl_Position = vec4(position, 0.0, 1.0);
       }
     `;
@@ -156,5 +171,75 @@ export class ShaderEngine {
     this.canvas.width = oldW;
     this.canvas.height = oldH;
     return dataUrl;
+  }
+
+  exportNormalMap(width, height, uniforms, strength = 3.0) {
+    const oldW = this.canvas.width;
+    const oldH = this.canvas.height;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.currentValues = { ...this.currentValues, ...uniforms };
+    this.draw();
+
+    // Copy WebGL canvas to 2D canvas (handles Y-flip correctly)
+    const src = document.createElement('canvas');
+    src.width = width;
+    src.height = height;
+    const ctx = src.getContext('2d');
+    ctx.drawImage(this.canvas, 0, 0);
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const px = imageData.data;
+
+    // Greyscale heightmap
+    const grey = new Float32Array(width * height);
+    for (let i = 0; i < width * height; i++) {
+      grey[i] = 0.299 * px[i * 4] / 255
+              + 0.587 * px[i * 4 + 1] / 255
+              + 0.114 * px[i * 4 + 2] / 255;
+    }
+
+    // Sobel filter → normal map
+    const out = document.createElement('canvas');
+    out.width = width;
+    out.height = height;
+    const octx = out.getContext('2d');
+    const outData = octx.createImageData(width, height);
+    const od = outData.data;
+
+    const s = (x, y) => grey[
+      Math.max(0, Math.min(height - 1, y)) * width +
+      Math.max(0, Math.min(width  - 1, x))
+    ];
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const gx = (
+          -s(x-1,y-1) + s(x+1,y-1) +
+          -2*s(x-1,y) + 2*s(x+1,y) +
+          -s(x-1,y+1) + s(x+1,y+1)
+        );
+        const gy = (
+          -s(x-1,y-1) + s(x-1,y+1) +
+          -2*s(x,y-1) + 2*s(x,y+1) +
+          -s(x+1,y-1) + s(x+1,y+1)
+        );
+        const nx = -gx * strength;
+        const ny = -gy * strength;
+        const nz = 1.0;
+        const len = Math.sqrt(nx*nx + ny*ny + nz*nz);
+        const i = (y * width + x) * 4;
+        od[i]   = Math.round((nx/len * 0.5 + 0.5) * 255);
+        od[i+1] = Math.round((ny/len * 0.5 + 0.5) * 255);
+        od[i+2] = Math.round((nz/len * 0.5 + 0.5) * 255);
+        od[i+3] = 255;
+      }
+    }
+
+    octx.putImageData(outData, 0, 0);
+
+    this.canvas.width = oldW;
+    this.canvas.height = oldH;
+
+    return out.toDataURL('image/png');
   }
 }
