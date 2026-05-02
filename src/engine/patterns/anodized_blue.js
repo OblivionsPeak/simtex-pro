@@ -32,7 +32,7 @@ export default {
       vec3 col = baseColor * streakMod;
 
       // Interference / thin-film edge shimmer — slight violet/cyan highlight
-      float shimmer = noise(vec2(uv.x * 30.0, uv.y * 5.0 + u_time * 0.02));
+      float shimmer = noise(vec2(uv.x * 30.0, uv.y * 5.0 + 1.5708));
       shimmer = pow(shimmer, 3.0) * 0.12;
       col += vec3(shimmer * 0.3, shimmer * 0.5, shimmer * 1.0);
 

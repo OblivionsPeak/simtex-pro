@@ -6,7 +6,7 @@ export default {
   shader: `
     vec4 generate() {
       float d = length(v_uv - 0.5);
-      float pulse = sin(d * u_scale - u_time * 5.0);
+      float pulse = sin(d * u_scale - 1.5708);
       float mask = smoothstep(0.2, 0.5, pulse * (1.0 - d));
       return mix(u_secondary_color, u_primary_color, mask);
     }

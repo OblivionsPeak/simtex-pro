@@ -43,7 +43,7 @@ export default {
       float gloss = pow(radial, 1.5) * 0.55 + 0.2;
 
       // Slow-moving sheen ripple to simulate environment reflection
-      float sheen = noise(uv * 3.0 + u_time * 0.05);
+      float sheen = noise(uv * 3.0 + 1.5708);
       sheen = smoothstep(0.35, 0.75, sheen) * 0.18;
 
       // Layer: base + candy over-coat + gloss highlight

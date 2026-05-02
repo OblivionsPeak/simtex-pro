@@ -61,7 +61,7 @@ export default {
       vec3 col = mix(binder, flakeColor, flakeLight * 0.9);
 
       // Subtle slow-varying shimmer across the whole surface (viewing angle variation)
-      float shimmer = noise(uv * 2.5 + u_time * 0.04) * 0.06;
+      float shimmer = noise(uv * 2.5 + 1.5708) * 0.06;
       col += u_base_color.rgb * shimmer;
 
       col = clamp(col, 0.0, 1.0);

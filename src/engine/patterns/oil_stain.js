@@ -67,7 +67,7 @@ export default {
       vec3 col = mix(subCol, oilColor, totalStain * 0.92);
 
       // Thin-film iridescent edge
-      float filmT = noise(uv * 12.0 + u_time * 0.01) * 0.5;
+      float filmT = noise(uv * 12.0 + 1.5708 * 0.01) * 0.5;
       vec3 film = thinFilm(filmT);
       col = mix(col, col * 0.5 + film * 0.55, totalEdge * 0.7);
 

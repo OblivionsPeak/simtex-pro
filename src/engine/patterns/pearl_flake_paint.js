@@ -32,7 +32,7 @@ export default {
       vec2 uv = v_uv;
 
       // Hue shift map — smooth spatial variation simulating viewing angle
-      float shiftNoise = noise(uv * 3.0 + u_time * 0.02);
+      float shiftNoise = noise(uv * 3.0 + 1.5708 * 0.02);
       shiftNoise += noise(uv * 6.0 + 1.7) * 0.4;
       shiftNoise /= 1.4;
       float hueShift = (shiftNoise * 2.0 - 1.0) * u_shift_amount * 0.35;

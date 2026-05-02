@@ -47,7 +47,7 @@ export default {
       vec2 uv = v_uv;
 
       // Animated noise coordinates
-      vec2 noiseUV = uv * u_band_scale + vec2(u_time * 0.02, u_time * 0.015);
+      vec2 noiseUV = uv * u_band_scale + vec2(1.5708 * 0.02, 1.5708 * 0.015);
 
       // Thickness map — two FBM layers for complexity
       float thickness1 = fbm_os(noiseUV);
@@ -62,7 +62,7 @@ export default {
 
       // Map thickness to hue — full rainbow cycle
       // Shift hue with time for slow drift
-      float hue = fract(thickness * 1.2 + u_time * 0.04);
+      float hue = fract(thickness * 1.2 + 1.5708 * 0.04);
       vec3 iridescent = hue2rgb(hue);
 
       // Thin-film intensity: brighter at mid-thickness, dimmer at edges
@@ -76,7 +76,7 @@ export default {
       vec3 base = mix(tarmac_dry, tarmac_wet, wet_mask * 0.7);
 
       // Slight specular highlight on wet surface
-      float spec_noise = smoothnoise_os(uv * 18.0 + vec2(u_time * 0.1));
+      float spec_noise = smoothnoise_os(uv * 18.0 + vec2(1.5708 * 0.1));
       float spec = pow(clamp(spec_noise, 0.0, 1.0), 6.0) * wet_mask * 0.12;
 
       // Additive iridescence on top of base

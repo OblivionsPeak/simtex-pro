@@ -54,7 +54,7 @@ export default {
           vec2 neighbor = vec2(float(x), float(y));
           vec2 rng      = voronoi_rand(i_uv + neighbor);
           // Animate jitter slightly to feel alive
-          rng = 0.5 + 0.5 * sin(u_time * 0.08 + 6.2831 * rng);
+          rng = 0.5 + 0.5 * sin(6.2831 * rng);
           vec2 diff     = neighbor + rng - f_uv;
           float d       = length(diff);
           if (d < m_dist) {

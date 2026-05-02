@@ -41,8 +41,8 @@ export default {
           vec2 center = neighbor + vec2(hx, hy);
           // Warp center slightly with slow noise for irregular droplet placement
           center += 0.15 * vec2(
-            noise(nID * 0.7 + u_time * 0.03),
-            noise(nID * 0.7 + vec2(5.3, 1.7) + u_time * 0.03)
+            noise(nID * 0.7 + 1.5708 * 0.03),
+            noise(nID * 0.7 + vec2(5.3, 1.7) + 1.5708 * 0.03)
           );
           float d = length(cellUV - center);
           if (d < minDist) {
@@ -59,7 +59,7 @@ export default {
     float rivulet(vec2 uv, float xPos) {
       float xDist = abs(uv.x - xPos);
       // Wavy wobble along Y using noise + time (slow drip)
-      float wobble = fbm(vec2(xPos * 4.7, uv.y * 2.5 + u_time * 0.04)) * 0.04;
+      float wobble = fbm(vec2(xPos * 4.7, uv.y * 2.5 + 1.5708 * 0.04)) * 0.04;
       float streak = smoothstep(0.022, 0.008, xDist + wobble);
       return streak;
     }
