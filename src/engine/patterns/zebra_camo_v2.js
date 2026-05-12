@@ -10,6 +10,22 @@ export default {
       return mix(u_secondary_color, u_primary_color, mask);
     }
   `,
+  variants: [
+    {
+      name: 'High Contrast (Default)',
+      uniforms: {
+        u_primary_color: [0.0, 0.0, 0.0, 1.0],
+        u_secondary_color: [1.0, 1.0, 1.0, 1.0]
+      }
+    },
+    {
+      name: 'Blackout Stealth',
+      uniforms: {
+        u_primary_color: [0.02, 0.02, 0.02, 1.0],
+        u_secondary_color: [0.15, 0.15, 0.15, 1.0]
+      }
+    }
+  ],
   uniforms: [
     { id: 'u_scale', name: 'Pattern Density', type: 'float', min: 1.0, max: 10.0, default: 5.0 },
     { id: 'u_primary_color', name: 'Stripe A', type: 'color', default: [0.0, 0.0, 0.0, 1.0] },
