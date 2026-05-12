@@ -152,6 +152,22 @@ function App() {
   };
 
   // Feature C: handleUniformChange pushes to undo history
+  const applyVariant = (variant) => {
+    const newUniforms = { ...uniforms, ...variant.uniforms };
+    setUniforms(newUniforms);
+    if (engineRef.current) {
+      engineRef.current.render({ ...newUniforms, u_is_spec: isSpecMap ? 1.0 : 0.0, u_opacity: masterOpacityRef.current });
+    }
+
+    const entry = { patternId: activePattern.id, uniforms: newUniforms };
+    setHistory(prev => {
+      const truncated = prev.slice(0, historyIndex + 1);
+      const next = [...truncated, entry].slice(-30);
+      return next;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 29));
+  };
+
   const handleUniformChange = (id, value) => {
     const newUniforms = { ...uniforms, [id]: value };
     setUniforms(newUniforms);
@@ -481,6 +497,38 @@ function App() {
                   }}
                 />
               </div>
+
+              {activePattern.variants && activePattern.variants.length > 0 && (
+                <div className="control-group variants-control" style={{ marginBottom: '16px' }}>
+                  <div className="control-label" style={{ marginBottom: '8px' }}>
+                    <span>Theme / Variant</span>
+                  </div>
+                  <div className="variants-row" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {activePattern.variants.map((v, i) => (
+                      <button 
+                        key={i} 
+                        className="variant-btn" 
+                        onClick={() => applyVariant(v)}
+                        style={{
+                          background: '#1a1a20',
+                          border: '1px solid var(--color-border)',
+                          color: '#fff',
+                          padding: '6px 10px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          cursor: 'pointer',
+                          flex: '1 1 calc(50% - 6px)',
+                          transition: 'border-color 0.2s',
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-accent)'}
+                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
+                      >
+                        {v.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {activePattern.uniforms.map(u => (
                 <div key={u.id} className="control-group">

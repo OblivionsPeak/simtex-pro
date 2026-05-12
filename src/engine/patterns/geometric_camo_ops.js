@@ -32,6 +32,38 @@ export default {
         return col;
     }
   `,
+  variants: [
+    {
+      name: 'Woodland (Ops)',
+      uniforms: {
+        u_color_base: [0.22, 0.27, 0.20, 1.0],
+        u_color_1: [0.15, 0.16, 0.15, 1.0],
+        u_color_2: [0.05, 0.05, 0.05, 1.0],
+        u_color_3: [0.35, 0.35, 0.35, 1.0],
+        u_color_accent: [0.85, 0.15, 0.15, 1.0]
+      }
+    },
+    {
+      name: 'Desert Recon',
+      uniforms: {
+        u_color_base: [0.76, 0.69, 0.50, 1.0], // Sandy Tan
+        u_color_1: [0.55, 0.47, 0.33, 1.0],    // Coyote Brown
+        u_color_2: [0.25, 0.28, 0.20, 1.0],    // Olive Drab
+        u_color_3: [0.10, 0.10, 0.10, 1.0],    // Matte Black
+        u_color_accent: [0.60, 0.40, 0.10, 1.0] // Bronze
+      }
+    },
+    {
+      name: 'Urban Stealth',
+      uniforms: {
+        u_color_base: [0.90, 0.90, 0.92, 1.0], // White/Light Grey
+        u_color_1: [0.60, 0.60, 0.65, 1.0],    // Mid Grey
+        u_color_2: [0.15, 0.15, 0.18, 1.0],    // Charcoal Black
+        u_color_3: [0.30, 0.30, 0.35, 1.0],    // Dark Grey
+        u_color_accent: [1.00, 0.40, 0.00, 1.0] // Tactical Orange
+      }
+    }
+  ],
   uniforms: [
     { id: 'u_scale', name: 'Camo Scale', type: 'float', min: 1.0, max: 50.0, default: 12.0 },
     { id: 'u_color_base', name: 'Base Green', type: 'color', default: [0.22, 0.27, 0.20, 1.0] },
