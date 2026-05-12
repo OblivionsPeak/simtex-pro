@@ -70,7 +70,7 @@ export default {
         u_color_1: [0.03, 0.03, 0.04, 1.0],
         u_color_2: [0.0, 0.0, 0.0, 1.0],
         u_color_3: [0.15, 0.15, 0.16, 1.0],
-        u_color_accent: [0.25, 0.05, 0.05, 1.0] // Deep Red
+        u_color_accent: [0.05, 0.05, 0.06, 1.0] // Dark Charcoal
       }
     }
   ],
