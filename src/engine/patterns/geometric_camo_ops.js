@@ -40,7 +40,7 @@ export default {
         u_color_1: [0.15, 0.16, 0.15, 1.0],
         u_color_2: [0.05, 0.05, 0.05, 1.0],
         u_color_3: [0.35, 0.35, 0.35, 1.0],
-        u_color_accent: [0.85, 0.15, 0.15, 1.0]
+        u_color_accent: [0.35, 0.28, 0.18, 1.0] // Dark Earth
       }
     },
     {
@@ -60,7 +60,7 @@ export default {
         u_color_1: [0.60, 0.60, 0.65, 1.0],    // Mid Grey
         u_color_2: [0.15, 0.15, 0.18, 1.0],    // Charcoal Black
         u_color_3: [0.30, 0.30, 0.35, 1.0],    // Dark Grey
-        u_color_accent: [1.00, 0.40, 0.00, 1.0] // Tactical Orange
+        u_color_accent: [0.25, 0.28, 0.35, 1.0] // Dark Blue-Grey
       }
     }
   ],
@@ -70,7 +70,7 @@ export default {
     { id: 'u_color_1', name: 'Dark Grey', type: 'color', default: [0.15, 0.16, 0.15, 1.0] },
     { id: 'u_color_2', name: 'Black', type: 'color', default: [0.05, 0.05, 0.05, 1.0] },
     { id: 'u_color_3', name: 'Light Grey', type: 'color', default: [0.35, 0.35, 0.35, 1.0] },
-    { id: 'u_color_accent', name: 'Accent Line', type: 'color', default: [0.85, 0.15, 0.15, 1.0] },
+    { id: 'u_color_accent', name: 'Accent Line', type: 'color', default: [0.35, 0.28, 0.18, 1.0] },
     { id: 'u_accent_amount', name: 'Accent Amount', type: 'float', min: 0.0, max: 1.0, default: 0.5 }
   ]
 };
