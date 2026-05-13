@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'pleated_fabric',
   name: 'Pleated Fabric',
   category: 'Industrial',
@@ -6,10 +6,10 @@ export default {
   shader: `
     // Map a value into a sawtooth that folds into a triangle wave (accordion pleat shape)
     float pleatProfile(float x) {
-      // x in [0,1] per pleat — returns height in [0,1]
+      // x in [0,1] per pleat â€” returns height in [0,1]
       // Each pleat: rise sharply (lit face), fold back (shadow face)
       float t = fract(x);
-      // Triangle wave: 0→1→0 over one period
+      // Triangle wave: 0â†’1â†’0 over one period
       return 1.0 - abs(2.0 * t - 1.0);
     }
 
@@ -24,7 +24,7 @@ export default {
       float depth  = u_depth;
       vec3  fabric = u_fabric_color.rgb;
 
-      // Pleats run vertically — fold along Y axis, wave in X
+      // Pleats run vertically â€” fold along Y axis, wave in X
       float px = v_uv.x * count;
       float height = pleatProfile(px);
       float slope  = pleatDeriv(px);  // +1 = lit face, -1 = shadow face
@@ -64,8 +64,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_pleat_count',  type: 'float', default: 12,   min: 4,   max: 30,  label: 'Pleat Count' },
-    { name: 'u_fabric_color', type: 'color', default: [0.15, 0.15, 0.18, 1.0],  label: 'Fabric Colour' },
-    { name: 'u_depth',        type: 'float', default: 1.0,  min: 0.2, max: 2.0, label: 'Fold Depth' }
+    { id: 'u_pleat_count',  type: 'float', default: 12,   min: 4,   max: 30, name: 'Pleat Count' },
+    { id: 'u_fabric_color', type: 'color', default: [0.15, 0.15, 0.18, 1.0], name: 'Fabric Colour' },
+    { id: 'u_depth',        type: 'float', default: 1.0,  min: 0.2, max: 2.0, name: 'Fold Depth' }
   ]
 };

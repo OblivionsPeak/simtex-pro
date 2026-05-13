@@ -1,8 +1,8 @@
-export default {
+﻿export default {
   id: 'interference_rings',
   name: 'Interference Rings',
   category: 'Abstract',
-  description: "Newton's rings — concentric iridescent interference fringes radiating from a contact point.",
+  description: "Newton's rings â€” concentric iridescent interference fringes radiating from a contact point.",
   shader: `
     // Convert HSV to RGB (GLSL 1.0 compatible)
     vec3 hsv2rgb(float h, float s, float v) {
@@ -36,25 +36,25 @@ export default {
       // But visually a sqrt mapping looks more like the classic photo
       float gap = dist * dist * freq * 8.0;
 
-      // Three wavelengths (R, G, B) — slightly different fringe frequencies
+      // Three wavelengths (R, G, B) â€” slightly different fringe frequencies
       float fR = fringeIntensity(gap * 1.00);
       float fG = fringeIntensity(gap * 1.18);
       float fB = fringeIntensity(gap * 1.38);
 
       vec3 fringeRGB = vec3(fR, fG, fB);
 
-      // Iridescent hue rotation — shift hue with gap
+      // Iridescent hue rotation â€” shift hue with gap
       float hue   = fract(gap * 0.08 + 0.0);
       vec3  iridCol = hsv2rgb(hue, irid * 0.7, 1.0);
 
       // Blend achromatic fringe with iridescent hue
       vec3 col = mix(fringeRGB, iridCol, clamp(irid * 0.5, 0.0, 1.0));
 
-      // Dark centre spot (perfect contact — zero gap, destructive at all λ)
+      // Dark centre spot (perfect contact â€” zero gap, destructive at all Î»)
       float centreDark = smoothstep(0.015, 0.0, dist) * 0.9;
       col *= (1.0 - centreDark);
 
-      // Slight radial vignette — interference fades at large radius
+      // Slight radial vignette â€” interference fades at large radius
       float vignette = 1.0 - smoothstep(0.4, 0.72, dist);
       col = mix(vec3(0.92), col, vignette);
       col = clamp(col, 0.0, 1.0);
@@ -63,8 +63,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_fringe_freq',  type: 'float', default: 18,  min: 4,   max: 40,  label: 'Fringe Frequency' },
-    { name: 'u_iridescence',  type: 'float', default: 1.2, min: 0.0, max: 2.0, label: 'Iridescence' },
-    { name: 'u_center',       type: 'float', default: 0.5, min: 0.1, max: 0.9, label: 'Ring Centre X' }
+    { id: 'u_fringe_freq',  type: 'float', default: 18,  min: 4,   max: 40, name: 'Fringe Frequency' },
+    { id: 'u_iridescence',  type: 'float', default: 1.2, min: 0.0, max: 2.0, name: 'Iridescence' },
+    { id: 'u_center',       type: 'float', default: 0.5, min: 0.1, max: 0.9, name: 'Ring Centre X' }
   ]
 };

@@ -1,8 +1,8 @@
-export default {
+﻿export default {
   id: 'velvet_pile',
   name: 'Velvet Pile',
   category: 'Industrial',
-  description: 'Velvet fabric with directional pile sheen — bright along the pile, dark against it, with a dramatic direction effect.',
+  description: 'Velvet fabric with directional pile sheen â€” bright along the pile, dark against it, with a dramatic direction effect.',
   shader: `
     // Hash noise for micro-fibre variation
     float hash21(vec2 p) {
@@ -35,7 +35,7 @@ export default {
 
       // "View direction" approximation: simulate looking straight down at the fabric
       // The effective highlight depends on the angle between the pile direction
-      // and the gradient of UV — simulating a raking light from upper-left
+      // and the gradient of UV â€” simulating a raking light from upper-left
       vec2 lightDir = normalize(vec2(0.6, 0.8));
 
       // Pile orientation factor: how much the pile faces the light
@@ -80,8 +80,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_base_color',     type: 'color', default: [0.35, 0.05, 0.08, 1.0], label: 'Velvet Colour' },
-    { name: 'u_pile_direction', type: 'float', default: 0.785, min: 0.0, max: 6.28, label: 'Pile Direction (rad)' },
-    { name: 'u_sheen',          type: 'float', default: 1.2,   min: 0.3, max: 2.0,  label: 'Sheen Intensity' }
+    { id: 'u_base_color',     type: 'color', default: [0.35, 0.05, 0.08, 1.0], name: 'Velvet Colour' },
+    { id: 'u_pile_direction', type: 'float', default: 0.785, min: 0.0, max: 6.28, name: 'Pile Direction (rad)' },
+    { id: 'u_sheen',          type: 'float', default: 1.2,   min: 0.3, max: 2.0, name: 'Sheen Intensity' }
   ]
 };

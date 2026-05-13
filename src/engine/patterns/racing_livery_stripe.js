@@ -1,8 +1,8 @@
-export default {
+﻿export default {
   id: 'racing_livery_stripe',
   name: 'Racing Livery Stripe',
   category: 'Racing',
-  description: 'Dual-tone diagonal speed stripe with gradient fade and crisp edges — a classic motorsport livery element.',
+  description: 'Dual-tone diagonal speed stripe with gradient fade and crisp edges â€” a classic motorsport livery element.',
   shader: `
     // Signed distance to an infinite angled stripe centred on the canvas
     float stripeSDist(vec2 uv, float angle) {
@@ -27,18 +27,18 @@ export default {
       // Perpendicular signed distance to stripe centreline
       float sDist = stripeSDist(v_uv, angle + 1.5707963); // perpendicular to stripe direction
 
-      // Sharp stripe mask — no anti-alias blur (crisp edge)
+      // Sharp stripe mask â€” no anti-alias blur (crisp edge)
       float stripeMask = step(-halfW, sDist) * step(sDist, halfW);
 
       // Gradient along the stripe length (parallel to stripe direction)
       vec2  stripeDir = vec2(cos(angle), sin(angle));
-      float along     = dot(v_uv - 0.5, stripeDir) + 0.5; // 0→1 along stripe
+      float along     = dot(v_uv - 0.5, stripeDir) + 0.5; // 0â†’1 along stripe
 
       // Colour gradient from stripeCol at one end to a lighter/darker variant
       vec3 stripeEnd   = mix(stripeCol, vec3(1.0), 0.25); // lighter at far end
       vec3 gradStripe  = mix(stripeCol, stripeEnd, along);
 
-      // Edge highlight — very thin bright line at each stripe edge for crispness
+      // Edge highlight â€” very thin bright line at each stripe edge for crispness
       float edgeDist = min(abs(sDist - halfW), abs(sDist + halfW));
       float edgeHighlight = smoothstep(0.012, 0.0, edgeDist) * 0.35 * stripeMask;
 
@@ -51,9 +51,9 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_stripe_color', type: 'color', default: [0.90, 0.10, 0.10, 1.0], label: 'Stripe Colour' },
-    { name: 'u_bg_color',     type: 'color', default: [0.05, 0.05, 0.05, 1.0], label: 'Background Colour' },
-    { name: 'u_stripe_width', type: 'float', default: 0.45, min: 0.1,  max: 0.9, label: 'Stripe Width' },
-    { name: 'u_angle',        type: 'float', default: 0.3,  min: -1.0, max: 1.0, label: 'Stripe Angle' }
+    { id: 'u_stripe_color', type: 'color', default: [0.90, 0.10, 0.10, 1.0], name: 'Stripe Colour' },
+    { id: 'u_bg_color',     type: 'color', default: [0.05, 0.05, 0.05, 1.0], name: 'Background Colour' },
+    { id: 'u_stripe_width', type: 'float', default: 0.45, min: 0.1,  max: 0.9, name: 'Stripe Width' },
+    { id: 'u_angle',        type: 'float', default: 0.3,  min: -1.0, max: 1.0, name: 'Stripe Angle' }
   ]
 };

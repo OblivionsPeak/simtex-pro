@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'origami_fold',
   name: 'Origami Fold',
   category: 'Geometric',
@@ -38,7 +38,7 @@ export default {
 
       vec2 uv = v_uv;
 
-      // Number of fold point sources — driven by complexity
+      // Number of fold point sources â€” driven by complexity
       int numPoints = int(clamp(complexity * 2.0 + 1.0, 1.0, 11.0));
 
       float minCreaseDist = 9999.0;
@@ -77,7 +77,7 @@ export default {
         }
       }
 
-      // Base paper texture — very slight mottled grain
+      // Base paper texture â€” very slight mottled grain
       float grain = (hash21(uv * 180.0) - 0.5) * 0.025;
 
       // Crease line width (thinner for high complexity)
@@ -104,8 +104,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_complexity',   type: 'float', default: 2.5, min: 1.0, max: 5.0, label: 'Complexity' },
-    { name: 'u_paper_color',  type: 'color', default: [0.96, 0.94, 0.90, 1.0], label: 'Paper Colour' },
-    { name: 'u_crease_color', type: 'color', default: [0.55, 0.50, 0.45, 1.0], label: 'Crease Colour' }
+    { id: 'u_complexity',   type: 'float', default: 2.5, min: 1.0, max: 5.0, name: 'Complexity' },
+    { id: 'u_paper_color',  type: 'color', default: [0.96, 0.94, 0.90, 1.0], name: 'Paper Colour' },
+    { id: 'u_crease_color', type: 'color', default: [0.55, 0.50, 0.45, 1.0], name: 'Crease Colour' }
   ]
 };

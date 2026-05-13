@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'linen_weave',
   name: 'Linen Weave',
   category: 'Industrial',
@@ -49,7 +49,7 @@ export default {
       // Warp thread runs vertically (u direction is across thread, v along thread)
       // Weft thread runs horizontally (v direction is across thread, u along thread)
 
-      // Thread radii — vary slightly per thread for organic feel
+      // Thread radii â€” vary slightly per thread for organic feel
       float warpId = cell.x;
       float weftId = cell.y;
 
@@ -89,8 +89,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_weave_scale', type: 'float', default: 18, min: 4, max: 40, label: 'Weave Scale' },
-    { name: 'u_base_color',  type: 'color', default: [0.82, 0.75, 0.58, 1.0], label: 'Warp Colour' },
-    { name: 'u_warp_color',  type: 'color', default: [0.72, 0.64, 0.48, 1.0], label: 'Weft Colour' }
+    { id: 'u_weave_scale', type: 'float', default: 18, min: 4, max: 40, name: 'Weave Scale' },
+    { id: 'u_base_color',  type: 'color', default: [0.82, 0.75, 0.58, 1.0], name: 'Warp Colour' },
+    { id: 'u_warp_color',  type: 'color', default: [0.72, 0.64, 0.48, 1.0], name: 'Weft Colour' }
   ]
 };

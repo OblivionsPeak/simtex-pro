@@ -1,10 +1,10 @@
-export default {
+﻿export default {
   id: 'bubblewrap',
   name: 'Bubble Wrap',
   category: 'Abstract',
   description: 'Air-filled plastic bubble wrap with hemispherical highlights, rim Fresnel, and clear film between bubbles.',
   shader: `
-    // Offset hexagonal grid — bubbles in a brick layout for efficiency
+    // Offset hexagonal grid â€” bubbles in a brick layout for efficiency
     vec2 bubbleCell(vec2 uv, out vec2 cellId) {
       // Brick offset: every other row shifts by 0.5
       float row = floor(uv.y);
@@ -26,7 +26,7 @@ export default {
       return diff;
     }
 
-    // Fresnel-like rim (brightest at grazing angle — edge of bubble)
+    // Fresnel-like rim (brightest at grazing angle â€” edge of bubble)
     float rimFresnel(vec2 p, float r) {
       float dist = length(p);
       float rim = dist / r;
@@ -53,7 +53,7 @@ export default {
       // Bubble tint from sky/environment
       vec3 tint = u_tint.rgb;
 
-      // Diffuse shading of the hemisphere — light from top-left
+      // Diffuse shading of the hemisphere â€” light from top-left
       float diff = sphereHighlight(local, bubbleR, vec2(-0.3, 0.5));
       diff = pow(diff, 0.7);
 
@@ -80,7 +80,7 @@ export default {
       bubbleCol  = mix(bubbleCol, rimCol, rim * 0.6);
       bubbleCol  = clamp(bubbleCol, 0.0, 1.0);
 
-      // Film between bubbles — slight shadow where bubbles press down
+      // Film between bubbles â€” slight shadow where bubbles press down
       vec3 filmCol = film * shadow;
 
       vec3 col = mix(filmCol, bubbleCol, inside);
@@ -89,8 +89,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_bubble_size', type: 'float', default: 14,  min: 4,  max: 30, label: 'Bubble Scale' },
-    { name: 'u_film_color',  type: 'color', default: [0.88, 0.90, 0.82, 1.0], label: 'Plastic Film' },
-    { name: 'u_tint',        type: 'color', default: [0.75, 0.85, 0.92, 1.0], label: 'Bubble Tint' }
+    { id: 'u_bubble_size', type: 'float', default: 14,  min: 4,  max: 30, name: 'Bubble Scale' },
+    { id: 'u_film_color',  type: 'color', default: [0.88, 0.90, 0.82, 1.0], name: 'Plastic Film' },
+    { id: 'u_tint',        type: 'color', default: [0.75, 0.85, 0.92, 1.0], name: 'Bubble Tint' }
   ]
 };

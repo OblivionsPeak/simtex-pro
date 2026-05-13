@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'mesh_jersey',
   name: 'Mesh Jersey',
   category: 'Industrial',
@@ -38,7 +38,7 @@ export default {
       vec2 cell  = floor(shifted);
       vec2 local = fract(shifted) - 0.5; // [-0.5, 0.5]
 
-      // Elliptical hole (slightly taller than wide — jersey stretches horizontally)
+      // Elliptical hole (slightly taller than wide â€” jersey stretches horizontally)
       vec2 holeScale = vec2(1.0 / (holeSize * 0.9), 1.0 / holeSize);
       float holeDist = length(local * holeScale) - 1.0;
 
@@ -62,7 +62,7 @@ export default {
       float holeMask = smoothstep(-0.02, 0.02, holeDist);
       float bgMask   = 1.0 - threadMask;
 
-      // Darken background (no thread — just see-through dark)
+      // Darken background (no thread â€” just see-through dark)
       vec3 bgCol     = u_thread_color.rgb * 0.08;
       vec3 threadCol = u_thread_color.rgb * loopShade + specGlint;
 
@@ -76,8 +76,8 @@ export default {
     }
   `,
   uniforms: [
-    { name: 'u_scale',        type: 'float', default: 14,  min: 4,   max: 30,  label: 'Mesh Scale' },
-    { name: 'u_thread_color', type: 'color', default: [0.90, 0.90, 0.90, 1.0], label: 'Thread Colour' },
-    { name: 'u_hole_size',    type: 'float', default: 0.45, min: 0.2, max: 0.7, label: 'Hole Size' }
+    { id: 'u_scale',        type: 'float', default: 14,  min: 4,   max: 30, name: 'Mesh Scale' },
+    { id: 'u_thread_color', type: 'color', default: [0.90, 0.90, 0.90, 1.0], name: 'Thread Colour' },
+    { id: 'u_hole_size',    type: 'float', default: 0.45, min: 0.2, max: 0.7, name: 'Hole Size' }
   ]
 };
