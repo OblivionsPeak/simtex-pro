@@ -526,7 +526,7 @@ void main() {
       return vec4(col, u_opacity);
     }
   `,uniforms:[{id:`u_grain`,name:`Grain Frequency`,type:`float`,min:10,max:150,default:60},{id:`u_base_color`,name:`Base Gold`,type:`color`,default:[.85,.68,.18,1]},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.5}]},He=s({default:()=>Ue}),Ue={id:`bubblewrap`,name:`Bubble Wrap`,category:`Abstract`,description:`Air-filled plastic bubble wrap with hemispherical highlights, rim Fresnel, and clear film between bubbles.`,shader:`
-    // Offset hexagonal grid — bubbles in a brick layout for efficiency
+    // Offset hexagonal grid â€” bubbles in a brick layout for efficiency
     vec2 bubbleCell(vec2 uv, out vec2 cellId) {
       // Brick offset: every other row shifts by 0.5
       float row = floor(uv.y);
@@ -548,7 +548,7 @@ void main() {
       return diff;
     }
 
-    // Fresnel-like rim (brightest at grazing angle — edge of bubble)
+    // Fresnel-like rim (brightest at grazing angle â€” edge of bubble)
     float rimFresnel(vec2 p, float r) {
       float dist = length(p);
       float rim = dist / r;
@@ -575,7 +575,7 @@ void main() {
       // Bubble tint from sky/environment
       vec3 tint = u_tint.rgb;
 
-      // Diffuse shading of the hemisphere — light from top-left
+      // Diffuse shading of the hemisphere â€” light from top-left
       float diff = sphereHighlight(local, bubbleR, vec2(-0.3, 0.5));
       diff = pow(diff, 0.7);
 
@@ -602,14 +602,14 @@ void main() {
       bubbleCol  = mix(bubbleCol, rimCol, rim * 0.6);
       bubbleCol  = clamp(bubbleCol, 0.0, 1.0);
 
-      // Film between bubbles — slight shadow where bubbles press down
+      // Film between bubbles â€” slight shadow where bubbles press down
       vec3 filmCol = film * shadow;
 
       vec3 col = mix(filmCol, bubbleCol, inside);
 
       return vec4(clamp(col, 0.0, 1.0), 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_bubble_size`,type:`float`,default:14,min:4,max:30,label:`Bubble Scale`},{name:`u_film_color`,type:`color`,default:[.88,.9,.82,1],label:`Plastic Film`},{name:`u_tint`,type:`color`,default:[.75,.85,.92,1],label:`Bubble Tint`}]},We=s({default:()=>Ge}),Ge={id:`burlap_sack_artisan`,name:`Burlap Sack`,category:`Abstract`,description:`Coarse, wide-gap organic woven fibers used in heavy storage bags.`,shader:`
+  `,uniforms:[{id:`u_bubble_size`,type:`float`,default:14,min:4,max:30,name:`Bubble Scale`},{id:`u_film_color`,type:`color`,default:[.88,.9,.82,1],name:`Plastic Film`},{id:`u_tint`,type:`color`,default:[.75,.85,.92,1],name:`Bubble Tint`}]},We=s({default:()=>Ge}),Ge={id:`burlap_sack_artisan`,name:`Burlap Sack`,category:`Abstract`,description:`Coarse, wide-gap organic woven fibers used in heavy storage bags.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -1965,7 +1965,7 @@ void main() {
       float mask = smoothstep(0.4, 0.45, d);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:40,default:12},{id:`u_primary_color`,name:`Honey Fill`,type:`color`,default:[1,.7,0,1]},{id:`u_secondary_color`,name:`Wax Wall`,type:`color`,default:[.2,.1,0,1]}]},Rr=s({default:()=>zr}),zr={id:`honeycomb_metal`,name:`Honeycomb Metal`,category:`Industrial`,description:`Aerospace aluminium honeycomb panel — machine-perfect hexagonal cells with bright thin walls and deep dark interiors.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:40,default:12},{id:`u_primary_color`,name:`Honey Fill`,type:`color`,default:[1,.7,0,1]},{id:`u_secondary_color`,name:`Wax Wall`,type:`color`,default:[.2,.1,0,1]}]},Rr=s({default:()=>zr}),zr={id:`honeycomb_metal`,name:`Honeycomb Metal`,category:`Industrial`,description:`Aerospace aluminium honeycomb panel â€” machine-perfect hexagonal cells with bright thin walls and deep dark interiors.`,shader:`
     // Perfect hexagonal grid SDF
     // Returns: x = dist to hex centre, y = dist to nearest wall
     vec2 hexGrid(vec2 uv) {
@@ -2014,21 +2014,21 @@ void main() {
       float insideCell = step(hexd, -wallThickness / cellRadius);
       float inWall     = 1.0 - insideCell;
 
-      // Wall lighting — simulate thin aluminium wall under oblique light
+      // Wall lighting â€” simulate thin aluminium wall under oblique light
       // Brightest on the wall face closest to light (upper-right)
       vec2  lightDir2D = normalize(vec2(0.7, 0.9));
       float wallFacing = clamp(dot(normalize(local), lightDir2D), 0.0, 1.0);
 
-      // Wall colour — bright aluminium with directional specular
+      // Wall colour â€” bright aluminium with directional specular
       float wallBright  = 0.55 + wallFacing * 0.45;
       float wallSpec    = pow(wallFacing, 12.0) * 0.4;
       vec3  wallShaded  = wallCol * wallBright + wallSpec;
 
-      // Cell interior — dark (depth), with slight concentric shading toward centre
+      // Cell interior â€” dark (depth), with slight concentric shading toward centre
       float cellInterior = 1.0 - smoothstep(0.0, 0.8, -hexd / (cellRadius * 0.6));
       vec3  cellCol      = wallCol * (1.0 - cellDepth * 0.92) * (0.04 + cellInterior * 0.06);
 
-      // Chamfer highlight — very thin bright line right at the hex wall edge
+      // Chamfer highlight â€” very thin bright line right at the hex wall edge
       float edgeDist   = abs(hexd + wallThickness / cellRadius);
       float edgeHighlight = smoothstep(0.04, 0.0, edgeDist) * 0.6;
 
@@ -2038,7 +2038,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_scale`,type:`float`,default:14,min:4,max:30,label:`Cell Scale`},{name:`u_wall_color`,type:`color`,default:[.78,.8,.82,1],label:`Wall Colour`},{name:`u_cell_depth`,type:`float`,default:.85,min:.2,max:1,label:`Cell Depth`}]},Br=s({default:()=>Vr}),Vr={id:`houndstooth`,name:`Houndstooth`,category:`Geometric`,description:`Pro-grade textile pattern for classic racing interiors.`,shader:`
+  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Cell Scale`},{id:`u_wall_color`,type:`color`,default:[.78,.8,.82,1],name:`Wall Colour`},{id:`u_cell_depth`,type:`float`,default:.85,min:.2,max:1,name:`Cell Depth`}]},Br=s({default:()=>Vr}),Vr={id:`houndstooth`,name:`Houndstooth`,category:`Geometric`,description:`Pro-grade textile pattern for classic racing interiors.`,shader:`
     float houndstooth(vec2 p) {
       vec2 gv = fract(p);
       float mask = step(gv.x, 0.5) * step(gv.y, 0.5);
@@ -2113,7 +2113,7 @@ void main() {
       float mask = step(0.5, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Ink Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.9,1]}]},Xr=s({default:()=>Zr}),Zr={id:`interference_rings`,name:`Interference Rings`,category:`Abstract`,description:`Newton's rings — concentric iridescent interference fringes radiating from a contact point.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Ink Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.9,1]}]},Xr=s({default:()=>Zr}),Zr={id:`interference_rings`,name:`Interference Rings`,category:`Abstract`,description:`Newton's rings â€” concentric iridescent interference fringes radiating from a contact point.`,shader:`
     // Convert HSV to RGB (GLSL 1.0 compatible)
     vec3 hsv2rgb(float h, float s, float v) {
       float hh = mod(h * 6.0, 6.0);
@@ -2146,32 +2146,32 @@ void main() {
       // But visually a sqrt mapping looks more like the classic photo
       float gap = dist * dist * freq * 8.0;
 
-      // Three wavelengths (R, G, B) — slightly different fringe frequencies
+      // Three wavelengths (R, G, B) â€” slightly different fringe frequencies
       float fR = fringeIntensity(gap * 1.00);
       float fG = fringeIntensity(gap * 1.18);
       float fB = fringeIntensity(gap * 1.38);
 
       vec3 fringeRGB = vec3(fR, fG, fB);
 
-      // Iridescent hue rotation — shift hue with gap
+      // Iridescent hue rotation â€” shift hue with gap
       float hue   = fract(gap * 0.08 + 0.0);
       vec3  iridCol = hsv2rgb(hue, irid * 0.7, 1.0);
 
       // Blend achromatic fringe with iridescent hue
       vec3 col = mix(fringeRGB, iridCol, clamp(irid * 0.5, 0.0, 1.0));
 
-      // Dark centre spot (perfect contact — zero gap, destructive at all λ)
+      // Dark centre spot (perfect contact â€” zero gap, destructive at all Î»)
       float centreDark = smoothstep(0.015, 0.0, dist) * 0.9;
       col *= (1.0 - centreDark);
 
-      // Slight radial vignette — interference fades at large radius
+      // Slight radial vignette â€” interference fades at large radius
       float vignette = 1.0 - smoothstep(0.4, 0.72, dist);
       col = mix(vec3(0.92), col, vignette);
       col = clamp(col, 0.0, 1.0);
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_fringe_freq`,type:`float`,default:18,min:4,max:40,label:`Fringe Frequency`},{name:`u_iridescence`,type:`float`,default:1.2,min:0,max:2,label:`Iridescence`},{name:`u_center`,type:`float`,default:.5,min:.1,max:.9,label:`Ring Centre X`}]},Qr=s({default:()=>$r}),$r={id:`iris_fibers_artisan`,name:`Iris Fibers`,category:`Natural`,description:`Radial organic fibrous patterns found in the human eye iris.`,shader:`
+  `,uniforms:[{id:`u_fringe_freq`,type:`float`,default:18,min:4,max:40,name:`Fringe Frequency`},{id:`u_iridescence`,type:`float`,default:1.2,min:0,max:2,name:`Iridescence`},{id:`u_center`,type:`float`,default:.5,min:.1,max:.9,name:`Ring Centre X`}]},Qr=s({default:()=>$r}),$r={id:`iris_fibers_artisan`,name:`Iris Fibers`,category:`Natural`,description:`Radial organic fibrous patterns found in the human eye iris.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * 2.0;
@@ -2430,7 +2430,7 @@ void main() {
       // Warp thread runs vertically (u direction is across thread, v along thread)
       // Weft thread runs horizontally (v direction is across thread, u along thread)
 
-      // Thread radii — vary slightly per thread for organic feel
+      // Thread radii â€” vary slightly per thread for organic feel
       float warpId = cell.x;
       float weftId = cell.y;
 
@@ -2468,7 +2468,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_weave_scale`,type:`float`,default:18,min:4,max:40,label:`Weave Scale`},{name:`u_base_color`,type:`color`,default:[.82,.75,.58,1],label:`Warp Colour`},{name:`u_warp_color`,type:`color`,default:[.72,.64,.48,1],label:`Weft Colour`}]},bi=s({default:()=>xi}),xi={id:`liquid_mercury_artisan`,name:`Liquid Mercury`,category:`Abstract`,description:`Smooth, blobby metallic shapes with high specularity mimicking liquid metal.`,shader:`
+  `,uniforms:[{id:`u_weave_scale`,type:`float`,default:18,min:4,max:40,name:`Weave Scale`},{id:`u_base_color`,type:`color`,default:[.82,.75,.58,1],name:`Warp Colour`},{id:`u_warp_color`,type:`color`,default:[.72,.64,.48,1],name:`Weft Colour`}]},bi=s({default:()=>xi}),xi={id:`liquid_mercury_artisan`,name:`Liquid Mercury`,category:`Abstract`,description:`Smooth, blobby metallic shapes with high specularity mimicking liquid metal.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
       vec2 i = floor(p); vec2 f = fract(p);
@@ -2715,7 +2715,7 @@ void main() {
       vec2 cell  = floor(shifted);
       vec2 local = fract(shifted) - 0.5; // [-0.5, 0.5]
 
-      // Elliptical hole (slightly taller than wide — jersey stretches horizontally)
+      // Elliptical hole (slightly taller than wide â€” jersey stretches horizontally)
       vec2 holeScale = vec2(1.0 / (holeSize * 0.9), 1.0 / holeSize);
       float holeDist = length(local * holeScale) - 1.0;
 
@@ -2739,7 +2739,7 @@ void main() {
       float holeMask = smoothstep(-0.02, 0.02, holeDist);
       float bgMask   = 1.0 - threadMask;
 
-      // Darken background (no thread — just see-through dark)
+      // Darken background (no thread â€” just see-through dark)
       vec3 bgCol     = u_thread_color.rgb * 0.08;
       vec3 threadCol = u_thread_color.rgb * loopShade + specGlint;
 
@@ -2751,7 +2751,7 @@ void main() {
 
       return vec4(clamp(col3, 0.0, 1.0), 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_scale`,type:`float`,default:14,min:4,max:30,label:`Mesh Scale`},{name:`u_thread_color`,type:`color`,default:[.9,.9,.9,1],label:`Thread Colour`},{name:`u_hole_size`,type:`float`,default:.45,min:.2,max:.7,label:`Hole Size`}]},Bi=s({default:()=>Vi}),Vi={id:`metal_flake`,name:`Metal Flake`,category:`Racing`,description:`Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.`,shader:`
+  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Mesh Scale`},{id:`u_thread_color`,type:`color`,default:[.9,.9,.9,1],name:`Thread Colour`},{id:`u_hole_size`,type:`float`,default:.45,min:.2,max:.7,name:`Hole Size`}]},Bi=s({default:()=>Vi}),Vi={id:`metal_flake`,name:`Metal Flake`,category:`Racing`,description:`Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float hash1(float n) { return fract(sin(n) * 43758.5453); }
     float noise(vec2 p) {
@@ -3573,7 +3573,7 @@ void main() {
 
       vec2 uv = v_uv;
 
-      // Number of fold point sources — driven by complexity
+      // Number of fold point sources â€” driven by complexity
       int numPoints = int(clamp(complexity * 2.0 + 1.0, 1.0, 11.0));
 
       float minCreaseDist = 9999.0;
@@ -3612,7 +3612,7 @@ void main() {
         }
       }
 
-      // Base paper texture — very slight mottled grain
+      // Base paper texture â€” very slight mottled grain
       float grain = (hash21(uv * 180.0) - 0.5) * 0.025;
 
       // Crease line width (thinner for high complexity)
@@ -3637,7 +3637,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_complexity`,type:`float`,default:2.5,min:1,max:5,label:`Complexity`},{name:`u_paper_color`,type:`color`,default:[.96,.94,.9,1],label:`Paper Colour`},{name:`u_crease_color`,type:`color`,default:[.55,.5,.45,1],label:`Crease Colour`}]},Na=s({default:()=>Pa}),Pa={id:`paint_chips`,name:`Paint Chips`,category:`Industrial`,description:`Chipped and scratched paint surface revealing bare metal substrate through irregular chips and long directional scratches.`,shader:`
+  `,uniforms:[{id:`u_complexity`,type:`float`,default:2.5,min:1,max:5,name:`Complexity`},{id:`u_paper_color`,type:`color`,default:[.96,.94,.9,1],name:`Paper Colour`},{id:`u_crease_color`,type:`color`,default:[.55,.5,.45,1],name:`Crease Colour`}]},Na=s({default:()=>Pa}),Pa={id:`paint_chips`,name:`Paint Chips`,category:`Industrial`,description:`Chipped and scratched paint surface revealing bare metal substrate through irregular chips and long directional scratches.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float hash1(float n) { return fract(sin(n) * 43758.5453); }
     float noise(vec2 p) {
@@ -4034,10 +4034,10 @@ void main() {
   `,uniforms:[{id:`u_scale`,name:`Pulse Speed`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Plasma Glow`,type:`color`,default:[1,.4,1,1]},{id:`u_secondary_color`,name:`Plasma Void`,type:`color`,default:[.1,0,.1,1]}]},mo=s({default:()=>ho}),ho={id:`pleated_fabric`,name:`Pleated Fabric`,category:`Industrial`,description:`Accordion-pleated fabric with lit faces, shadowed valleys, and specular fold edges.`,shader:`
     // Map a value into a sawtooth that folds into a triangle wave (accordion pleat shape)
     float pleatProfile(float x) {
-      // x in [0,1] per pleat — returns height in [0,1]
+      // x in [0,1] per pleat â€” returns height in [0,1]
       // Each pleat: rise sharply (lit face), fold back (shadow face)
       float t = fract(x);
-      // Triangle wave: 0→1→0 over one period
+      // Triangle wave: 0â†’1â†’0 over one period
       return 1.0 - abs(2.0 * t - 1.0);
     }
 
@@ -4052,7 +4052,7 @@ void main() {
       float depth  = u_depth;
       vec3  fabric = u_fabric_color.rgb;
 
-      // Pleats run vertically — fold along Y axis, wave in X
+      // Pleats run vertically â€” fold along Y axis, wave in X
       float px = v_uv.x * count;
       float height = pleatProfile(px);
       float slope  = pleatDeriv(px);  // +1 = lit face, -1 = shadow face
@@ -4090,7 +4090,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_pleat_count`,type:`float`,default:12,min:4,max:30,label:`Pleat Count`},{name:`u_fabric_color`,type:`color`,default:[.15,.15,.18,1],label:`Fabric Colour`},{name:`u_depth`,type:`float`,default:1,min:.2,max:2,label:`Fold Depth`}]},go=s({default:()=>_o}),_o={id:`polka_dot_artisan`,name:`Pro Polka Dots`,category:`Organic`,description:`Precision uniform polka dots with adjustable spacing and edge softness.`,shader:`
+  `,uniforms:[{id:`u_pleat_count`,type:`float`,default:12,min:4,max:30,name:`Pleat Count`},{id:`u_fabric_color`,type:`color`,default:[.15,.15,.18,1],name:`Fabric Colour`},{id:`u_depth`,type:`float`,default:1,min:.2,max:2,name:`Fold Depth`}]},go=s({default:()=>_o}),_o={id:`polka_dot_artisan`,name:`Pro Polka Dots`,category:`Organic`,description:`Precision uniform polka dots with adjustable spacing and edge softness.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv * u_scale) - 0.5;
       float d = length(uv);
@@ -4138,7 +4138,7 @@ void main() {
       float mask = step(0.4, fract(d * u_scale));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crystal Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Quartz Face`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Prism Core`,type:`color`,default:[.8,.8,.9,1]}]},So=s({default:()=>Co}),Co={id:`racing_livery_stripe`,name:`Racing Livery Stripe`,category:`Racing`,description:`Dual-tone diagonal speed stripe with gradient fade and crisp edges — a classic motorsport livery element.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crystal Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Quartz Face`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Prism Core`,type:`color`,default:[.8,.8,.9,1]}]},So=s({default:()=>Co}),Co={id:`racing_livery_stripe`,name:`Racing Livery Stripe`,category:`Racing`,description:`Dual-tone diagonal speed stripe with gradient fade and crisp edges â€” a classic motorsport livery element.`,shader:`
     // Signed distance to an infinite angled stripe centred on the canvas
     float stripeSDist(vec2 uv, float angle) {
       // Direction perpendicular to stripe edge
@@ -4162,18 +4162,18 @@ void main() {
       // Perpendicular signed distance to stripe centreline
       float sDist = stripeSDist(v_uv, angle + 1.5707963); // perpendicular to stripe direction
 
-      // Sharp stripe mask — no anti-alias blur (crisp edge)
+      // Sharp stripe mask â€” no anti-alias blur (crisp edge)
       float stripeMask = step(-halfW, sDist) * step(sDist, halfW);
 
       // Gradient along the stripe length (parallel to stripe direction)
       vec2  stripeDir = vec2(cos(angle), sin(angle));
-      float along     = dot(v_uv - 0.5, stripeDir) + 0.5; // 0→1 along stripe
+      float along     = dot(v_uv - 0.5, stripeDir) + 0.5; // 0â†’1 along stripe
 
       // Colour gradient from stripeCol at one end to a lighter/darker variant
       vec3 stripeEnd   = mix(stripeCol, vec3(1.0), 0.25); // lighter at far end
       vec3 gradStripe  = mix(stripeCol, stripeEnd, along);
 
-      // Edge highlight — very thin bright line at each stripe edge for crispness
+      // Edge highlight â€” very thin bright line at each stripe edge for crispness
       float edgeDist = min(abs(sDist - halfW), abs(sDist + halfW));
       float edgeHighlight = smoothstep(0.012, 0.0, edgeDist) * 0.35 * stripeMask;
 
@@ -4184,7 +4184,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_stripe_color`,type:`color`,default:[.9,.1,.1,1],label:`Stripe Colour`},{name:`u_bg_color`,type:`color`,default:[.05,.05,.05,1],label:`Background Colour`},{name:`u_stripe_width`,type:`float`,default:.45,min:.1,max:.9,label:`Stripe Width`},{name:`u_angle`,type:`float`,default:.3,min:-1,max:1,label:`Stripe Angle`}]},wo=s({default:()=>To}),To={id:`radial_gradient_artisan`,name:`Master Radial`,category:`Utility`,description:`Focus-aligned radial gradient transition.`,shader:`
+  `,uniforms:[{id:`u_stripe_color`,type:`color`,default:[.9,.1,.1,1],name:`Stripe Colour`},{id:`u_bg_color`,type:`color`,default:[.05,.05,.05,1],name:`Background Colour`},{id:`u_stripe_width`,type:`float`,default:.45,min:.1,max:.9,name:`Stripe Width`},{id:`u_angle`,type:`float`,default:.3,min:-1,max:1,name:`Stripe Angle`}]},wo=s({default:()=>To}),To={id:`radial_gradient_artisan`,name:`Master Radial`,category:`Utility`,description:`Focus-aligned radial gradient transition.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5) * 2.0;
       float mask = smoothstep(0.0, 1.0, d);
@@ -5583,7 +5583,7 @@ void main() {
       float stripes = step(0.1, fract(v_uv.y * 10.0));
       return mix(u_secondary_color, u_primary_color, mask * stripes);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Sun Core`,type:`color`,default:[1,.6,0,1]},{id:`u_secondary_color`,name:`Atmosphere`,type:`color`,default:[1,0,.5,1]}]},jc=s({default:()=>Mc}),Mc={id:`velvet_pile`,name:`Velvet Pile`,category:`Industrial`,description:`Velvet fabric with directional pile sheen — bright along the pile, dark against it, with a dramatic direction effect.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Sun Core`,type:`color`,default:[1,.6,0,1]},{id:`u_secondary_color`,name:`Atmosphere`,type:`color`,default:[1,0,.5,1]}]},jc=s({default:()=>Mc}),Mc={id:`velvet_pile`,name:`Velvet Pile`,category:`Industrial`,description:`Velvet fabric with directional pile sheen â€” bright along the pile, dark against it, with a dramatic direction effect.`,shader:`
     // Hash noise for micro-fibre variation
     float hash21(vec2 p) {
       vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -5615,7 +5615,7 @@ void main() {
 
       // "View direction" approximation: simulate looking straight down at the fabric
       // The effective highlight depends on the angle between the pile direction
-      // and the gradient of UV — simulating a raking light from upper-left
+      // and the gradient of UV â€” simulating a raking light from upper-left
       vec2 lightDir = normalize(vec2(0.6, 0.8));
 
       // Pile orientation factor: how much the pile faces the light
@@ -5658,7 +5658,7 @@ void main() {
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{name:`u_base_color`,type:`color`,default:[.35,.05,.08,1],label:`Velvet Colour`},{name:`u_pile_direction`,type:`float`,default:.785,min:0,max:6.28,label:`Pile Direction (rad)`},{name:`u_sheen`,type:`float`,default:1.2,min:.3,max:2,label:`Sheen Intensity`}]},Nc=s({default:()=>Pc}),Pc={id:`verdigris_patina`,name:`Verdigris Patina`,category:`Industrial`,description:`Aged copper or bronze with green-blue verdigris oxidation pooling in recesses over warm reddish copper.`,shader:`
+  `,uniforms:[{id:`u_base_color`,type:`color`,default:[.35,.05,.08,1],name:`Velvet Colour`},{id:`u_pile_direction`,type:`float`,default:.785,min:0,max:6.28,name:`Pile Direction (rad)`},{id:`u_sheen`,type:`float`,default:1.2,min:.3,max:2,name:`Sheen Intensity`}]},Nc=s({default:()=>Pc}),Pc={id:`verdigris_patina`,name:`Verdigris Patina`,category:`Industrial`,description:`Aged copper or bronze with green-blue verdigris oxidation pooling in recesses over warm reddish copper.`,shader:`
     // --- helpers BEFORE generate() ---
 
     float hash1_vp(vec2 p) {
