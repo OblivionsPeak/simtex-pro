@@ -63,14 +63,14 @@ void main() {
         streaks = streaks / 1.75;
         
         // Macro wear gradient
-        float wear = noise(uv * 0.5 + vec2(0.0, u_time*0.1));
+        float wear = noise(uv * 0.5 + vec2(0.0, u_wear_offset*0.1));
         
         // Combine streaks and wear
         float ablation = smoothstep(0.3, 0.7, streaks * wear);
         
         return mix(u_base_color, u_ablated_color, ablation);
     }
-  `,uniforms:[{id:`u_scale`,name:`Streak Scale`,type:`float`,min:1,max:20,default:5},{id:`u_base_color`,name:`Pristine Coating`,type:`color`,default:[.9,.9,.95,1]},{id:`u_ablated_color`,name:`Ablated Core`,type:`color`,default:[.2,.2,.25,1]},{id:`u_time`,name:`Wear Offset`,type:`float`,min:0,max:10,default:0}]},ne=s({default:()=>re}),re={id:`aero_riblets`,name:`Aerodynamic Riblets`,category:`Racing`,description:`Microscale V-groove riblets machined into aerodynamic surfaces to reduce turbulent drag — as used on F1 cars, aircraft, and high-performance bodywork.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Streak Scale`,type:`float`,min:1,max:20,default:5},{id:`u_base_color`,name:`Pristine Coating`,type:`color`,default:[.9,.9,.95,1]},{id:`u_ablated_color`,name:`Ablated Core`,type:`color`,default:[.2,.2,.25,1]},{id:`u_wear_offset`,name:`Wear Offset`,type:`float`,min:0,max:10,default:0}]},ne=s({default:()=>re}),re={id:`aero_riblets`,name:`Aerodynamic Riblets`,category:`Racing`,description:`Microscale V-groove riblets machined into aerodynamic surfaces to reduce turbulent drag — as used on F1 cars, aircraft, and high-performance bodywork.`,shader:`
     float hash_ar(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise_ar(vec2 p) {
       vec2 i = floor(p), f = fract(p);
@@ -483,7 +483,7 @@ void main() {
         float network = pow(ridge1 * ridge2 * ridge3, 2.0) * 5.0;
         
         // Pulse effect
-        float pulse = 0.5 + 0.5 * sin(u_time * 2.0 + uv.x + uv.y);
+        float pulse = 0.5 + 0.5 * sin(u_pulse * 2.0 + uv.x + uv.y);
         float glowMask = smoothstep(0.4, 0.8, network) * pulse;
         float coreMask = smoothstep(0.8, 1.0, network);
         
@@ -493,7 +493,7 @@ void main() {
         
         return finalColor;
     }
-  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:8},{id:`u_bg_dark`,name:`Substrate Deep`,type:`color`,default:[.05,.08,.05,1]},{id:`u_bg_light`,name:`Substrate Surface`,type:`color`,default:[.15,.2,.15,1]},{id:`u_glow_color`,name:`Bioluminescence`,type:`color`,default:[.2,1,.5,1]},{id:`u_time`,name:`Pulse Animate`,type:`float`,min:0,max:100,default:0}]},Ee=s({default:()=>De}),De={id:`bird_plumage_artisan`,name:`Bird Plumage`,category:`Natural`,description:`Soft, overlapping organic feather vane shapes found in avian wings.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:8},{id:`u_bg_dark`,name:`Substrate Deep`,type:`color`,default:[.05,.08,.05,1]},{id:`u_bg_light`,name:`Substrate Surface`,type:`color`,default:[.15,.2,.15,1]},{id:`u_glow_color`,name:`Bioluminescence`,type:`color`,default:[.2,1,.5,1]},{id:`u_pulse`,name:`Pulse Animate`,type:`float`,min:0,max:100,default:0}]},Ee=s({default:()=>De}),De={id:`bird_plumage_artisan`,name:`Bird Plumage`,category:`Natural`,description:`Soft, overlapping organic feather vane shapes found in avian wings.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -596,7 +596,7 @@ void main() {
         float mazeNoise = fract(sin(dot(id, vec2(12.9898, 78.233))) * 43758.5453);
         
         // Calculate iridescence based on depth and noise
-        float iridPhase = steppedDist + mazeNoise + u_time * 0.1;
+        float iridPhase = steppedDist + mazeNoise + u_phase * 0.1;
         iridPhase = fract(iridPhase);
         
         vec4 color1 = u_color_a;
@@ -618,7 +618,7 @@ void main() {
         
         return finalColor + vec4(edgeHighlight * 0.2);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crystal Size`,type:`float`,min:2,max:30,default:10},{id:`u_color_a`,name:`Oxide Pink`,type:`color`,default:[.9,.2,.6,1]},{id:`u_color_b`,name:`Oxide Gold`,type:`color`,default:[.8,.7,.1,1]},{id:`u_color_c`,name:`Oxide Blue`,type:`color`,default:[.1,.4,.9,1]},{id:`u_time`,name:`Growth Phase`,type:`float`,min:0,max:100,default:0}]},Me=s({default:()=>Ne}),Ne={id:`blueprint_grid_tech`,name:`Blueprint Grid`,category:`Utility`,description:`Technical structural alignment grid.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crystal Size`,type:`float`,min:2,max:30,default:10},{id:`u_color_a`,name:`Oxide Pink`,type:`color`,default:[.9,.2,.6,1]},{id:`u_color_b`,name:`Oxide Gold`,type:`color`,default:[.8,.7,.1,1]},{id:`u_color_c`,name:`Oxide Blue`,type:`color`,default:[.1,.4,.9,1]},{id:`u_phase`,name:`Growth Phase`,type:`float`,min:0,max:100,default:0}]},Me=s({default:()=>Ne}),Ne={id:`blueprint_grid_tech`,name:`Blueprint Grid`,category:`Utility`,description:`Technical structural alignment grid.`,shader:`
     vec4 generate() {
       vec2 g = fract(v_uv * u_scale);
       float mask = step(0.98, max(g.x, g.y));
@@ -1010,7 +1010,7 @@ void main() {
                 vec2 pt = random2(id + offset);
                 
                 // Animate points expanding/contracting
-                float radius = 0.1 + 0.3 * (0.5 + 0.5 * sin(u_time + pt.x * 6.28));
+                float radius = 0.1 + 0.3 * (0.5 + 0.5 * sin(u_pulse + pt.x * 6.28));
                 
                 float dist = length(gv - (offset + pt));
                 
@@ -1027,7 +1027,7 @@ void main() {
         
         return mix(fleshColor, u_spot_color, spotMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Scale`,type:`float`,min:2,max:30,default:12},{id:`u_base_color`,name:`Fleshy Base`,type:`color`,default:[.7,.3,.3,1]},{id:`u_spot_color`,name:`Chromatophore`,type:`color`,default:[.1,.1,.1,1]},{id:`u_time`,name:`Pulse Phase`,type:`float`,min:0,max:100,default:0}]},gt=s({default:()=>_t}),_t={id:`chain_mail_artisan`,name:`Chain Mail`,category:`Industrial`,description:`Interlocking metal ring structures used in protective armor and fencing.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Scale`,type:`float`,min:2,max:30,default:12},{id:`u_base_color`,name:`Fleshy Base`,type:`color`,default:[.7,.3,.3,1]},{id:`u_spot_color`,name:`Chromatophore`,type:`color`,default:[.1,.1,.1,1]},{id:`u_pulse`,name:`Pulse Phase`,type:`float`,min:0,max:100,default:0}]},gt=s({default:()=>_t}),_t={id:`chain_mail_artisan`,name:`Chain Mail`,category:`Industrial`,description:`Interlocking metal ring structures used in protective armor and fencing.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -1369,7 +1369,7 @@ void main() {
         
         // Simulated glowing content behind the mask (low freq noise)
         float contentNoise = fract(sin(dot(floor(uv*0.1), vec2(12.9898, 78.233))) * 43758.5453);
-        float content = smoothstep(0.3, 0.7, contentNoise + sin(u_time + v_uv.x * 5.0) * 0.5);
+        float content = smoothstep(0.3, 0.7, contentNoise + sin(u_phase + v_uv.x * 5.0) * 0.5);
         
         vec3 phosphor = vec3(r, g, b) * scanline * u_brightness;
         
@@ -1379,7 +1379,7 @@ void main() {
         // Add ambient reflection
         return screen + u_ambient_glare * 0.1;
     }
-  `,uniforms:[{id:`u_scale`,name:`Grille Scale`,type:`float`,min:10,max:200,default:80},{id:`u_brightness`,name:`Phosphor Brightness`,type:`float`,min:.5,max:3,default:1.5},{id:`u_ambient_glare`,name:`Screen Glass`,type:`color`,default:[.05,.05,.05,1]},{id:`u_time`,name:`Signal Phase`,type:`float`,min:0,max:100,default:0}]},Ut=s({default:()=>Wt}),Wt={id:`cyber_grid_pro`,name:`Cyber Grid`,category:`Technology`,description:`Pro-grade data-matrix style grid with secondary interference lines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grille Scale`,type:`float`,min:10,max:200,default:80},{id:`u_brightness`,name:`Phosphor Brightness`,type:`float`,min:.5,max:3,default:1.5},{id:`u_ambient_glare`,name:`Screen Glass`,type:`color`,default:[.05,.05,.05,1]},{id:`u_phase`,name:`Signal Phase`,type:`float`,min:0,max:100,default:0}]},Ut=s({default:()=>Wt}),Wt={id:`cyber_grid_pro`,name:`Cyber Grid`,category:`Technology`,description:`Pro-grade data-matrix style grid with secondary interference lines.`,shader:`
     vec4 generate() {
       vec2 g = fract(v_uv * u_scale);
       float grid = step(0.95, max(g.x, g.y));
@@ -2385,7 +2385,7 @@ void main() {
         vec2 uv = v_uv * u_scale;
         
         // Base spectral gradient shifting with view angle/uv.y
-        float angle = v_uv.y + u_time * 0.1;
+        float angle = v_uv.y + u_shift * 0.1;
         float spectrum = fract(angle * 3.0);
         
         vec3 col;
@@ -2407,7 +2407,7 @@ void main() {
         
         return baseFoil + pattern * scatter * u_pattern_brightness;
     }
-  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:5,max:50,default:20},{id:`u_foil_intensity`,name:`Spectral Saturation`,type:`float`,min:0,max:2,default:1},{id:`u_pattern_brightness`,name:`Foil Glint`,type:`float`,min:0,max:2,default:1.2},{id:`u_time`,name:`Angle Shift`,type:`float`,min:0,max:10,default:0}]},ii=s({default:()=>ai}),ai={id:`holographic_glitch_artisan`,name:`Hologlitch`,category:`Abstract`,description:`Chromatic offset stripes and holographic artifacts mimicking digital interference.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:5,max:50,default:20},{id:`u_foil_intensity`,name:`Spectral Saturation`,type:`float`,min:0,max:2,default:1},{id:`u_pattern_brightness`,name:`Foil Glint`,type:`float`,min:0,max:2,default:1.2},{id:`u_shift`,name:`Angle Shift`,type:`float`,min:0,max:10,default:0}]},ii=s({default:()=>ai}),ai={id:`holographic_glitch_artisan`,name:`Hologlitch`,category:`Abstract`,description:`Chromatic offset stripes and holographic artifacts mimicking digital interference.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * 40.0);
@@ -2686,7 +2686,7 @@ void main() {
         vec2 uv = v_uv * u_scale;
         
         // Plasma core using inverted voronoi
-        float v = voronoi(uv + vec2(u_time * 0.1, u_time * 0.15));
+        float v = voronoi(uv + vec2(u_flow * 0.1, u_flow * 0.15));
         float plasma = smoothstep(0.4, 0.0, v);
         
         // Copper coils (horizontal lines)
@@ -2703,7 +2703,7 @@ void main() {
         
         return mix(plasmaLayer, coilLayer, coilMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Core Scale`,type:`float`,min:2,max:20,default:5},{id:`u_bg_color`,name:`Housing`,type:`color`,default:[.05,.05,.08,1]},{id:`u_plasma_color`,name:`Plasma Energy`,type:`color`,default:[0,.8,1,1]},{id:`u_copper_light`,name:`Copper Coil Highlight`,type:`color`,default:[.8,.4,.2,1]},{id:`u_copper_dark`,name:`Copper Coil Shadow`,type:`color`,default:[.3,.1,.05,1]},{id:`u_time`,name:`Energy Flow`,type:`float`,min:0,max:100,default:0}]},Oi=s({default:()=>ki}),ki={id:`kevlar_grid_artisan`,name:`Kevlar Weave`,category:`Industrial`,description:`Heavy tactical weave used in protective armor and performance gear.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Core Scale`,type:`float`,min:2,max:20,default:5},{id:`u_bg_color`,name:`Housing`,type:`color`,default:[.05,.05,.08,1]},{id:`u_plasma_color`,name:`Plasma Energy`,type:`color`,default:[0,.8,1,1]},{id:`u_copper_light`,name:`Copper Coil Highlight`,type:`color`,default:[.8,.4,.2,1]},{id:`u_copper_dark`,name:`Copper Coil Shadow`,type:`color`,default:[.3,.1,.05,1]},{id:`u_flow`,name:`Energy Flow`,type:`float`,min:0,max:100,default:0}]},Oi=s({default:()=>ki}),ki={id:`kevlar_grid_artisan`,name:`Kevlar Weave`,category:`Industrial`,description:`Heavy tactical weave used in protective armor and performance gear.`,shader:`
     vec4 generate() {
       float lines = sin(v_uv.x * 400.0) * sin(v_uv.y * 400.0);
       float mask = smoothstep(-0.5, 0.5, lines);
@@ -3413,14 +3413,14 @@ void main() {
         float bloom = smoothstep(0.3, 0.0, v);
         
         // Heat animation
-        float heatPulse = 0.5 + 0.5 * sin(u_time * 2.0 + warpUV.x * 2.0);
+        float heatPulse = 0.5 + 0.5 * sin(u_heat * 2.0 + warpUV.x * 2.0);
         
         vec4 crackGlow = mix(u_heat_core, vec4(1.0, 1.0, 1.0, 1.0), heatPulse * 0.5); // White hot core
         crackGlow += bloom * u_heat_core * 0.5;
         
         return mix(crackGlow, coolSurface, crack);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crack Scale`,type:`float`,min:2,max:15,default:5},{id:`u_cool_metal`,name:`Cooled Surface`,type:`color`,default:[.1,.1,.12,1]},{id:`u_hot_metal`,name:`Warm Surface`,type:`color`,default:[.4,.1,.05,1]},{id:`u_heat_core`,name:`Fissure Core`,type:`color`,default:[1,.4,0,1]},{id:`u_time`,name:`Heat Pulse`,type:`float`,min:0,max:100,default:0}]},xa=s({default:()=>Sa}),Sa={id:`monstera_leaf_artisan`,name:`Monstera Split-Leaf`,category:`Natural`,description:`The iconic tropical split-leaf silhouette with decorative voids.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crack Scale`,type:`float`,min:2,max:15,default:5},{id:`u_cool_metal`,name:`Cooled Surface`,type:`color`,default:[.1,.1,.12,1]},{id:`u_hot_metal`,name:`Warm Surface`,type:`color`,default:[.4,.1,.05,1]},{id:`u_heat_core`,name:`Fissure Core`,type:`color`,default:[1,.4,0,1]},{id:`u_heat`,name:`Heat Pulse`,type:`float`,min:0,max:100,default:0}]},xa=s({default:()=>Sa}),Sa={id:`monstera_leaf_artisan`,name:`Monstera Split-Leaf`,category:`Natural`,description:`The iconic tropical split-leaf silhouette with decorative voids.`,shader:`
     float circle(vec2 p, float r) { return length(p) - r; }
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
@@ -4176,7 +4176,7 @@ void main() {
         float matrix = smoothstep(1.0, 1.2, minDist);
         
         // Fiber light transmission animation
-        float lightPulse = 0.5 + 0.5 * sin(u_time * 5.0 + fiberType * 6.28);
+        float lightPulse = 0.5 + 0.5 * sin(u_flow * 5.0 + fiberType * 6.28);
         
         vec4 coreColor = mix(u_fiber_dark, u_fiber_glow, lightPulse);
         
@@ -4188,7 +4188,7 @@ void main() {
         
         return finalColor;
     }
-  `,uniforms:[{id:`u_scale`,name:`Bundle Scale`,type:`float`,min:2,max:20,default:8},{id:`u_resin_matrix`,name:`Resin Base`,type:`color`,default:[.05,.05,.05,1]},{id:`u_cladding`,name:`Fiber Cladding`,type:`color`,default:[.2,.2,.25,1]},{id:`u_fiber_glow`,name:`Light Transmission`,type:`color`,default:[0,.8,1,1]},{id:`u_fiber_dark`,name:`Inactive Fiber`,type:`color`,default:[.1,.1,.2,1]},{id:`u_time`,name:`Data Flow`,type:`float`,min:0,max:100,default:0}]},lo=s({default:()=>uo}),uo={id:`origami_fold`,name:`Origami Fold`,category:`Geometric`,description:`Origami crease pattern with radiating mountain and valley fold lines on cream paper.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Bundle Scale`,type:`float`,min:2,max:20,default:8},{id:`u_resin_matrix`,name:`Resin Base`,type:`color`,default:[.05,.05,.05,1]},{id:`u_cladding`,name:`Fiber Cladding`,type:`color`,default:[.2,.2,.25,1]},{id:`u_fiber_glow`,name:`Light Transmission`,type:`color`,default:[0,.8,1,1]},{id:`u_fiber_dark`,name:`Inactive Fiber`,type:`color`,default:[.1,.1,.2,1]},{id:`u_flow`,name:`Data Flow`,type:`float`,min:0,max:100,default:0}]},lo=s({default:()=>uo}),uo={id:`origami_fold`,name:`Origami Fold`,category:`Geometric`,description:`Origami crease pattern with radiating mountain and valley fold lines on cream paper.`,shader:`
     // Distance from point p to infinite line through a and b
     float lineDistance(vec2 p, vec2 a, vec2 b) {
       vec2 ab = b - a;
@@ -5921,7 +5921,7 @@ void main() {
         float dendrites = smoothstep(0.05, 0.0, abs(vWarp - 0.2));
         
         // Synaptic sparks (moving along dendrites)
-        float sparkPhase = u_time * 2.0 + vWarp * 10.0;
+        float sparkPhase = u_flow * 2.0 + vWarp * 10.0;
         float spark = fract(sparkPhase);
         float sparkGlow = smoothstep(0.95, 1.0, spark) * dendrites;
         
@@ -5929,7 +5929,7 @@ void main() {
         
         return network + u_spark_color * sparkGlow * 2.0;
     }
-  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:6},{id:`u_bg_color`,name:`Brain Matter`,type:`color`,default:[.05,.02,.08,1]},{id:`u_neuron_color`,name:`Neurons`,type:`color`,default:[.4,.2,.6,1]},{id:`u_spark_color`,name:`Electrical Impulse`,type:`color`,default:[.4,1,1,1]},{id:`u_time`,name:`Synapse Fire`,type:`float`,min:0,max:100,default:0}]},Fc=s({default:()=>Ic}),Ic={id:`tech_fractal_artisan`,name:`Logic Fractal`,category:`Abstract`,description:`Geometric recursive logic patterns mimicking complex computational architectures.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:6},{id:`u_bg_color`,name:`Brain Matter`,type:`color`,default:[.05,.02,.08,1]},{id:`u_neuron_color`,name:`Neurons`,type:`color`,default:[.4,.2,.6,1]},{id:`u_spark_color`,name:`Electrical Impulse`,type:`color`,default:[.4,1,1,1]},{id:`u_flow`,name:`Synapse Fire`,type:`float`,min:0,max:100,default:0}]},Fc=s({default:()=>Ic}),Ic={id:`tech_fractal_artisan`,name:`Logic Fractal`,category:`Abstract`,description:`Geometric recursive logic patterns mimicking complex computational architectures.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
       float d = 0.0;
