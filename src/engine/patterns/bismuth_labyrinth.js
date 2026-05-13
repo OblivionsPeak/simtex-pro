@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'bismuth_labyrinth_artisan',
   name: 'Bismuth Labyrinth',
   category: 'Natural',
@@ -22,7 +22,7 @@ export default {
         float mazeNoise = fract(sin(dot(id, vec2(12.9898, 78.233))) * 43758.5453);
         
         // Calculate iridescence based on depth and noise
-        float iridPhase = steppedDist + mazeNoise + u_time * 0.1;
+        float iridPhase = steppedDist + mazeNoise + u_phase * 0.1;
         iridPhase = fract(iridPhase);
         
         vec4 color1 = u_color_a;
@@ -50,6 +50,6 @@ export default {
     { id: 'u_color_a', name: 'Oxide Pink', type: 'color', default: [0.9, 0.2, 0.6, 1.0] },
     { id: 'u_color_b', name: 'Oxide Gold', type: 'color', default: [0.8, 0.7, 0.1, 1.0] },
     { id: 'u_color_c', name: 'Oxide Blue', type: 'color', default: [0.1, 0.4, 0.9, 1.0] },
-    { id: 'u_time', name: 'Growth Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_phase', name: 'Growth Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

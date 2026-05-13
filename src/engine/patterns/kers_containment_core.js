@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'kers_containment_core_artisan',
   name: 'KERS Containment Core',
   category: 'Technology',
@@ -24,7 +24,7 @@ export default {
         vec2 uv = v_uv * u_scale;
         
         // Plasma core using inverted voronoi
-        float v = voronoi(uv + vec2(u_time * 0.1, u_time * 0.15));
+        float v = voronoi(uv + vec2(u_flow * 0.1, u_flow * 0.15));
         float plasma = smoothstep(0.4, 0.0, v);
         
         // Copper coils (horizontal lines)
@@ -48,6 +48,6 @@ export default {
     { id: 'u_plasma_color', name: 'Plasma Energy', type: 'color', default: [0.0, 0.8, 1.0, 1.0] },
     { id: 'u_copper_light', name: 'Copper Coil Highlight', type: 'color', default: [0.8, 0.4, 0.2, 1.0] },
     { id: 'u_copper_dark', name: 'Copper Coil Shadow', type: 'color', default: [0.3, 0.1, 0.05, 1.0] },
-    { id: 'u_time', name: 'Energy Flow', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_flow', name: 'Energy Flow', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

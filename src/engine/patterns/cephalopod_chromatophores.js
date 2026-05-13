@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'cephalopod_chromatophores_artisan',
   name: 'Cephalopod Chromatophores',
   category: 'Organic',
@@ -21,7 +21,7 @@ export default {
                 vec2 pt = random2(id + offset);
                 
                 // Animate points expanding/contracting
-                float radius = 0.1 + 0.3 * (0.5 + 0.5 * sin(u_time + pt.x * 6.28));
+                float radius = 0.1 + 0.3 * (0.5 + 0.5 * sin(u_pulse + pt.x * 6.28));
                 
                 float dist = length(gv - (offset + pt));
                 
@@ -43,6 +43,6 @@ export default {
     { id: 'u_scale', name: 'Cell Scale', type: 'float', min: 2.0, max: 30.0, default: 12.0 },
     { id: 'u_base_color', name: 'Fleshy Base', type: 'color', default: [0.7, 0.3, 0.3, 1.0] },
     { id: 'u_spot_color', name: 'Chromatophore', type: 'color', default: [0.1, 0.1, 0.1, 1.0] },
-    { id: 'u_time', name: 'Pulse Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_pulse', name: 'Pulse Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

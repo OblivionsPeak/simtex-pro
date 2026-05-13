@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'optical_fiber_bundle_artisan',
   name: 'Optical Fiber Bundle',
   category: 'Technology',
@@ -41,7 +41,7 @@ export default {
         float matrix = smoothstep(1.0, 1.2, minDist);
         
         // Fiber light transmission animation
-        float lightPulse = 0.5 + 0.5 * sin(u_time * 5.0 + fiberType * 6.28);
+        float lightPulse = 0.5 + 0.5 * sin(u_flow * 5.0 + fiberType * 6.28);
         
         vec4 coreColor = mix(u_fiber_dark, u_fiber_glow, lightPulse);
         
@@ -60,6 +60,6 @@ export default {
     { id: 'u_cladding', name: 'Fiber Cladding', type: 'color', default: [0.2, 0.2, 0.25, 1.0] },
     { id: 'u_fiber_glow', name: 'Light Transmission', type: 'color', default: [0.0, 0.8, 1.0, 1.0] },
     { id: 'u_fiber_dark', name: 'Inactive Fiber', type: 'color', default: [0.1, 0.1, 0.2, 1.0] },
-    { id: 'u_time', name: 'Data Flow', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_flow', name: 'Data Flow', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

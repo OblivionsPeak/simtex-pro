@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'aero_ablative_coating_artisan',
   name: 'Aero-Ablative Coating',
   category: 'Racing',
@@ -21,7 +21,7 @@ export default {
         streaks = streaks / 1.75;
         
         // Macro wear gradient
-        float wear = noise(uv * 0.5 + vec2(0.0, u_time*0.1));
+        float wear = noise(uv * 0.5 + vec2(0.0, u_wear_offset*0.1));
         
         // Combine streaks and wear
         float ablation = smoothstep(0.3, 0.7, streaks * wear);
@@ -33,6 +33,6 @@ export default {
     { id: 'u_scale', name: 'Streak Scale', type: 'float', min: 1.0, max: 20.0, default: 5.0 },
     { id: 'u_base_color', name: 'Pristine Coating', type: 'color', default: [0.9, 0.9, 0.95, 1.0] },
     { id: 'u_ablated_color', name: 'Ablated Core', type: 'color', default: [0.2, 0.2, 0.25, 1.0] },
-    { id: 'u_time', name: 'Wear Offset', type: 'float', min: 0.0, max: 10.0, default: 0.0 }
+    { id: 'u_wear_offset', name: 'Wear Offset', type: 'float', min: 0.0, max: 10.0, default: 0.0 }
   ]
 };

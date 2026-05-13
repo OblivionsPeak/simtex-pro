@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'synaptic_spark_artisan',
   name: 'Synaptic Spark',
   category: 'Organic',
@@ -42,7 +42,7 @@ export default {
         float dendrites = smoothstep(0.05, 0.0, abs(vWarp - 0.2));
         
         // Synaptic sparks (moving along dendrites)
-        float sparkPhase = u_time * 2.0 + vWarp * 10.0;
+        float sparkPhase = u_flow * 2.0 + vWarp * 10.0;
         float spark = fract(sparkPhase);
         float sparkGlow = smoothstep(0.95, 1.0, spark) * dendrites;
         
@@ -56,6 +56,6 @@ export default {
     { id: 'u_bg_color', name: 'Brain Matter', type: 'color', default: [0.05, 0.02, 0.08, 1.0] },
     { id: 'u_neuron_color', name: 'Neurons', type: 'color', default: [0.4, 0.2, 0.6, 1.0] },
     { id: 'u_spark_color', name: 'Electrical Impulse', type: 'color', default: [0.4, 1.0, 1.0, 1.0] },
-    { id: 'u_time', name: 'Synapse Fire', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_flow', name: 'Synapse Fire', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

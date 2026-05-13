@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'bioluminescent_mycelium_artisan',
   name: 'Bioluminescent Mycelium',
   category: 'Organic',
@@ -29,7 +29,7 @@ export default {
         float network = pow(ridge1 * ridge2 * ridge3, 2.0) * 5.0;
         
         // Pulse effect
-        float pulse = 0.5 + 0.5 * sin(u_time * 2.0 + uv.x + uv.y);
+        float pulse = 0.5 + 0.5 * sin(u_pulse * 2.0 + uv.x + uv.y);
         float glowMask = smoothstep(0.4, 0.8, network) * pulse;
         float coreMask = smoothstep(0.8, 1.0, network);
         
@@ -45,6 +45,6 @@ export default {
     { id: 'u_bg_dark', name: 'Substrate Deep', type: 'color', default: [0.05, 0.08, 0.05, 1.0] },
     { id: 'u_bg_light', name: 'Substrate Surface', type: 'color', default: [0.15, 0.2, 0.15, 1.0] },
     { id: 'u_glow_color', name: 'Bioluminescence', type: 'color', default: [0.2, 1.0, 0.5, 1.0] },
-    { id: 'u_time', name: 'Pulse Animate', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_pulse', name: 'Pulse Animate', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

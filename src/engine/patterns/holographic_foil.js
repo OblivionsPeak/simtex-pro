@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'holographic_foil_artisan',
   name: 'Holographic Foil',
   category: 'Abstract',
@@ -8,7 +8,7 @@ export default {
         vec2 uv = v_uv * u_scale;
         
         // Base spectral gradient shifting with view angle/uv.y
-        float angle = v_uv.y + u_time * 0.1;
+        float angle = v_uv.y + u_shift * 0.1;
         float spectrum = fract(angle * 3.0);
         
         vec3 col;
@@ -35,6 +35,6 @@ export default {
     { id: 'u_scale', name: 'Pattern Density', type: 'float', min: 5.0, max: 50.0, default: 20.0 },
     { id: 'u_foil_intensity', name: 'Spectral Saturation', type: 'float', min: 0.0, max: 2.0, default: 1.0 },
     { id: 'u_pattern_brightness', name: 'Foil Glint', type: 'float', min: 0.0, max: 2.0, default: 1.2 },
-    { id: 'u_time', name: 'Angle Shift', type: 'float', min: 0.0, max: 10.0, default: 0.0 }
+    { id: 'u_shift', name: 'Angle Shift', type: 'float', min: 0.0, max: 10.0, default: 0.0 }
   ]
 };

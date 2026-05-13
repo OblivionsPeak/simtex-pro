@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'crt_phosphor_mask_artisan',
   name: 'CRT Phosphor Mask',
   category: 'Technology',
@@ -22,7 +22,7 @@ export default {
         
         // Simulated glowing content behind the mask (low freq noise)
         float contentNoise = fract(sin(dot(floor(uv*0.1), vec2(12.9898, 78.233))) * 43758.5453);
-        float content = smoothstep(0.3, 0.7, contentNoise + sin(u_time + v_uv.x * 5.0) * 0.5);
+        float content = smoothstep(0.3, 0.7, contentNoise + sin(u_phase + v_uv.x * 5.0) * 0.5);
         
         vec3 phosphor = vec3(r, g, b) * scanline * u_brightness;
         
@@ -37,6 +37,6 @@ export default {
     { id: 'u_scale', name: 'Grille Scale', type: 'float', min: 10.0, max: 200.0, default: 80.0 },
     { id: 'u_brightness', name: 'Phosphor Brightness', type: 'float', min: 0.5, max: 3.0, default: 1.5 },
     { id: 'u_ambient_glare', name: 'Screen Glass', type: 'color', default: [0.05, 0.05, 0.05, 1.0] },
-    { id: 'u_time', name: 'Signal Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_phase', name: 'Signal Phase', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };

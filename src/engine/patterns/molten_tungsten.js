@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'molten_tungsten_artisan',
   name: 'Molten Tungsten',
   category: 'Industrial',
@@ -45,7 +45,7 @@ export default {
         float bloom = smoothstep(0.3, 0.0, v);
         
         // Heat animation
-        float heatPulse = 0.5 + 0.5 * sin(u_time * 2.0 + warpUV.x * 2.0);
+        float heatPulse = 0.5 + 0.5 * sin(u_heat * 2.0 + warpUV.x * 2.0);
         
         vec4 crackGlow = mix(u_heat_core, vec4(1.0, 1.0, 1.0, 1.0), heatPulse * 0.5); // White hot core
         crackGlow += bloom * u_heat_core * 0.5;
@@ -58,6 +58,6 @@ export default {
     { id: 'u_cool_metal', name: 'Cooled Surface', type: 'color', default: [0.1, 0.1, 0.12, 1.0] },
     { id: 'u_hot_metal', name: 'Warm Surface', type: 'color', default: [0.4, 0.1, 0.05, 1.0] },
     { id: 'u_heat_core', name: 'Fissure Core', type: 'color', default: [1.0, 0.4, 0.0, 1.0] },
-    { id: 'u_time', name: 'Heat Pulse', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
+    { id: 'u_heat', name: 'Heat Pulse', type: 'float', min: 0.0, max: 100.0, default: 0.0 }
   ]
 };
