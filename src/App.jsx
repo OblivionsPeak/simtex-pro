@@ -268,6 +268,40 @@ function App() {
     link.click();
   };
 
+  // Export Set: diffuse + spec + normal with matching filenames, one click.
+  // Downloads are staggered so the browser doesn't swallow them.
+  const downloadSet = () => {
+    if (!engineRef.current) return;
+    const e = engineRef.current;
+    const base = `simtex_${activePattern.id}${seamlessExport ? '_seamless' : ''}_${resolution}`;
+    const save = (dataUrl, suffix) => {
+      const link = document.createElement('a');
+      link.download = `${base}_${suffix}.png`;
+      link.href = dataUrl;
+      link.click();
+    };
+
+    const diffUniforms = { ...uniforms, u_is_spec: 0.0 };
+    save(
+      seamlessExport
+        ? e.exportSeamless(resolution, resolution, diffUniforms)
+        : e.export(resolution, resolution, diffUniforms),
+      'diff'
+    );
+    setTimeout(() => {
+      const specUniforms = { ...uniforms, u_is_spec: 1.0 };
+      save(
+        seamlessExport
+          ? e.exportSeamless(resolution, resolution, specUniforms)
+          : e.export(resolution, resolution, specUniforms),
+        'spec'
+      );
+    }, 400);
+    setTimeout(() => {
+      save(e.exportNormalMap(resolution, resolution, { ...uniforms, u_is_spec: 0.0, u_opacity: 1.0 }), 'normal');
+    }, 800);
+  };
+
   const downloadNormalMap = () => {
     if (!engineRef.current) return;
     const dataUrl = engineRef.current.exportNormalMap(resolution, resolution, {
@@ -437,7 +471,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.3.0</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.4.0</small></h1>
             </div>
           </div>
 
@@ -797,7 +831,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.3.0</span>
+          <span className="version-label">v3.4.0</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -834,6 +868,14 @@ function App() {
             <button className="btn-primary" onClick={downloadTexture}>
               <Download size={18} />
               <span>Export PNG</span>
+            </button>
+            <button
+              className="btn-primary btn-set"
+              onClick={downloadSet}
+              title="Export the full iRacing set: diffuse + spec + normal maps with matching filenames"
+            >
+              <Download size={18} />
+              <span>Export Set</span>
             </button>
           </div>
         </header>
@@ -1200,6 +1242,8 @@ function App() {
         .uv-btn.active { background: rgba(37,99,235,0.25); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.4); }
         .btn-normal { width: 42px; height: 42px; font-size: 10px; }
         .btn-seamless.active { background: rgba(37,99,235,0.3); color: var(--color-accent); box-shadow: var(--shadow-glow); }
+        .btn-set { background: rgba(37,99,235,0.18); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.45); box-shadow: none; }
+        .btn-set:hover { background: rgba(37,99,235,0.3); transform: translateY(-1px); }
         .tile-badge { background: var(--color-accent); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.08em; }
         .canvas-overlay { display: flex; align-items: center; gap: 8px; }
       `}</style>

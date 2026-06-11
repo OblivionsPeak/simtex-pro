@@ -9,6 +9,18 @@ const isElectron = process.env.ELECTRON === 'true'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: './',
+  build: {
+    rollupOptions: {
+      output: {
+        // Split rarely-changing vendor code from the frequently-updated
+        // pattern library so returning visitors hit cache for the rest
+        manualChunks(id) {
+          if (id.includes('node_modules')) return 'vendor';
+          if (id.includes('/engine/patterns/')) return 'patterns';
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     isElectron && electron([
