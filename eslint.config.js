@@ -26,4 +26,11 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    // Build/config and tooling scripts run under Node, not the browser
+    files: ['vite.config.js', 'scripts/**/*.{js,mjs}', 'electron/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
 ])
