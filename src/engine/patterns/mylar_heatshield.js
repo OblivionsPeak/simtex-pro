@@ -2,6 +2,7 @@ export default {
   id: 'mylar_heatshield',
   name: 'Mylar Heat Shield',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Crinkled mylar or aluminium heat shield foil with bright specular hotspots and crinkle shadow valleys.',
   shader: `
     // --- helpers BEFORE generate() ---

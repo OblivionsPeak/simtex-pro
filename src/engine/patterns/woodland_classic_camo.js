@@ -2,6 +2,7 @@ export default {
   id: 'woodland_classic_camo',
   name: 'Woodland Classic Camo',
   category: 'Organic',
+  added: '2026-05-12',
   description: 'Classic M81 style camouflage with large organic blobs overlapping each other.',
   shader: `
     

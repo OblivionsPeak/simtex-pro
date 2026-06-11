@@ -2,6 +2,7 @@ export default {
   id: 'leopard_print',
   name: 'Leopard Print',
   category: 'Organic',
+  added: '2026-06-11',
   description: 'Classic leopard rosettes: irregular broken dark rings around tan centres scattered with hash jitter over a cream-gold base, with noise-driven ring break-up and size variance.',
   shader: `
 

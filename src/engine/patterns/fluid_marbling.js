@@ -2,6 +2,7 @@ export default {
   id: 'fluid_marbling_pro',
   name: 'Fluid Marbling',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Organic static liquid flow with colorful mineral-like marbling.',
   shader: `
     vec4 generate() {

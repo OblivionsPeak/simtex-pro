@@ -2,6 +2,7 @@ export default {
   id: 'damask_lace_artisan',
   name: 'Damask Lace',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Complex organic floral symmetry and decorative lace patterns.',
   shader: `
     vec4 generate() {

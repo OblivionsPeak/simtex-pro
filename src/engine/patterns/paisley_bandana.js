@@ -2,6 +2,7 @@ export default {
   id: 'paisley_bandana',
   name: 'Paisley Bandana',
   category: 'Abstract',
+  added: '2026-06-11',
   description: 'Bandana-style repeat of curled paisley boteh teardrops with echo outlines, center dots and dotted halo rings, alternating orientation on a staggered grid.',
   shader: `
 

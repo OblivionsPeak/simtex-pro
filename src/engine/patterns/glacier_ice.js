@@ -2,6 +2,7 @@ export default {
   id: 'glacier_ice_artisan',
   name: 'Glacier Ice',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Crackled crystalline planes with directional depth found in Arctic ice formations.',
   shader: `
     vec4 generate() {

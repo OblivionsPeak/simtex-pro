@@ -2,6 +2,7 @@ export default {
   id: 'holographic_glitch_artisan',
   name: 'Hologlitch',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Chromatic offset stripes and holographic artifacts mimicking digital interference.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

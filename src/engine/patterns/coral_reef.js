@@ -2,6 +2,7 @@ export default {
   id: 'coral_reef_artisan',
   name: 'Coral Branch',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Branching organic calcium structures mimicking underwater coral reef formations.',
   shader: `
     vec4 generate() {

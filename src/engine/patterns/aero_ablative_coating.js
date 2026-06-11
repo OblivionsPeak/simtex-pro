@@ -2,6 +2,7 @@
   id: 'aero_ablative_coating_artisan',
   name: 'Aero-Ablative Coating',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'A smooth surface that sheds layers under high velocity, showing directional wind streak lines and gradient wear.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

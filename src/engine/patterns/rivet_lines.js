@@ -2,6 +2,7 @@ export default {
   id: 'rivet_lines_pro',
   name: 'Panel Rivets',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Structural rivet seams for automotive panels.',
   shader: `
     vec4 generate() {

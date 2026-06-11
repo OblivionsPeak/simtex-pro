@@ -2,6 +2,7 @@ export default {
   id: 'oil_canvas_artisan',
   name: 'Oil Canvas Strokes',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Directional brush-stroke noise mimicking thick oil paint on canvas.',
   shader: `
     vec4 generate() {

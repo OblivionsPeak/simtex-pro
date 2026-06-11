@@ -2,6 +2,7 @@ export default {
   id: 'dragon_plate_artisan',
   name: 'Dragon Plate',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Thick, overlapping pointed armor-like scales with depth found in mythical creature hide.',
   shader: `
     vec4 generate() {

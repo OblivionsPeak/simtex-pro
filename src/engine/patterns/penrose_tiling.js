@@ -2,6 +2,7 @@ export default {
   id: 'penrose_tiling_artisan',
   name: 'Penrose Mesh',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Aperiodic, non-repeating tiling lines mimicking complex mathematical quasicrystal structures.',
   shader: `
     vec4 generate() {

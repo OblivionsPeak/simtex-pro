@@ -2,6 +2,7 @@
   id: 'optical_fiber_bundle_artisan',
   name: 'Optical Fiber Bundle',
   category: 'Technology',
+  added: '2026-05-13',
   description: 'Glowing fiber optic cables of varying diameters, bleeding light into a dark resin matrix.',
   shader: `
     vec2 random2( vec2 p ) {

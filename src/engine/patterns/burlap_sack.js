@@ -2,6 +2,7 @@ export default {
   id: 'burlap_sack_artisan',
   name: 'Burlap Sack',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Coarse, wide-gap organic woven fibers used in heavy storage bags.',
   shader: `
     vec4 generate() {

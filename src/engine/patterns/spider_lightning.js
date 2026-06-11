@@ -2,6 +2,7 @@ export default {
   id: 'spider_lightning',
   name: 'Spider Lightning',
   category: 'Abstract',
+  added: '2026-06-11',
   description: 'A spider web spun from lightning: jagged electric bolts radiate from a glowing core, linked by sagging arcs of plasma and branching micro-filaments. Static render — Trading Paints safe.',
   shader: `
 

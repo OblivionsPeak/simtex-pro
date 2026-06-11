@@ -2,6 +2,7 @@ export default {
   id: 'weathered_paint_artisan',
   name: 'Weathered Paint',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Chipped and peeling paint flakes mimicking aged industrial surfaces.',
   shader: `
     float noise(vec2 p) {

@@ -2,6 +2,7 @@ export default {
   id: 'sakura_petals',
   name: 'Sakura Petals',
   category: 'Natural',
+  added: '2026-06-11',
   description: 'Scattered cherry-blossom petals drifting across the surface at three depths, each petal a softly notched teardrop with its own size, tilt and tint.',
   shader: `
 

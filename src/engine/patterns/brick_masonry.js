@@ -2,6 +2,7 @@ export default {
   id: 'brick_masonry_artisan',
   name: 'Classic Bricks',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Staggered rectangular masonry with structural mortar joints.',
   shader: `
     vec4 generate() {

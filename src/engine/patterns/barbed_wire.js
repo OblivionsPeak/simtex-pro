@@ -2,6 +2,7 @@ export default {
   id: 'barbed_wire_artisan',
   name: 'Barbed Wire',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Twisted metal strands and sharp interlocking barbs for security motifs.',
   shader: `
     vec4 generate() {

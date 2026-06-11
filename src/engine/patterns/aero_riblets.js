@@ -2,6 +2,7 @@ export default {
   id: 'aero_riblets',
   name: 'Aerodynamic Riblets',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'Microscale V-groove riblets machined into aerodynamic surfaces to reduce turbulent drag — as used on F1 cars, aircraft, and high-performance bodywork.',
   shader: `
     float hash_ar(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

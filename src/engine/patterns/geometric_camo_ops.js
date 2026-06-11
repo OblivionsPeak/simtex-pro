@@ -2,6 +2,7 @@ export default {
   id: 'geometric_camo_ops',
   name: 'Geometric Camo (Ops)',
   category: 'Geometric',
+  added: '2026-05-12',
   description: 'A modern, sharp geometric splinter camouflage designed for high-performance racing liveries with vibrant accent capabilities.',
   shader: `
     

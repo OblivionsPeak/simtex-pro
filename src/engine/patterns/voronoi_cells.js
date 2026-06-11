@@ -2,6 +2,7 @@ export default {
   id: 'voronoi_cells_pro',
   name: 'Voronoi Cells',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Mathematical fractured cell structures often found in biological and geological formations.',
   shader: `
     vec2 hash2(vec2 p) {

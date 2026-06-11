@@ -2,6 +2,7 @@ export default {
   id: 'sandblasted_steel',
   name: 'Sandblasted Steel',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Bead-blasted aluminium or steel with uniform isotropic micro-crater texture and soft satin sheen.',
   shader: `
     // --- helpers BEFORE generate() ---

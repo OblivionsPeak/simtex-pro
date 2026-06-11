@@ -2,6 +2,7 @@ export default {
   id: 'gravel_trap_artisan',
   name: 'Gravel Trap',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Irregular sharp cellular noise mimicking track-side runoff gravel.',
   shader: `
     vec4 generate() {

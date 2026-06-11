@@ -2,6 +2,7 @@ export default {
   id: 'chrome_mirror',
   name: 'Chrome Mirror',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'Mirror-polished chrome finish with gradient reflection bands simulating sky, horizon, and ground environment.',
   shader: `
 

@@ -2,6 +2,7 @@
   id: 'crt_phosphor_mask_artisan',
   name: 'CRT Phosphor Mask',
   category: 'Technology',
+  added: '2026-05-13',
   description: 'Macro view of an old tube monitor featuring RGB sub-pixels and scanlines.',
   shader: `
     vec4 generate() {

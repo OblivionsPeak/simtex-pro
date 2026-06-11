@@ -2,6 +2,7 @@ export default {
   id: 'wood_parquet_artisan',
   name: 'Wood Parquet',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Complex interlocking geometric floor planks for premium interior design.',
   shader: `
     vec4 generate() {

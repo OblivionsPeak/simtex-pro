@@ -2,6 +2,7 @@ export default {
   id: 'obsidian_fracture_artisan',
   name: 'Obsidian Flow',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Sharp, mirror-like volcanic glass fractures found in fresh obsidian flows.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'blueprint_grid_tech',
   name: 'Blueprint Grid',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'Technical structural alignment grid.',
   shader: `
     vec4 generate() {

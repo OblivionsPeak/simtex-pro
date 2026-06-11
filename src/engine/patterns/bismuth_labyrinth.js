@@ -2,6 +2,7 @@
   id: 'bismuth_labyrinth_artisan',
   name: 'Bismuth Labyrinth',
   category: 'Natural',
+  added: '2026-05-13',
   description: 'Right-angled, stair-step crystal growth with extreme iridescent oxide layer coloring.',
   shader: `
     vec4 generate() {

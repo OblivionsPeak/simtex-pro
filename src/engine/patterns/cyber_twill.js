@@ -2,6 +2,7 @@ export default {
   id: 'cyber_twill_artisan',
   name: 'Cyber Twill',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Advanced glowing-edge carbon fiber weave for high-performance cybernetic components.',
   shader: `
     vec4 generate() {

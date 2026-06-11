@@ -2,6 +2,7 @@ export default {
   id: 'tech_fractal_artisan',
   name: 'Logic Fractal',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Geometric recursive logic patterns mimicking complex computational architectures.',
   shader: `
     vec4 generate() {

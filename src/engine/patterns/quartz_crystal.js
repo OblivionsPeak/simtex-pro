@@ -2,6 +2,7 @@ export default {
   id: 'quartz_crystal_artisan',
   name: 'Quartz Plane',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Sharp geometric crystalline planes and internal mineral prisms.',
   shader: `
     vec4 generate() {

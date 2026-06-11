@@ -2,6 +2,7 @@ export default {
   id: 'hex_mesh_pro',
   name: 'Aerodynamic Hex',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'Technical high-airflow hexagonal mesh grid.',
   shader: `
     float hexDist(vec2 p) {

@@ -2,6 +2,7 @@
   id: 'cephalopod_chromatophores_artisan',
   name: 'Cephalopod Chromatophores',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'Dynamic, cellular color-changing spots that vary in size and density over a fleshy base layer.',
   shader: `
     vec2 random2( vec2 p ) {

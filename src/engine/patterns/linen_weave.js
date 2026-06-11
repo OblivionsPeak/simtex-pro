@@ -2,6 +2,7 @@
   id: 'linen_weave',
   name: 'Linen Weave',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Natural linen plain weave with organic fibre slubs and warm ecru tones.',
   shader: `
     // Hash for pseudo-random noise

@@ -2,6 +2,7 @@ export default {
   id: 'nappa_leather_artisan',
   name: 'Nappa Leather',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Smooth premium leather grain with subtle organic pores found in high-end bucket seats.',
   shader: `
     vec4 generate() {

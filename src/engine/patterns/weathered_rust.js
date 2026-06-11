@@ -2,6 +2,7 @@ export default {
   id: 'weathered_rust_pro',
   name: 'Weathered Rust',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Pro-grade oxidizing metallic surface with realistic pitting and oxidation layers.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

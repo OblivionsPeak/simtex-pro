@@ -2,6 +2,7 @@ export default {
   id: 'amethyst_natural',
   name: 'Amethyst Crystal',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Amethyst crystal cluster cross-section with elongated Voronoi cells, anisotropic face shading, and lavender-to-violet color range.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'fiber_optic_bundle_artisan',
   name: 'Fiber Bundle',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Glowing bundles of light-conducting strands found in high-speed data transmission systems.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'microchip_wafer_pro',
   name: 'Microchip Die',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'High-density silicon wafer etching with localized circuit density.',
   shader: `
     vec4 generate() {

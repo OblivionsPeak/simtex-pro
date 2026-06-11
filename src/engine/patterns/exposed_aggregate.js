@@ -2,6 +2,7 @@ export default {
   id: 'exposed_aggregate',
   name: 'Exposed Aggregate',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Exposed aggregate concrete with embedded smooth pebbles in warm stone colors set in a dark cement matrix.',
   shader: `
     // --- helpers BEFORE generate() ---

@@ -2,6 +2,7 @@ export default {
   id: 'gold_leaf_artisan',
   name: 'Gold Leaf',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Irregular metallic foil noise and gold leaf textures for premium accents.',
   shader: `
     vec4 generate() {

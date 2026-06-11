@@ -2,6 +2,7 @@ export default {
   id: 'demon_scales_artisan',
   name: 'Demon Scales',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Overlapping pointed organic scales with depth found in mythical beast armor.',
   shader: `
     vec4 generate() {

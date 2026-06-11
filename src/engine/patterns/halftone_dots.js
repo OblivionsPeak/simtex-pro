@@ -2,6 +2,7 @@ export default {
   id: 'halftone_dots_artisan',
   name: 'CMYK Halftone',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Professional offset color dots and halftone patterns used in high-end graphic design.',
   shader: `
     vec4 generate() {

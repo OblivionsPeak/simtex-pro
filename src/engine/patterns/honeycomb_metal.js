@@ -2,6 +2,7 @@
   id: 'honeycomb_metal',
   name: 'Honeycomb Metal',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Aerospace aluminium honeycomb panel â€” machine-perfect hexagonal cells with bright thin walls and deep dark interiors.',
   shader: `
     // Perfect hexagonal grid SDF

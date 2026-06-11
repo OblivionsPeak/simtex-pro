@@ -2,6 +2,7 @@ export default {
   id: 'morpho_iridescence_natural',
   name: 'Morpho Iridescence',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Deep structural blue iridescence of the Morpho butterfly wing — pure nanostructure diffraction blue with fine scale-row banding and angle-dependent shimmer.',
   shader: `
     float hash11(float p) { return fract(sin(p * 127.1) * 43758.5453); }

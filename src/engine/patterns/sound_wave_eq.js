@@ -2,6 +2,7 @@ export default {
   id: 'sound_wave_eq',
   name: 'Sound Wave EQ',
   category: 'Abstract',
+  added: '2026-06-11',
   description: 'A frozen spectrum analyzer: vertical equalizer bars of random heights rising from the baseline, segmented into LED blocks with a hot peak tip.',
   shader: `
 

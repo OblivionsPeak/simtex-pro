@@ -2,6 +2,7 @@ export default {
   id: 'tyre_burnout',
   name: 'Tyre Burnout',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Dark rubber burnout and skid marks on asphalt with irregular fuzzy edges, lighter internal streaks, and visible tyre tread impressions.',
   shader: `
     float fbm(vec2 p) {

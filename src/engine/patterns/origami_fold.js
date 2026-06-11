@@ -2,6 +2,7 @@
   id: 'origami_fold',
   name: 'Origami Fold',
   category: 'Geometric',
+  added: '2026-05-01',
   description: 'Origami crease pattern with radiating mountain and valley fold lines on cream paper.',
   shader: `
     // Distance from point p to infinite line through a and b

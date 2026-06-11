@@ -2,6 +2,7 @@ export default {
   id: 'charcoal_sketch_artisan',
   name: 'Charcoal Sketch',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Cross-hatched noise lines mimicking hand-drawn charcoal or graphite sketches.',
   shader: `
     vec4 generate() {

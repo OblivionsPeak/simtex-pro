@@ -2,6 +2,7 @@ export default {
   id: 'kevlar_grid_artisan',
   name: 'Kevlar Weave',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Heavy tactical weave used in protective armor and performance gear.',
   shader: `
     vec4 generate() {

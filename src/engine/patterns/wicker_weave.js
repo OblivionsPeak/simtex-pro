@@ -2,6 +2,7 @@ export default {
   id: 'wicker_weave_artisan',
   name: 'Wicker Weave',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Interlocking thick strands of woven wood found in traditional basketry.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'bird_plumage_artisan',
   name: 'Bird Plumage',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Soft, overlapping organic feather vane shapes found in avian wings.',
   shader: `
     vec4 generate() {

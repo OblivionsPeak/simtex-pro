@@ -2,6 +2,7 @@ export default {
   id: 'macrame_knot_artisan',
   name: 'Macrame Knot',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Interlocking geometric square knots found in traditional fiber crafts.',
   shader: `
     vec4 generate() {

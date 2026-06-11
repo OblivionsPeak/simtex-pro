@@ -2,6 +2,7 @@ export default {
   id: 'harlequin_diamond',
   name: 'Harlequin Diamond',
   category: 'Geometric',
+  added: '2026-04-15',
   description: 'Classic high-contrast diagonal diamond pattern.',
   shader: `
     vec4 generate() {

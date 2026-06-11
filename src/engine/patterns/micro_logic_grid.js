@@ -2,6 +2,7 @@ export default {
   id: 'micro_logic_grid_artisan',
   name: 'Logic Array',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Microscopic grid of semiconductor logic gates and data-bus structures.',
   shader: `
     vec4 generate() {

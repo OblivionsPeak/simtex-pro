@@ -2,6 +2,7 @@ export default {
   id: 'stitched_leather_pro',
   name: 'Stitched Leather',
   category: 'Organic',
+  added: '2026-04-15',
   description: 'Premium pebbled leather texture with perimeter stitching simulation.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

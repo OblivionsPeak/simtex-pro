@@ -2,6 +2,7 @@ export default {
   id: 'viral_capsid_artisan',
   name: 'Viral Capsid',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'Geometric, icosahedral protein structures interlocking to form complex biological shells.',
   shader: `
     // Hexagonal grid basis to simulate icosahedral unwrapping

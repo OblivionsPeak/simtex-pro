@@ -2,6 +2,7 @@ export default {
   id: 'mother_of_pearl_artisan',
   name: 'Mother of Pearl',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Iridescent-like wavy organic noise smears mimicking biological nacre.',
   shader: `
     vec4 generate() {

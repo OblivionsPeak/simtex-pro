@@ -2,6 +2,7 @@
   id: 'mesh_jersey',
   name: 'Mesh Jersey',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Open-hole sports jersey knit mesh with rounded thread loops forming a regular grid of holes.',
   shader: `
     // Smooth minimum for rounded shape merging

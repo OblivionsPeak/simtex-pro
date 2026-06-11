@@ -2,6 +2,7 @@ export default {
   id: 'lichen_growth_artisan',
   name: 'Lichen Moss',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Splotchy organic crust and symbiotic growths found on weathered rocks and trees.',
   shader: `
     vec4 generate() {

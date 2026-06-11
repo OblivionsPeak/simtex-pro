@@ -2,6 +2,7 @@ export default {
   id: 'realistic_viper_artisan',
   name: 'Realistic Viper',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Small, diamond-shaped high-fidelity interlocking scales mimicking viper skin.',
   shader: `
     vec4 generate() {

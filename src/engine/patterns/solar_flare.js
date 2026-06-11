@@ -2,6 +2,7 @@ export default {
   id: 'solar_flare_pro',
   name: 'Solar Flare',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Static plasma energy flux with high-intensity radiation centers.',
   shader: `
     vec4 generate() {

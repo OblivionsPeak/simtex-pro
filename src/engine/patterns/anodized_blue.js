@@ -2,6 +2,7 @@ export default {
   id: 'anodized_blue',
   name: 'Anodized Blue',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'Anodized aluminum in deep cobalt/sapphire blue with subtle directional streaking from the anodizing bath.',
   shader: `
 

@@ -2,6 +2,7 @@ export default {
   id: 'asphalt_pro_artisan',
   name: 'Asphalt Pro',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'High-detail granular road surface noise found on professional track layouts.',
   shader: `
     vec4 generate() {

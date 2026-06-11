@@ -2,6 +2,7 @@ export default {
   id: 'solar_flares_v2_artisan',
   name: 'Solar Corona',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Abstract high-energy atmospheric flares and plasma smears from a stellar corona.',
   shader: `
     vec4 generate() {

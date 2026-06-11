@@ -2,6 +2,7 @@ export default {
   id: 'iris_fibers_artisan',
   name: 'Iris Fibers',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Radial organic fibrous patterns found in the human eye iris.',
   shader: `
     vec4 generate() {

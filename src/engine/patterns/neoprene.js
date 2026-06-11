@@ -2,6 +2,7 @@ export default {
   id: 'neoprene',
   name: 'Neoprene',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Dense rubber neoprene with a characteristic small-cell foam surface texture and slightly glossy matte finish, as used in wetsuits and padding.',
   shader: `
 

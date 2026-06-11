@@ -2,6 +2,7 @@ export default {
   id: 'argyle_knit_artisan',
   name: 'Argyle Knit',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Classic diamond-checkered textile pattern with structural crossing threads.',
   shader: `
     vec4 generate() {

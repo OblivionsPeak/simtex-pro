@@ -2,6 +2,7 @@ export default {
   id: 'cast_iron',
   name: 'Cast Iron',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Raw cast iron with a coarse sand-mold grain, dark matte grey surface, and occasional small porosity dimples from casting.',
   shader: `
     float fbm(vec2 p) {

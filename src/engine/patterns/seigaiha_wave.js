@@ -2,6 +2,7 @@ export default {
   id: 'seigaiha_wave',
   name: 'Seigaiha Waves',
   category: 'Geometric',
+  added: '2026-06-11',
   description: 'The classic Japanese seigaiha wave pattern: staggered overlapping fans of crisp concentric semicircle arcs, like a stylized sea.',
   shader: `
 

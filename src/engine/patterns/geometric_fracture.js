@@ -2,6 +2,7 @@ export default {
   id: 'geometric_fracture_artisan',
   name: 'Shatter Shard',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Sharp angular procedural shards and crystalline fractures mimicking high-speed impact surfaces.',
   shader: `
     vec2 rand(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

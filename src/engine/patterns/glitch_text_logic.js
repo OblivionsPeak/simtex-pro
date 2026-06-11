@@ -2,6 +2,7 @@ export default {
   id: 'glitch_text_logic_artisan',
   name: 'Logic Glitch',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Abstract blocks of logic-like symbols and corrupted data stream visualizations.',
   shader: `
     vec4 generate() {

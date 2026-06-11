@@ -2,6 +2,7 @@ export default {
   id: 'acid_etch_artisan',
   name: 'Acid Etch',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'High-contrast stylized chemical erosion patterns found in weathered metals.',
   shader: `
     float noise(vec2 p) {

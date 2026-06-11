@@ -2,6 +2,7 @@ export default {
   id: 'halftone_pop_artisan',
   name: 'Halftone Pop-Art',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Classic CMYK-style dot matrix textures found in pop-art and comic books.',
   shader: `
     vec4 generate() {

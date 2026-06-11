@@ -2,6 +2,7 @@ export default {
   id: 'hunting_camo_forest',
   name: 'Forest Hunting Camo',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Pro-grade wilderness camouflage with organic branch and leaf shapes.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

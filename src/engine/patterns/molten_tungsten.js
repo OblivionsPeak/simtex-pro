@@ -2,6 +2,7 @@
   id: 'molten_tungsten_artisan',
   name: 'Molten Tungsten',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Superheated, cracked metal surface glowing intensely white-hot in the deep fissures.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

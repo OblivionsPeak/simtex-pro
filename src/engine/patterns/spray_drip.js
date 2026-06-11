@@ -2,6 +2,7 @@ export default {
   id: 'spray_drip_artisan',
   name: 'Spray Drip',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Static vertical paint drip effect mimicking street-art application.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

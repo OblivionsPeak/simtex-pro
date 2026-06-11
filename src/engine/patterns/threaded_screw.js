@@ -2,6 +2,7 @@ export default {
   id: 'threaded_screw_artisan',
   name: 'Threaded Bolt',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Helical metal grooves representing industrial fasteners and bolts.',
   shader: `
     vec4 generate() {

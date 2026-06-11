@@ -2,6 +2,7 @@ export default {
   id: 'steel_wool_artisan',
   name: 'Steel Wool',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Chaos-line noise mimicking tangled metal strands found in industrial abrasives.',
   shader: `
     vec4 generate() {

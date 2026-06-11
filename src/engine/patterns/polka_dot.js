@@ -2,6 +2,7 @@ export default {
   id: 'polka_dot_artisan',
   name: 'Pro Polka Dots',
   category: 'Organic',
+  added: '2026-04-15',
   description: 'Precision uniform polka dots with adjustable spacing and edge softness.',
   shader: `
     vec4 generate() {

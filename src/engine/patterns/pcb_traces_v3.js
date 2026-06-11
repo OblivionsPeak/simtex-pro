@@ -2,6 +2,7 @@ export default {
   id: 'pcb_traces_v3_artisan',
   name: 'Pro PCB Logic',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Triple-layer circuit logic with advanced bus-routing and microscopic trace detail.',
   shader: `
     vec4 generate() {

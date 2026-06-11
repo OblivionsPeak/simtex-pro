@@ -2,6 +2,7 @@ export default {
   id: 'vaporwave_sun_artisan',
   name: 'Retro Sun',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Segmented radial retro sun patterns found in 80s synthwave and vaporwave aesthetics.',
   shader: `
     vec4 generate() {

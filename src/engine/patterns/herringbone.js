@@ -2,6 +2,7 @@ export default {
   id: 'herringbone_weave_pro',
   name: 'Herringbone',
   category: 'Geometric',
+  added: '2026-04-15',
   description: 'Pro-grade chevron-style herringbone weave pattern.',
   shader: `
     vec4 generate() {

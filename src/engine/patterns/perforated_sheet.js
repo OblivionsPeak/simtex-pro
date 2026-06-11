@@ -2,6 +2,7 @@ export default {
   id: 'perforated_sheet',
   name: 'Perforated Sheet',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'CNC-perforated aluminium sheet with round punched-through holes and chamfer highlights on hole rims.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

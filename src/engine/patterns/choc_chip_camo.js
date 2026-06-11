@@ -2,6 +2,7 @@ export default {
   id: 'choc_chip_camo',
   name: 'Chocolate Chip Camo',
   category: 'Organic',
+  added: '2026-05-12',
   description: 'Broad waves of base color overlaid with small, high-contrast pebbles to mimic a rocky desert floor.',
   shader: `
     

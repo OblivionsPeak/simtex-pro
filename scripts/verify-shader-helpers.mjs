@@ -16,6 +16,12 @@ for (const f of readdirSync(dir).filter(x => x.endsWith('.js'))) {
   const p = (await import(`file://${join(dir, f)}`)).default;
   const full = buildHelperPrelude(p.shader) + p.shader;
 
+  // Every pattern must carry an 'added' date (YYYY-MM-DD) for newest-first sorting
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(p.added || '')) {
+    console.log(`NO 'added' DATE in ${f}`);
+    bad++;
+  }
+
   for (const name of HELPERS) {
     const calls = new RegExp(`\\b${name}\\s*\\(`).test(p.shader);
     const defs = [...full.matchAll(new RegExp(`(float|vec3)\\s+${name}\\s*\\([^)]*\\)\\s*\\{`, 'g'))];

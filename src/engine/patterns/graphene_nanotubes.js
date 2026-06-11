@@ -2,6 +2,7 @@ export default {
   id: 'graphene_nanotubes_artisan',
   name: 'Graphene Nanotubes',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Hexagonal carbon lattices at a molecular scale with metallic glowing points.',
   shader: `
     // Hexagonal grid function

@@ -2,6 +2,7 @@ export default {
   id: 'brake_rotors_artisan',
   name: 'Brake Rotors',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Concentric heat-etched metal grooves found on high-performance brake discs.',
   shader: `
     vec4 generate() {

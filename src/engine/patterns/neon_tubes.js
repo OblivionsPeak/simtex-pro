@@ -2,6 +2,7 @@ export default {
   id: 'neon_tubes_artisan',
   name: 'Neon Path',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Glowing tubular neon paths mimicking high-fidelity urban lighting rigs.',
   shader: `
     vec4 generate() {

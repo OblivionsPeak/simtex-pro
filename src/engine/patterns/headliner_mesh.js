@@ -2,6 +2,7 @@ export default {
   id: 'headliner_mesh_artisan',
   name: 'Headliner Mesh',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Breathable ceiling textile with hexagonal micro-pores found in modern automotive interiors.',
   shader: `
     vec4 generate() {

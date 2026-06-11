@@ -2,6 +2,7 @@ export default {
   id: 'tig_weld',
   name: 'TIG Weld Bead',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'TIG weld bead running horizontally with characteristic stacked-coin ripple arcs, hot bright center, and heat-affected steel.',
   shader: `
     // --- helpers BEFORE generate() ---

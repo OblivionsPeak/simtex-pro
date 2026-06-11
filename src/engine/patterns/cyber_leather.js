@@ -2,6 +2,7 @@ export default {
   id: 'cyber_leather_artisan',
   name: 'Cyber Leather',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Synthetic high-performance leather with integrated glowing micro-circuitry pores.',
   shader: `
     vec4 generate() {

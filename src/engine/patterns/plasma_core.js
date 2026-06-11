@@ -2,6 +2,7 @@ export default {
   id: 'plasma_core_artisan',
   name: 'Plasma Core',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Pulsing radial energy patterns mimicking high-energy physics experiment cores.',
   shader: `
     vec4 generate() {

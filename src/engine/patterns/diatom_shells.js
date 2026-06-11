@@ -2,6 +2,7 @@ export default {
   id: 'diatom_shells_artisan',
   name: 'Diatom Shells',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Intricate microscopic silicate shells found in marine plankton formations.',
   shader: `
     vec4 generate() {

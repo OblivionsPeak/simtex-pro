@@ -2,6 +2,7 @@ export default {
   id: 'wood_grain_artisan',
   name: 'Wood Grain Pro',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'High-detail procedural timber with concentric growth rings and knots.',
   shader: `
     vec4 generate() {

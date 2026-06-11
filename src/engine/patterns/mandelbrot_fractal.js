@@ -2,6 +2,7 @@ export default {
   id: 'mandelbrot_fractal',
   name: 'Mandelbrot Explorer',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Pure mathematical fractal boundary with high-precision iteration.',
   shader: `
     vec4 generate() {

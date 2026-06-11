@@ -2,6 +2,7 @@
   id: 'interference_rings',
   name: 'Interference Rings',
   category: 'Abstract',
+  added: '2026-05-01',
   description: "Newton's rings â€” concentric iridescent interference fringes radiating from a contact point.",
   shader: `
     // Convert HSV to RGB (GLSL 1.0 compatible)

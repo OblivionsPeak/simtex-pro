@@ -2,6 +2,7 @@ export default {
   id: 'wavy_checkers_artisan',
   name: 'Wavy Checkers',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Flowing, distorted racing flags mimicking a waving checkered banner.',
   shader: `
     vec4 generate() {

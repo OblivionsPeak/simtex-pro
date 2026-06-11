@@ -2,6 +2,7 @@ export default {
   id: 'banded_agate_artisan',
   name: 'Banded Agate',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Concentric mineral rings and gemstone strata found in polished agate slices.',
   shader: `
     vec4 generate() {

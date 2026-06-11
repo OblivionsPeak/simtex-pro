@@ -2,6 +2,7 @@ export default {
   id: 'cyber_wiring_artisan',
   name: 'Cyber Bundle',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Dense, tangled bundles of high-speed digital wiring and fiber-optic strands.',
   shader: `
     vec4 generate() {

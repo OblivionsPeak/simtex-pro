@@ -2,6 +2,7 @@ export default {
   id: 'fish_scales_artisan',
   name: 'Fish Scales',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Round, thin overlapping semi-circles found in aquatic life and reflective armor.',
   shader: `
     vec4 generate() {

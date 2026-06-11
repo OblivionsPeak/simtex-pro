@@ -2,6 +2,7 @@
   id: 'racing_livery_stripe',
   name: 'Racing Livery Stripe',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Dual-tone diagonal speed stripe with gradient fade and crisp edges â€” a classic motorsport livery element.',
   shader: `
     // Signed distance to an infinite angled stripe centred on the canvas

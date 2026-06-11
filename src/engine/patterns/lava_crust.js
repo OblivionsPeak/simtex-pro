@@ -2,6 +2,7 @@ export default {
   id: 'lava_crust_pro',
   name: 'Lava Crust',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Static volcanic cooling patterns with high-heat emission cracks.',
   shader: `
     vec4 generate() {

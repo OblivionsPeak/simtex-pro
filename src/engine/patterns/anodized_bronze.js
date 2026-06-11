@@ -2,6 +2,7 @@ export default {
   id: 'anodized_bronze',
   name: 'Anodized Bronze',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'Anodized aluminum in a warm bronze/gold tone with micro-grain texture and subtle colour banding from bath imperfections.',
   shader: `
     float fbm(vec2 p) {

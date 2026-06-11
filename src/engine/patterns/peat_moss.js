@@ -2,6 +2,7 @@ export default {
   id: 'peat_moss_artisan',
   name: 'Peat Moss',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Dense organic clumpy sprawl mimicking professional landscape and high-fidelity vegetation.',
   shader: `
     vec4 generate() {

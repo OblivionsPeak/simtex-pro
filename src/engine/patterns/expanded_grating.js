@@ -2,6 +2,7 @@ export default {
   id: 'expanded_grating_pro',
   name: 'Expanded Metal',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Heavy industrial walkway grating with diamond-slotted apertures.',
   shader: `
     vec4 generate() {

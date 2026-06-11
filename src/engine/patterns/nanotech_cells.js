@@ -2,6 +2,7 @@ export default {
   id: 'nanotech_cells_artisan',
   name: 'Nano Plating',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Microscopic hexagonal active plating designed for dynamic aerodynamic surfaces.',
   shader: `
     vec4 generate() {

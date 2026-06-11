@@ -2,6 +2,7 @@ export default {
   id: 'travertine_natural',
   name: 'Travertine',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Layered travertine limestone with wavy cream-to-tan sedimentary bands and occasional trapped gas-bubble void pockets.',
   shader: `
     float hash11(float p)  { return fract(sin(p * 127.1) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'roll_cage_foam_artisan',
   name: 'Roll Cage Foam',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Dense, pitted cellular protective foam found on professional roll cage padding.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

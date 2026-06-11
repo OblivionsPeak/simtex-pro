@@ -2,6 +2,7 @@ export default {
   id: 'monstera_leaf_artisan',
   name: 'Monstera Split-Leaf',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'The iconic tropical split-leaf silhouette with decorative voids.',
   shader: `
     float circle(vec2 p, float r) { return length(p) - r; }

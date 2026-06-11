@@ -2,6 +2,7 @@ export default {
   id: 'moire_silk_artisan',
   name: 'Moire Silk',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Water-like wavy fabric interference patterns found in heavy silk moire.',
   shader: `
     vec4 generate() {

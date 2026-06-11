@@ -2,6 +2,7 @@ export default {
   id: 'rim_spoke_carbon_artisan',
   name: 'Spoke Carbon',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Multi-layered carbon strands optimized for high-strength wheel spokes.',
   shader: `
     vec4 generate() {

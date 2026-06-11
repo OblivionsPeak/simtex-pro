@@ -2,6 +2,7 @@ export default {
   id: 'worn_asphalt',
   name: 'Worn Asphalt',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Heavily worn racing asphalt with exposed aggregate, oil-stained patches, crack lines, and rubber marbling from racing tyres.',
   shader: `
     float fbm(vec2 p) {

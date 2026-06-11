@@ -2,6 +2,7 @@ export default {
   id: 'cow_print',
   name: 'Cow Print',
   category: 'Organic',
+  added: '2026-06-11',
   description: 'Classic Holstein cow hide: irregular organic black blotches scattered over white, with a second smaller blotch layer for natural variety.',
   shader: `
 

@@ -2,6 +2,7 @@ export default {
   id: 'roof_shingles_artisan',
   name: 'Scalloped Shingles',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Overlapping curved roofing tiles used in architectural design.',
   shader: `
     vec4 generate() {

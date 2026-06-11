@@ -2,6 +2,7 @@ export default {
   id: 'hex_fade',
   name: 'Hex Fade',
   category: 'Geometric',
+  added: '2026-06-11',
   description: 'The signature modern GT livery motif: a crisp honeycomb hexagon grid that shrinks and dissolves to nothing along a controllable fade direction with dithered per-cell dropout.',
   shader: `
 

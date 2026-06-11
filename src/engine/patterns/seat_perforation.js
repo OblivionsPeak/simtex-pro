@@ -2,6 +2,7 @@ export default {
   id: 'seat_perforation_artisan',
   name: 'Seat Perforation',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Grid of fine ventilation holes found in professional bucket seats and luxury automotive leather.',
   shader: `
     vec4 generate() {

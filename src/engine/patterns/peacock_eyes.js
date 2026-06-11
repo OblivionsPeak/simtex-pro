@@ -2,6 +2,7 @@ export default {
   id: 'peacock_eyes_artisan',
   name: 'Peacock Eyes',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Ornate organic pattern mimicking the "eyes" found in peacock feathers.',
   shader: `
     vec4 generate() {

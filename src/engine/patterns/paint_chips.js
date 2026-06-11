@@ -2,6 +2,7 @@ export default {
   id: 'paint_chips',
   name: 'Paint Chips',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'Chipped and scratched paint surface revealing bare metal substrate through irregular chips and long directional scratches.',
   shader: `
     float hash1(float n) { return fract(sin(n) * 43758.5453); }

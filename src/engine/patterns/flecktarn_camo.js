@@ -2,6 +2,7 @@ export default {
   id: 'flecktarn_camo',
   name: 'Flecktarn Camo',
   category: 'Organic',
+  added: '2026-05-12',
   description: 'A complex pattern consisting of small, densely packed spots and dots that create a disruptive, noisy texture.',
   shader: `
     

@@ -2,6 +2,7 @@ export default {
   id: 'plant_cells_artisan',
   name: 'Plant Cells',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Geometric hexagonal-ish stacked cells mimicking biological plant structures.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

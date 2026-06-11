@@ -2,6 +2,7 @@ export default {
   id: 'salt_crystal_natural',
   name: 'Salt Crystal',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Cubic salt crystal formations of varying size seen from above, white and translucent on a dark substrate.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

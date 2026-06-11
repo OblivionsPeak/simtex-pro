@@ -2,6 +2,7 @@ export default {
   id: 'oil_slick',
   name: 'Oil Slick',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Thin-film oil interference on wet dark tarmac — rainbow iridescence bands in sinuous organic puddles.',
   shader: `
     // --- helpers BEFORE generate() ---

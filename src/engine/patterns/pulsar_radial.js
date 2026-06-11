@@ -2,6 +2,7 @@ export default {
   id: 'pulsar_radial_artisan',
   name: 'Pulsar Radial',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'High-frequency radial pulses mimicking deep-space electromagnetic emissions.',
   shader: `
     vec4 generate() {

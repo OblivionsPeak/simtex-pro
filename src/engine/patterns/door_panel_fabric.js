@@ -2,6 +2,7 @@ export default {
   id: 'door_panel_fabric_artisan',
   name: 'Panel Fabric',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Coarse interior textile weave found in lightweight door cards and racing interiors.',
   shader: `
     vec4 generate() {

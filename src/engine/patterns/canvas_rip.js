@@ -2,6 +2,7 @@ export default {
   id: 'canvas_rip_artisan',
   name: 'Canvas Rip',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Rough, crossing threads with a torn opening mimicking shredded heavy canvas.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'turbo_fan_artisan',
   name: 'Turbo Turbine',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Radial blades of a high-boost turbocharger compressor wheel.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'paper_tear_artisan',
   name: 'Aggressive Tear',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'High-intensity directional shreds and jagged ruptures mimicking ripped metal or heavy cardstock.',
   shader: `
     float fbm(vec2 p) {

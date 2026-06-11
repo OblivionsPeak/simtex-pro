@@ -2,6 +2,7 @@ export default {
   id: 'fingerprint_swirls_artisan',
   name: 'Fingerprint Swirls',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Swirling organic ridge patterns mimicking human dermatoglyphics.',
   shader: `
     vec4 generate() {

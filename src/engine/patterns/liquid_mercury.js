@@ -2,6 +2,7 @@ export default {
   id: 'liquid_mercury_artisan',
   name: 'Liquid Mercury',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Smooth, blobby metallic shapes with high specularity mimicking liquid metal.',
   shader: `
     vec4 generate() {

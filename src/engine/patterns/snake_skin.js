@@ -2,6 +2,7 @@ export default {
   id: 'snake_skin_artisan',
   name: 'Snake Skin',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Precisely interlocking reptilian scales with organic variance.',
   shader: `
     vec4 generate() {

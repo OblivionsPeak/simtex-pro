@@ -2,6 +2,7 @@ export default {
   id: 'tech_hex_v2_artisan',
   name: 'Tech Hex v2',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'Advanced geometric hex-grid with internal subdivided offsets for sci-fi panels.',
   shader: `
     vec2 hexCoords(vec2 uv) {

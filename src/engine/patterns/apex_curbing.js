@@ -2,6 +2,7 @@ export default {
   id: 'apex_curbing_artisan',
   name: 'Track Curbing',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Classic circuit apex curbing with tire wear marks.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

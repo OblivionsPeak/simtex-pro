@@ -2,6 +2,7 @@ export default {
   id: 'anodized_titanium_artisan',
   name: 'Anodized Titanium',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'Multi-colored prismatic heat distribution and electrochemical finish for high-performance components.',
   shader: `
     vec4 generate() {

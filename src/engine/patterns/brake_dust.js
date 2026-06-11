@@ -2,6 +2,7 @@ export default {
   id: 'brake_dust_artisan',
   name: 'Brake Dust',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Fine anisotropic dark grit and metallic shavings found on race-worn wheel rims.',
   shader: `
     vec4 generate() {

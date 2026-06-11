@@ -2,6 +2,7 @@ export default {
   id: 'metal_flake',
   name: 'Metal Flake',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.',
   shader: `
     float hash1(float n) { return fract(sin(n) * 43758.5453); }

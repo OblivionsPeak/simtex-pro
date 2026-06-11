@@ -2,6 +2,7 @@ export default {
   id: 'louis_check_artisan',
   name: 'Louis Check',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Luxury designer-style checkered leather pattern with premium soft shading.',
   shader: `
     vec4 generate() {

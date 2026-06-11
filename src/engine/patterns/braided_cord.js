@@ -2,6 +2,7 @@ export default {
   id: 'braided_cord_artisan',
   name: 'Braided Cord',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Overlapping thick strands of woven tactical rope found in automotive and maritime gear.',
   shader: `
     vec4 generate() {

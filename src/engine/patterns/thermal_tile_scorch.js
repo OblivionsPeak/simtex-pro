@@ -2,6 +2,7 @@ export default {
   id: 'thermal_tile_scorch_artisan',
   name: 'Thermal Tile Scorch',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Heat-ablated spacecraft tiles showing directional plasma scorch marks and edge wear.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

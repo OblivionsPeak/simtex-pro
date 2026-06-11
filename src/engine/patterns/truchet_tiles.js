@@ -2,6 +2,7 @@ export default {
   id: 'truchet_tiles_artisan',
   name: 'Truchet Arc',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Interlocking arc-based tiles mimicking complex organic circuitry and decorative pavement.',
   shader: `
     vec4 generate() {

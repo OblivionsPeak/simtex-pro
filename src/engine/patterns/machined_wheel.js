@@ -2,6 +2,7 @@ export default {
   id: 'machined_wheel',
   name: 'Machined Wheel',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'CNC machined aluminum wheel face with concentric lathe rings, radial spoke shadows, and a polished centre hub.',
   shader: `
 

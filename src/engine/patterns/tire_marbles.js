@@ -2,6 +2,7 @@ export default {
   id: 'tire_marbles_artisan',
   name: 'Tire Marbles',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Clumpy rubber debris and "offline" track grit formed during high-heat racing conditions.',
   shader: `
     vec4 generate() {

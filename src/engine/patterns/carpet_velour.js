@@ -2,6 +2,7 @@ export default {
   id: 'carpet_velour_artisan',
   name: 'Velour Carpet',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Soft, deep pile industrial carpet found in premium grand touring interiors.',
   shader: `
     vec4 generate() {

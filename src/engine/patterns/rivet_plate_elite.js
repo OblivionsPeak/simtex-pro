@@ -2,6 +2,7 @@ export default {
   id: 'rivet_plate_elite',
   name: 'Rivet Plate Elite',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Overlapping heavy armor sections with structural corner rivets.',
   shader: `
     vec4 generate() {

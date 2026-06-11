@@ -2,6 +2,7 @@ export default {
   id: 'bismuth_crystal_natural',
   name: 'Bismuth Crystal',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Iridescent metallic bismuth hopper crystals with staircase terraced surfaces and rainbow oxide interference colors.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

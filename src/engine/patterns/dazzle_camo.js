@@ -2,6 +2,7 @@ export default {
   id: 'dazzle_camo',
   name: 'Dazzle Camo',
   category: 'Geometric',
+  added: '2026-06-11',
   description: 'WWI battleship razzle-dazzle: bold irregular geometric zones, each filled with hard-edged two-tone stripes at its own clashing angle and frequency, plus occasional accent zones.',
   shader: `
 

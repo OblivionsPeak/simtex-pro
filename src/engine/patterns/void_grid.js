@@ -2,6 +2,7 @@ export default {
   id: 'void_grid_artisan',
   name: 'Void Grid',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Infinite perspective grid reminiscent of 1980s retro-futuristic digital visualization.',
   shader: `
     vec4 generate() {

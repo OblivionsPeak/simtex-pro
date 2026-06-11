@@ -2,6 +2,7 @@ export default {
   id: 'bone_pores_artisan',
   name: 'Bone Pores',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Porous trabecular organic network found in skeletal sections.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'watercolor_bleed_artisan',
   name: 'Watercolor Flow',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Soft organic color spreads and bleeding textures mimicking paint on high-fidelity wet paper.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'washi_paper',
   name: 'Washi Paper',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Japanese handmade washi paper with long random fibres, mottled translucency, and cream base.',
   shader: `
     float hash21(vec2 p) {

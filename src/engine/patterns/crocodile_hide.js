@@ -2,6 +2,7 @@ export default {
   id: 'crocodile_hide_artisan',
   name: 'Crocodile Hide',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Large rectangular blocky scales with organic gap jitter found in reptilian leather.',
   shader: `
     vec4 generate() {

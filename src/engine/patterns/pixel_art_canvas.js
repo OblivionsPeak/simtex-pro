@@ -2,6 +2,7 @@ export default {
   id: 'pixel_art_canvas_artisan',
   name: 'Pixel Grid',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Large-block quantized color grid mimicking retro 8-bit digital canvases.',
   shader: `
     vec4 generate() {

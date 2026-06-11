@@ -2,6 +2,7 @@
   id: 'holographic_foil_artisan',
   name: 'Holographic Foil',
   category: 'Abstract',
+  added: '2026-05-13',
   description: 'Multi-layered, shifting prismatic gradients reminiscent of rare trading cards.',
   shader: `
     vec4 generate() {

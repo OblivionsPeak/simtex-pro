@@ -2,6 +2,7 @@ export default {
   id: 'rubber_compound',
   name: 'Rubber Compound',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Fresh vulcanised racing tyre rubber — near-black carbon grain, subtle mould-release sheen, and low-frequency press flow marks.',
   shader: `
     // --- helpers BEFORE generate() ---

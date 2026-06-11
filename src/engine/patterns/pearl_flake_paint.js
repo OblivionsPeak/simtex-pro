@@ -2,6 +2,7 @@ export default {
   id: 'pearl_flake_paint',
   name: 'Pearl Flake Paint',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'Iridescent pearl automotive paint with hue-shifting colour across the surface and fine mica flake shimmer.',
   shader: `
 

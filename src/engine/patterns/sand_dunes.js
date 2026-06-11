@@ -2,6 +2,7 @@ export default {
   id: 'sand_dunes_artisan',
   name: 'Sand Dunes',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Rippling wave-like ridges found in vast desert wastelands and oceanic floors.',
   shader: `
     vec4 generate() {

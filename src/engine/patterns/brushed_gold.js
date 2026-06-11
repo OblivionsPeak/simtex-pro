@@ -2,6 +2,7 @@ export default {
   id: 'brushed_gold',
   name: 'Brushed Gold',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Directional brushed gold metal with fine horizontal linear grain and a subtle specular sheen, as found on machined jewelry and trim.',
   shader: `
 

@@ -2,6 +2,7 @@ export default {
   id: 'slate_rock_natural',
   name: 'Slate Rock',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Dark layered slate with parallel cleavage planes, fine horizontal grain, and occasional crossing fracture lines.',
   shader: `
     float hash11(float p)  { return fract(sin(p * 127.1) * 43758.5453); }

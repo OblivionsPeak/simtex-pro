@@ -2,6 +2,7 @@ export default {
   id: 'rose_gold_brushed',
   name: 'Rose Gold Brushed',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Directional brushed rose gold metal with warm pink-gold grain streaks and a subtle specular sheen band.',
   shader: `
     float hash11(float p) { return fract(sin(p * 127.1) * 43758.5453); }

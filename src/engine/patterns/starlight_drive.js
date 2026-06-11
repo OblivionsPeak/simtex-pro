@@ -2,6 +2,7 @@ export default {
   id: 'starlight_drive_artisan',
   name: 'Star Drive',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Streaked starfield with motion blur effects found in high-speed space transit simulations.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

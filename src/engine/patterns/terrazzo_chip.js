@@ -2,6 +2,7 @@ export default {
   id: 'terrazzo_chip_artisan',
   name: 'Terrazzo Chip',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'Scattered irregular stone flakes and marble chips mimicking professional terrazzo flooring.',
   shader: `
     vec4 generate() {

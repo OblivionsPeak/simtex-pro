@@ -2,6 +2,7 @@ export default {
   id: 'tiger_stripes_artisan',
   name: 'Predator Stripes',
   category: 'Organic',
+  added: '2026-04-15',
   description: 'Organic predator-style tiger stripes with tapered edges.',
   shader: `
     vec4 generate() {

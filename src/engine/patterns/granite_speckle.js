@@ -2,6 +2,7 @@ export default {
   id: 'granite_speckle_natural',
   name: 'Granite Speckle',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Classic grey granite with randomly scattered feldspar, quartz, biotite mica, and hornblende mineral grains.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'neural_net_artisan',
   name: 'Neural Network',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Interconnected nodes and synthetic logic lines mimicking artificial intelligence structures.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

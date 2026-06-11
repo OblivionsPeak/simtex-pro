@@ -2,6 +2,7 @@ export default {
   id: 'laser_etch',
   name: 'Laser Etch',
   category: 'Technology',
+  added: '2026-05-01',
   description: 'Laser-engraved geometric lines on dark anodized metal, revealing bright bare aluminium in precise 45-degree patterns.',
   shader: `
     // --- helpers BEFORE generate() ---

@@ -2,6 +2,7 @@ export default {
   id: 'infinite_spiral_pro',
   name: 'Infinite Spiral',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Mathematical spirograph with static interlocking floral loops.',
   shader: `
     vec4 generate() {

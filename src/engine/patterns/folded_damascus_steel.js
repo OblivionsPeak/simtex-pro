@@ -2,6 +2,7 @@ export default {
   id: 'folded_damascus_steel_artisan',
   name: 'Folded Damascus Steel',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Swirling, wavy folded steel patterns with high-contrast acid bath etching.',
   shader: `
     float fbm(vec2 p) {

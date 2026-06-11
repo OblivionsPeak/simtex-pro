@@ -2,6 +2,7 @@ export default {
   id: 'heat_blued_titanium',
   name: 'Heat-Blued Titanium',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Titanium heat-oxidation colour bands — the characteristic silver → straw → gold → purple → blue gradient on exhaust systems and racing hardware.',
   shader: `
     float hash_hbt(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

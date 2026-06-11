@@ -2,6 +2,7 @@ export default {
   id: 'mandala_radial_artisan',
   name: 'Mandala Radial',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Harmonic geometric recurrence and radial symmetry patterns.',
   shader: `
     vec4 generate() {

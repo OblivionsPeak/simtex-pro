@@ -2,6 +2,7 @@ export default {
   id: 'linear_gradient_artisan',
   name: 'Master Linear',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'High-precision linear gradient for base transitions.',
   shader: `
     vec4 generate() {

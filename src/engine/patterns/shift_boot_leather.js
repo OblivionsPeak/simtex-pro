@@ -2,6 +2,7 @@ export default {
   id: 'shift_boot_leather_artisan',
   name: 'Shift Boot Leather',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Organic crumpled leather folds and distressed textures found in shift boots and gaiters.',
   shader: `
     vec4 generate() {

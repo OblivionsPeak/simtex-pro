@@ -2,6 +2,7 @@ export default {
   id: 'cyber_grid_pro',
   name: 'Cyber Grid',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'Pro-grade data-matrix style grid with secondary interference lines.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'root_system_artisan',
   name: 'Root System',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Branching procedural line networks found in organic root systems and neural pathways.',
   shader: `
     vec4 generate() {

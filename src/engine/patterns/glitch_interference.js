@@ -2,6 +2,7 @@ export default {
   id: 'glitch_interference_artisan',
   name: 'Signal Glitch',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Chaotic horizontal interference and data-stream glitch patterns.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

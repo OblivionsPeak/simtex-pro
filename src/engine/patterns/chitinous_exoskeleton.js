@@ -2,6 +2,7 @@ export default {
   id: 'chitinous_exoskeleton_artisan',
   name: 'Chitinous Exoskeleton',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'Iridescent, segmented insectoid armor plating with deep, structural color shifting.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

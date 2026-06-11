@@ -2,6 +2,7 @@ export default {
   id: 'impasto_paint_artisan',
   name: 'Impasto Paint',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Thick, textured brush strokes and heavy oil paint impasto effects.',
   shader: `
     vec4 generate() {

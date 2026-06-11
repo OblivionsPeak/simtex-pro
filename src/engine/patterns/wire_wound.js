@@ -2,6 +2,7 @@ export default {
   id: 'wire_wound',
   name: 'Wire Wound',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Tightly wound coil seen from above — concentric oval rings from wire turns with bright highlights and trailing-edge shadows, as in a solenoid cross-section.',
   shader: `
 

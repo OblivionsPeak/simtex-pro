@@ -2,6 +2,7 @@ export default {
   id: 'etched_brass_artisan',
   name: 'Etched Brass',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'Victorian-style chemical etching and ornate brass panel patterns.',
   shader: `
     vec4 generate() {

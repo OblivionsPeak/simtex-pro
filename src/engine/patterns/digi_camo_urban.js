@@ -2,6 +2,7 @@ export default {
   id: 'digi_camo_urban',
   name: 'Urban Digi Camo',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'High-contrast city digital camouflage.',
   shader: `
     vec4 generate() {

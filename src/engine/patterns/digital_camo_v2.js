@@ -2,6 +2,7 @@ export default {
   id: 'digital_camo_v2_artisan',
   name: 'Ghost Camo',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Advanced multi-scale digital camouflage with low-visibility spectral patterns.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'low_poly_facets',
   name: 'Low-Poly Facets',
   category: 'Geometric',
+  added: '2026-06-11',
   description: 'Triangulated low-poly mosaic with flat per-face shading: hash-jittered facet brightness over a large-scale lighting gradient so the surface reads like a faceted 3D render.',
   shader: `
 

@@ -2,6 +2,7 @@ export default {
   id: 'splinter_camo',
   name: 'Splinter Camo',
   category: 'Geometric',
+  added: '2026-05-12',
   description: 'A non-digital but highly angular, geometric camouflage consisting of sharp intersecting polygons and shards.',
   shader: `
     

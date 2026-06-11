@@ -2,6 +2,7 @@ export default {
   id: 'houndstooth',
   name: 'Houndstooth',
   category: 'Geometric',
+  added: '2026-04-15',
   description: 'Pro-grade textile pattern for classic racing interiors.',
   shader: `
     float ht_edge(float edge, float x, float s) {

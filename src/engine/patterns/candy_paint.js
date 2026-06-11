@@ -2,6 +2,7 @@ export default {
   id: 'candy_paint',
   name: 'Candy Paint',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'Deep glossy candy-coat automotive paint with a saturated translucent hue over a dark metallic base.',
   shader: `
 

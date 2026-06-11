@@ -2,6 +2,7 @@ export default {
   id: 'volcanic_basalt_artisan',
   name: 'Basalt Pillar',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Pitted, geometric volcanic rock found in hexagonal basalt formations.',
   shader: `
     vec4 generate() {

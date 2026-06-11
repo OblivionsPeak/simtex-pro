@@ -2,6 +2,7 @@ export default {
   id: 'vinyl_wrap',
   name: 'Vinyl Wrap Film',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'Matte vinyl wrap film with characteristic micro-pebble surface texture and subtle directional sheen. Excellent as a spec or normal-map source for flat paint finishes.',
   shader: `
     float hash_vw(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

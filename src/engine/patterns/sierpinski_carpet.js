@@ -2,6 +2,7 @@ export default {
   id: 'sierpinski_carpet_artisan',
   name: 'Fractal Carpet',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Recursive square fractal grid structures found in high-performance digital logic layouts.',
   shader: `
     vec4 generate() {

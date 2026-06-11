@@ -2,6 +2,7 @@
   id: 'bubblewrap',
   name: 'Bubble Wrap',
   category: 'Abstract',
+  added: '2026-05-01',
   description: 'Air-filled plastic bubble wrap with hemispherical highlights, rim Fresnel, and clear film between bubbles.',
   shader: `
     // Offset hexagonal grid â€” bubbles in a brick layout for efficiency

@@ -2,6 +2,7 @@
   id: 'pleated_fabric',
   name: 'Pleated Fabric',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Accordion-pleated fabric with lit faces, shadowed valleys, and specular fold edges.',
   shader: `
     // Map a value into a sawtooth that folds into a triangle wave (accordion pleat shape)

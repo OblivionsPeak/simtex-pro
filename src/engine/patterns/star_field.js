@@ -2,6 +2,7 @@ export default {
   id: 'star_field_artisan',
   name: 'Star Field Static',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'High-density thresholded noise clusters representing deep-space star fields.',
   shader: `
     vec4 generate() {

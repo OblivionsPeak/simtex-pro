@@ -2,6 +2,7 @@ export default {
   id: 'ink_blot_test_artisan',
   name: 'Ink Blot',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Symmetrical organic Rorschach blobs mimicking organic ink flow on folded paper.',
   shader: `
     vec4 generate() {

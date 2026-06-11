@@ -2,6 +2,7 @@ export default {
   id: 'knurl_grip',
   name: 'Knurl Grip',
   category: 'Racing',
+  added: '2026-05-01',
   description: 'Diamond knurl grip pattern — two sets of diagonal machined ridges crossing at 45 degrees to form sharp pyramid diamonds with bright tips and dark valleys.',
   shader: `
     // Rotate a UV coordinate by angle (radians)

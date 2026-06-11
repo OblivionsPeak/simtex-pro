@@ -2,6 +2,7 @@ export default {
   id: 'circuit_traces_pro',
   name: 'Circuit Traces',
   category: 'Technology',
+  added: '2026-04-15',
   description: 'Pro-grade PCB layout with branching traces and circular nodes.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

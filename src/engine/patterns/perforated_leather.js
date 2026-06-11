@@ -2,6 +2,7 @@ export default {
   id: 'perforated_leather',
   name: 'Perforated Leather',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Smooth leather with a regular diamond punched-hole pattern over a contrasting backing, as used in racing seats and steering wheel grips.',
   shader: `
 

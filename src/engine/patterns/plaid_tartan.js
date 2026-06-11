@@ -2,6 +2,7 @@ export default {
   id: 'plaid_tartan_artisan',
   name: 'Plaid Tartan',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Multi-colored interlocking textile grid found in classic Scottish kilts.',
   shader: `
     vec4 generate() {

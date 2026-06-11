@@ -2,6 +2,7 @@
   id: 'synaptic_spark_artisan',
   name: 'Synaptic Spark',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'A network of neurons and dendrites with high-contrast electrical impulses.',
   shader: `
     vec2 random2( vec2 p ) {

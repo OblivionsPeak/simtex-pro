@@ -2,6 +2,7 @@ export default {
   id: 'nomex_weave',
   name: 'Nomex Fire Suit Weave',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'FIA-grade Nomex aramid weave as found on fire suits, helmet liners, and race car interiors. Tight 2/1 diagonal twill structure.',
   shader: `
     float hash_nw(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

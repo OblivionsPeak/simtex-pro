@@ -2,6 +2,7 @@ export default {
   id: 'brake_rotor_wear_artisan',
   name: 'Brake Rotor Wear',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Circular friction streaks and heat scarring found on high-performance ceramic and steel rotors.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

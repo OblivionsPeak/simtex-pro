@@ -2,6 +2,7 @@ export default {
   id: 'energy_shield_artisan',
   name: 'Phase Shield',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Hexagonal-linked energy barrier pattern with high-frequency interference patterns.',
   shader: `
     vec4 generate() {

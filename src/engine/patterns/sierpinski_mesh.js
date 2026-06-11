@@ -2,6 +2,7 @@ export default {
   id: 'sierpinski_mesh_artisan',
   name: 'Fractal Mesh',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Recursive Sierpinski triangle fractal structures found in high-performance lightweight parts.',
   shader: `
     vec4 generate() {

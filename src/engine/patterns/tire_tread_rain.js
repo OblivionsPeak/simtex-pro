@@ -2,6 +2,7 @@ export default {
   id: 'tire_tread_rain',
   name: 'Rain Tire Tread',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Deep directional grooves for wet weather conditions.',
   shader: `
     vec4 generate() {

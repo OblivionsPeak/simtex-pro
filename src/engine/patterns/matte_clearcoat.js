@@ -2,6 +2,7 @@ export default {
   id: 'matte_clearcoat',
   name: 'Matte Clearcoat',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'Flat/satin automotive paint finish with micro-surface grain, mimicking matte-wrapped or flat-painted race cars.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

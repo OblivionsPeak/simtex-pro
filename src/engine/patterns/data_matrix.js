@@ -2,6 +2,7 @@ export default {
   id: 'data_matrix_artisan',
   name: 'Data Matrix',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Stacked digital data blocks mimicking high-density computer storage and visualization.',
   shader: `
     vec4 generate() {

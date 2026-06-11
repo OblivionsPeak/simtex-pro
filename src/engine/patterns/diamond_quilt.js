@@ -2,6 +2,7 @@ export default {
   id: 'diamond_quilt_artisan',
   name: 'Diamond Quilt',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Stitched padded fabric effect with soft surface shading for luxury upholstery.',
   shader: `
     vec4 generate() {

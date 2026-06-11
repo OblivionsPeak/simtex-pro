@@ -2,6 +2,7 @@ export default {
   id: 'damask_silk_artisan',
   name: 'Damask Silk',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Floral symmetrical weave with high-end fabric sheen found in luxury upholstery.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'forest_litter_artisan',
   name: 'Forest Litter',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Dense organic debris and varying leaf shapes found on a forest floor.',
   shader: `
     vec4 generate() {

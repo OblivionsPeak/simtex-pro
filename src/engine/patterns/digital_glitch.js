@@ -2,6 +2,7 @@ export default {
   id: 'digital_glitch_pro',
   name: 'Digital Glitch',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Static pixel shift and signal interference simulation.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

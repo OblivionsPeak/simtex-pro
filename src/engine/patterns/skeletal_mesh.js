@@ -2,6 +2,7 @@ export default {
   id: 'skeletal_mesh_artisan',
   name: 'Skeletal Mesh',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Periodic rib-like line patterns with organic jitter found in anatomical structures.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'piston_top_artisan',
   name: 'Piston Head',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Concentric rings of machined high-performance aluminum with heat seasoning.',
   shader: `
     vec4 generate() {

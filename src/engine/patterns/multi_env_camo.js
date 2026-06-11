@@ -2,6 +2,7 @@ export default {
   id: 'multi_env_camo',
   name: 'Multi-Environment Camo',
   category: 'Organic',
+  added: '2026-05-12',
   description: 'An advanced shader that uses smooth gradients and soft blending between layers rather than hard edges, creating a highly modern, versatile camouflage.',
   shader: `
 

@@ -2,6 +2,7 @@ export default {
   id: 'corrugated_steel_artisan',
   name: 'Corrugated Steel',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Wavy metal sheet textures used in industrial construction and containers.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'fusion_panel_artisan',
   name: 'Fusion Plating',
   category: 'Technology',
+  added: '2026-04-16',
   description: 'Complex geometric panel lines and "greebles" found on high-energy reactor housings.',
   shader: `
     vec4 generate() {

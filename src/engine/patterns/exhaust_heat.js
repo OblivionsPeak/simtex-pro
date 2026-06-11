@@ -2,6 +2,7 @@ export default {
   id: 'exhaust_heat_artisan',
   name: 'Exhaust Bluing',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'Wavy prismatic heat seasoning found on high-temperature titanium and steel exhaust systems.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'wood_block_print_artisan',
   name: 'Wood Print',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Coarse carved relief texture mimicking traditional wood block printing techniques.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'powder_coat',
   name: 'Powder Coat',
   category: 'Industrial',
+  added: '2026-05-13',
   description: 'Powder coat finish with characteristic orange-peel micro-texture. Common on roll cages, wheel centres, and suspension components.',
   shader: `
     float hash_pc(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

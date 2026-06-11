@@ -2,6 +2,7 @@ export default {
   id: 'twill_carbon_pro',
   name: 'Pro Twill Carbon',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Classic high-detail 2x2 carbon fiber weave.',
   shader: `
     vec4 generate() {

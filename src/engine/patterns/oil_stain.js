@@ -2,6 +2,7 @@ export default {
   id: 'oil_stain',
   name: 'Oil Stain',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'Dark oil and grease stains on a concrete substrate with irregular pooling and thin-film iridescence at dried edges.',
   shader: `
     float fbm(vec2 p) {

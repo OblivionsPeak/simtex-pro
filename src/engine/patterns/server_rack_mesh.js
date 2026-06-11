@@ -2,6 +2,7 @@ export default {
   id: 'server_rack_mesh_artisan',
   name: 'Server Mesh',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'Industrial perforated metal mesh found on high-density enterprise server racks.',
   shader: `
     vec4 generate() {

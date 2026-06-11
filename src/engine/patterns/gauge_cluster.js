@@ -2,6 +2,7 @@ export default {
   id: 'gauge_cluster_artisan',
   name: 'Gauge Finish',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Concentric circular brushed finish found on high-end analog gauge clusters and trim panels.',
   shader: `
     vec4 generate() {

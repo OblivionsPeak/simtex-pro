@@ -3,6 +3,9 @@ import { ShaderEngine } from './engine/ShaderEngine';
 import { PATTERNS, CATEGORIES } from './engine/patterns';
 import { Download, Layers, Shield, Settings, Zap, Info, Maximize, Search, X, Star } from 'lucide-react';
 
+// Patterns added within the last 21 days get a NEW badge
+const NEW_BADGE_CUTOFF = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
+
 function App() {
   const canvasRef = useRef(null);
   const engineRef = useRef(null);
@@ -16,6 +19,7 @@ function App() {
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [sortNewest, setSortNewest] = useState(false);
 
   // Update State
   const [, setUpdateStatus] = useState('');
@@ -63,7 +67,7 @@ function App() {
 
   // Filtered Patterns
   const filteredPatterns = useMemo(() => {
-    return PATTERNS.filter(p => {
+    const filtered = PATTERNS.filter(p => {
       const matchesSearch =
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -72,7 +76,13 @@ function App() {
         (activeCategory === 'Favorites' ? favorites.includes(p.id) : p.category === activeCategory);
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, activeCategory, favorites]);
+    if (sortNewest) {
+      return [...filtered].sort((a, b) =>
+        (b.added || '').localeCompare(a.added || '') || a.name.localeCompare(b.name)
+      );
+    }
+    return filtered;
+  }, [searchQuery, activeCategory, favorites, sortNewest]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -427,7 +437,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.2.0</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.3.0</small></h1>
             </div>
           </div>
 
@@ -466,9 +476,16 @@ function App() {
 
         {/* Scrollable Patterns List */}
         <section className="patterns-container pro-scrollbar">
-          <div className="section-title">
+          <div className="section-title patterns-title">
             <Layers size={16} />
             <span>PATTERNS ({filteredPatterns.length})</span>
+            <button
+              className={`sort-toggle ${sortNewest ? 'active' : ''}`}
+              onClick={() => setSortNewest(s => !s)}
+              title={sortNewest ? 'Sorted newest first — click for default order' : 'Sort newest first'}
+            >
+              NEW FIRST
+            </button>
           </div>
           <div className="pattern-grid">
             {filteredPatterns.length > 0 ? filteredPatterns.map(p => (
@@ -485,7 +502,10 @@ function App() {
                   )}
                   <div className="card-text">
                     <div className="card-header">
-                      <div className="pattern-name">{p.name}</div>
+                      <div className="pattern-name">
+                        {p.name}
+                        {p.added >= NEW_BADGE_CUTOFF && <span className="new-badge">NEW</span>}
+                      </div>
                       <div className="pattern-category">{p.category}</div>
                     </div>
                     <div className="pattern-desc">{p.description}</div>
@@ -777,7 +797,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.2.0</span>
+          <span className="version-label">v3.3.0</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -952,6 +972,33 @@ function App() {
         .pattern-category { font-size: 9px; font-weight: 800; color: var(--color-accent); text-transform: uppercase; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 4px; }
         .pattern-card.active { background: rgba(37, 99, 235, 0.1); border-color: var(--color-accent); box-shadow: var(--shadow-glow); }
         .pattern-name { font-weight: 600; font-size: 13px; color: #fff; }
+        .new-badge {
+          display: inline-block;
+          margin-left: 6px;
+          font-size: 8px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          color: #fff;
+          background: var(--color-accent);
+          border-radius: 4px;
+          padding: 1px 5px;
+          vertical-align: 2px;
+        }
+        .patterns-title { position: relative; }
+        .sort-toggle {
+          margin-left: auto;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          padding: 3px 8px;
+          border-radius: 10px;
+          background: rgba(255,255,255,0.05);
+          color: var(--color-text-dim);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .sort-toggle:hover:not(.active) { background: rgba(255,255,255,0.1); color: #fff; }
+        .sort-toggle.active { background: var(--color-accent); color: #fff; box-shadow: var(--shadow-glow); }
         .pattern-desc { font-size: 11px; color: var(--color-text-dim); line-height: 1.4; }
         .no-results { font-size: 12px; color: var(--color-text-dim); text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); }
 

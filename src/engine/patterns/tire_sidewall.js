@@ -2,6 +2,7 @@ export default {
   id: 'tire_sidewall_artisan',
   name: 'Tire Sidewall',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Raised geometric patterns and grip ridges found on professional racing tires.',
   shader: `
     vec4 generate() {

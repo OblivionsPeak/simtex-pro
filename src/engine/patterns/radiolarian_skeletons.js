@@ -2,6 +2,7 @@ export default {
   id: 'radiolarian_skeletons_artisan',
   name: 'Radiolarian Skeletons',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'Intricate, symmetrical, perforated silica shells based on microscopic marine zooplankton.',
   shader: `
     vec2 random2( vec2 p ) {

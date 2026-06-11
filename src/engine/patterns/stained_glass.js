@@ -2,6 +2,7 @@ export default {
   id: 'stained_glass',
   name: 'Stained Glass',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Backlit stained glass window with vivid saturated color panels and thick dark lead came lines.',
   shader: `
     // --- helpers BEFORE generate() ---

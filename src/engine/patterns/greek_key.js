@@ -2,6 +2,7 @@ export default {
   id: 'greek_key_artisan',
   name: 'Greek Key',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Classic ancient geometric meander border patterns found in historic architecture.',
   shader: `
     vec4 generate() {

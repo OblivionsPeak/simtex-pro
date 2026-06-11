@@ -2,6 +2,7 @@ export default {
   id: 'armco_barrier',
   name: 'Armco Barrier',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'Corrugated W-beam steel Armco safety barrier as found lining every racing circuit — with bolt holes, panel seams, and galvanized steel surface.',
   shader: `
     float hash_ab(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

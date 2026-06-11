@@ -2,6 +2,7 @@ export default {
   id: 'corduroy_rib_artisan',
   name: 'Corduroy Rib',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Parallel fuzzy ridges of heavy fabric used in durable workwear.',
   shader: `
     vec4 generate() {

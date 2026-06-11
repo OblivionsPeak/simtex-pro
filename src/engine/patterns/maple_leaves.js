@@ -2,6 +2,7 @@ export default {
   id: 'maple_leaves_artisan',
   name: 'Maple Leaf Scatter',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Randomly distributed maple leaf shapes with rotation and scale variance.',
   shader: `
     float maple(vec2 p) {

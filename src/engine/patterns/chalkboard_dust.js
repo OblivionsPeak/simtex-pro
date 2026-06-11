@@ -2,6 +2,7 @@ export default {
   id: 'chalkboard_dust_artisan',
   name: 'Chalk Dust',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Smudged powdery residue and chalk markings found on weathered racing boards.',
   shader: `
     vec4 generate() {

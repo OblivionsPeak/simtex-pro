@@ -2,6 +2,7 @@ export default {
   id: 'corroded_aluminum',
   name: 'Corroded Aluminum',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Pitted and oxidized aluminum with dull grey-white aluminum oxide patches over a matte base, with small darker corrosion pits.',
   shader: `
     float fbm(vec2 p) {

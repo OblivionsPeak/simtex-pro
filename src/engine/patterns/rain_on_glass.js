@@ -2,6 +2,7 @@ export default {
   id: 'rain_on_glass',
   name: 'Rain on Glass',
   category: 'Natural',
+  added: '2026-04-30',
   description: 'Rainwater on a tinted glass windshield — beaded droplets with meniscus rim highlights and wavy vertical rivulets.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

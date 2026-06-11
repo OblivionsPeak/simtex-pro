@@ -2,6 +2,7 @@ export default {
   id: 'woven_fiberglass',
   name: 'Woven Fiberglass',
   category: 'Industrial',
+  added: '2026-04-30',
   description: 'E-glass plain-weave fiberglass cloth with cream tow bundles, glass-sheen highlights, and amber resin pockets.',
   shader: `
     // Smooth Hermite profile for a tow cross-section.

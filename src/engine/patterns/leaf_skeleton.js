@@ -2,6 +2,7 @@ export default {
   id: 'leaf_skeleton_pro',
   name: 'Leaf Skeleton',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Technical vein structure mimicking a decaying leaf skeleton.',
   shader: `
     vec4 generate() {

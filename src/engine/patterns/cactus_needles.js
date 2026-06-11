@@ -2,6 +2,7 @@ export default {
   id: 'cactus_needles_artisan',
   name: 'Cactus Spine',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Geometric star-cluster spines found on high-fidelity xerophytic vegetation.',
   shader: `
     vec4 generate() {

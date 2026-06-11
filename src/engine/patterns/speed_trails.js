@@ -2,6 +2,7 @@ export default {
   id: 'speed_trails_artisan',
   name: 'Speed Trails',
   category: 'Racing',
+  added: '2026-04-15',
   description: 'Horizontal motion-style smears representing velocity and aerodynamic flow.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

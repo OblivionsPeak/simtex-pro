@@ -2,6 +2,7 @@ export default {
   id: 'julia_fractal',
   name: 'Julia Set',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'High-symmetry mathematical fractal based on complex number seeds.',
   shader: `
     vec4 generate() {

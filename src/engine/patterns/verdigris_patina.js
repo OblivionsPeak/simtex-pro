@@ -2,6 +2,7 @@ export default {
   id: 'verdigris_patina',
   name: 'Verdigris Patina',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Aged copper or bronze with green-blue verdigris oxidation pooling in recesses over warm reddish copper.',
   shader: `
     // --- helpers BEFORE generate() ---

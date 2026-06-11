@@ -2,6 +2,7 @@ export default {
   id: 'single_rivet_line_artisan',
   name: 'Single Rivet Row',
   category: 'Industrial',
+  added: '2026-04-16',
   description: 'A single linear row of industrial rivets for precision panel seams.',
   shader: `
     vec4 generate() {

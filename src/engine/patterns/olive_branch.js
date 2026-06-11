@@ -2,6 +2,7 @@ export default {
   id: 'olive_branch_artisan',
   name: 'Olive Branch',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Symmetrical leaf layering along a spine, symbolizing peace and precision.',
   shader: `
     float leaf(vec2 p) {

@@ -2,6 +2,7 @@ export default {
   id: 'alcantara_suede_artisan',
   name: 'Alcantara Suede',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Soft, directional fiber nap mimicking professional racing steering wheels and seats.',
   shader: `
     vec4 generate() {

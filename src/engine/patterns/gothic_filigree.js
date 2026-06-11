@@ -2,6 +2,7 @@ export default {
   id: 'gothic_filigree_artisan',
   name: 'Gothic Filigree',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Intricate iron-like symmetrical swirls and ornate architectural blackwork.',
   shader: `
     vec4 generate() {

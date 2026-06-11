@@ -2,6 +2,7 @@ export default {
   id: 'brain_coral_pro',
   name: 'Brain Coral',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Labyrinthine organic structure mimicking undersea brain coral.',
   shader: `
     vec4 generate() {

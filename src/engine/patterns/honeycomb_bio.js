@@ -2,6 +2,7 @@ export default {
   id: 'honeycomb_bio',
   name: 'HoneyComb Bio',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Precise hexagonal organic cell wall structure.',
   shader: `
     float hexDist(vec2 p) {

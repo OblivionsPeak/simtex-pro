@@ -2,6 +2,7 @@ export default {
   id: 'prismatic_flip',
   name: 'Prismatic Flip Paint',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'Colour-shifting flip paint that sweeps through the spectrum across the surface — as seen on modern motorsport liveries and special-edition road cars.',
   shader: `
     float hash_pf(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'diamond_plate_pro',
   name: 'Diamond Plate',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Classic anti-slip safety metal floor texture.',
   shader: `
     float diamond(vec2 p) {

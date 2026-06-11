@@ -2,6 +2,7 @@
   id: 'velvet_pile',
   name: 'Velvet Pile',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Velvet fabric with directional pile sheen â€” bright along the pile, dark against it, with a dramatic direction effect.',
   shader: `
     // Hash noise for micro-fibre variation

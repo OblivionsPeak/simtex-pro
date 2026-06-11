@@ -2,6 +2,7 @@ export default {
   id: 'multicam',
   name: 'MultiCam',
   category: 'Organic',
+  added: '2026-06-11',
   description: 'The modern multi-terrain camouflage standard: a drifting tan-to-cream base gradient layered with organic olive and brown blobs and the signature small dark and cream spots.',
   shader: `
 

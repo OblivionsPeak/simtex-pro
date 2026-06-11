@@ -2,6 +2,7 @@ export default {
   id: 'sandstone_layers_artisan',
   name: 'Sandstone Strata',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Fine horizontal layers and sediments found in weathered sandstone walls.',
   shader: `
     float hash(float n) { return fract(sin(n) * 43758.5453); }

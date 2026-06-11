@@ -2,6 +2,7 @@ export default {
   id: 'soap_bubble_abstract',
   name: 'Soap Bubble',
   category: 'Abstract',
+  added: '2026-05-01',
   description: 'Iridescent soap film with thin-film interference hues, Newton ring bands, and a dark background.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

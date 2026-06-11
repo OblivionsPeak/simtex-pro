@@ -2,6 +2,7 @@ export default {
   id: 'tiger_stripe_camo',
   name: 'Tiger Stripe Camo',
   category: 'Organic',
+  added: '2026-05-12',
   description: 'Aggressive, horizontally flowing organic stripes characteristic of jungle warfare uniforms.',
   shader: `
     

@@ -2,6 +2,7 @@ export default {
   id: 'forged_carbon',
   name: 'Forged Carbon',
   category: 'Organic',
+  added: '2026-04-15',
   description: 'Randomized carbon shred pattern used in hypercars.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }

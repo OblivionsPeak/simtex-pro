@@ -2,6 +2,7 @@
   id: 'kers_containment_core_artisan',
   name: 'KERS Containment Core',
   category: 'Technology',
+  added: '2026-05-13',
   description: 'Glowing, high-energy plasma cells wrapped in intricate copper coiling.',
   shader: `
     vec2 random2( vec2 p ) {

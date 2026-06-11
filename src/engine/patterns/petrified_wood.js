@@ -2,6 +2,7 @@ export default {
   id: 'petrified_wood_artisan',
   name: 'Petrified Wood',
   category: 'Geology',
+  added: '2026-04-16',
   description: 'Fossilized wood grain with vibrant mineral staining and crystalized structures.',
   shader: `
     vec4 generate() {

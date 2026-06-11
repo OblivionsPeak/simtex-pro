@@ -2,6 +2,7 @@
   id: 'bioluminescent_mycelium_artisan',
   name: 'Bioluminescent Mycelium',
   category: 'Organic',
+  added: '2026-05-13',
   description: 'Glowing fungal networks pulsing with neon light against a dark, porous substrate.',
   shader: `
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

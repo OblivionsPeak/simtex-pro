@@ -2,6 +2,7 @@ export default {
   id: 'pine_bark_artisan',
   name: 'Pine Bark',
   category: 'Natural',
+  added: '2026-04-16',
   description: 'Rough, vertical flaky ridges found on mature pine trees.',
   shader: `
     vec4 generate() {

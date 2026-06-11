@@ -2,6 +2,7 @@ export default {
   id: 'hotrod_flames',
   name: 'Hot Rod Flames',
   category: 'Racing',
+  added: '2026-06-11',
   description: 'Classic hot rod flame licks streaming left to right: fbm-warped tongues that taper and curl, layered outer, mid and hot-core colours for the traditional outlined look.',
   shader: `
 

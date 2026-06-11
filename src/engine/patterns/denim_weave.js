@@ -2,6 +2,7 @@ export default {
   id: 'denim_weave_artisan',
   name: 'Denim Fabric',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'Iconic indigo-stained twill weave with micro-directional thread noise.',
   shader: `
     vec4 generate() {

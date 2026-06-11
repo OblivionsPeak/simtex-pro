@@ -2,6 +2,7 @@ export default {
   id: 'palm_fronds_artisan',
   name: 'Palm Fronds',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Fan-like radial leaf structures found in tropical palm trees.',
   shader: `
     vec4 generate() {

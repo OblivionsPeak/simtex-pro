@@ -2,6 +2,7 @@ export default {
   id: 'gold_leaf_flake_artisan',
   name: 'Gold Flake',
   category: 'Abstract',
+  added: '2026-04-16',
   description: 'Thin, irregular metallic foil fragments and gold leaf flakes mimicking luxurious textured finishes.',
   shader: `
     vec4 generate() {

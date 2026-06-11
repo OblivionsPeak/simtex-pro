@@ -2,6 +2,7 @@ export default {
   id: 'zebra_camo_v2_artisan',
   name: 'Zebra Camo v2',
   category: 'Abstract',
+  added: '2026-04-15',
   description: 'High-contrast geometric distortion variant of precision camouflages.',
   shader: `
     vec4 generate() {

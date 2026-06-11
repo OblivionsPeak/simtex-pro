@@ -2,6 +2,7 @@ export default {
   id: 'tinted_carbon',
   name: 'Tinted Carbon Fibre',
   category: 'Racing',
+  added: '2026-05-13',
   description: 'Colour-tinted resin carbon fibre — gold, blue, and red carbon as seen on real motorsport bodywork.',
   shader: `
     float hash_tc(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

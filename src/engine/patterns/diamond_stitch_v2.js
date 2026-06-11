@@ -2,6 +2,7 @@ export default {
   id: 'diamond_stitch_v2_artisan',
   name: 'Pro Diamond Stitch',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Advanced padded upholstery with individual cross-stitching detail found in luxury GT cockpits.',
   shader: `
     vec4 generate() {

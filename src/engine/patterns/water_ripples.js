@@ -2,6 +2,7 @@ export default {
   id: 'water_ripples_artisan',
   name: 'Water Ripples',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Static concentric liquid wave interference patterns.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'mud_splatter',
   name: 'Mud Splatter',
   category: 'Racing',
+  added: '2026-04-30',
   description: 'Dried mud and dirt splatter with organic layered blobs of varying size and opacity, typical of rally or race car bodywork.',
   shader: `
     float fbm(vec2 p) {

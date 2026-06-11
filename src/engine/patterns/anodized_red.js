@@ -2,6 +2,7 @@ export default {
   id: 'anodized_red',
   name: 'Anodized Red',
   category: 'Industrial',
+  added: '2026-05-01',
   description: 'Red anodized aluminum in cherry/crimson with a smooth satin finish and subtle micro-streaks from the anodizing bath process.',
   shader: `
     float fbm(vec2 p) {

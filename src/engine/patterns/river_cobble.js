@@ -2,6 +2,7 @@ export default {
   id: 'river_cobble_artisan',
   name: 'River Cobble',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Smooth, irregular organic stone clusters mimicking riverbed masonry.',
   shader: `
     vec2 random2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

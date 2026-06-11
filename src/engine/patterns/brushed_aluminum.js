@@ -2,6 +2,7 @@ export default {
   id: 'brushed_aluminum_artisan',
   name: 'Brushed Metal',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'High-frequency linear streaks mimicking professional metal brushing and finishing.',
   shader: `
     vec4 generate() {

@@ -2,6 +2,7 @@ export default {
   id: 'chain_mail_artisan',
   name: 'Chain Mail',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Interlocking metal ring structures used in protective armor and fencing.',
   shader: `
     vec4 generate() {

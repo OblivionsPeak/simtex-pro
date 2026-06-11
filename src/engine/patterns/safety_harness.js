@@ -2,6 +2,7 @@ export default {
   id: 'safety_harness_artisan',
   name: 'Safety Harness',
   category: 'Racing',
+  added: '2026-04-16',
   description: 'Heavy-duty nylon web weave found in 5-point and 6-point racing harnesses.',
   shader: `
     vec4 generate() {

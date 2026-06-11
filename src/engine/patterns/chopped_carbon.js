@@ -2,6 +2,7 @@ export default {
   id: 'chopped_carbon_artisan',
   name: 'Chopped Carbon',
   category: 'Industrial',
+  added: '2026-04-15',
   description: 'Randomly oriented forged carbon fragments mimicking premium high-performance composites.',
   shader: `
     vec4 generate() {

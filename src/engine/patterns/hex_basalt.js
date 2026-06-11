@@ -2,6 +2,7 @@ export default {
   id: 'hex_basalt_natural',
   name: 'Hex Basalt',
   category: 'Natural',
+  added: '2026-05-01',
   description: 'Hexagonal columnar basalt cross-sections like the Giants Causeway, with dark joints and per-column tonal variation.',
   shader: `
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }

@@ -2,6 +2,7 @@ export default {
   id: 'frost_crystals_artisan',
   name: 'Frost Crystals',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Crystalline window-ice patterns and frost blooms found in extreme cold.',
   shader: `
     vec4 generate() {

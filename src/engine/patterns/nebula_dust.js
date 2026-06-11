@@ -2,6 +2,7 @@ export default {
   id: 'nebula_dust_artisan',
   name: 'Nebula Dust',
   category: 'Natural',
+  added: '2026-04-15',
   description: 'Soft, colored organic dust clouds found in interstellar gas formations.',
   shader: `
     float noise(vec2 p) {
