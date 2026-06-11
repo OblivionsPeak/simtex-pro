@@ -6,6 +6,79 @@ import { Download, Layers, Shield, Settings, Zap, Info, Maximize, Search, X, Sta
 // Patterns added within the last 21 days get a NEW badge
 const NEW_BADGE_CUTOFF = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
 
+const rgbToHex = (rgb) => {
+  const toHex = (c) => Math.round(c * 255).toString(16).padStart(2, '0');
+  return `#${toHex(rgb[0])}${toHex(rgb[1])}${toHex(rgb[2])}`;
+};
+
+const hexToRgb = (hex, alpha = 1.0) => {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return [r, g, b, alpha];
+};
+
+// Typed hex + RGB (0-255) inputs, two-way synced with the color swatch.
+// The hex field shows a local draft while focused so external updates
+// don't clobber it mid-keystroke; only valid 6-digit hex commits.
+const ColorValueInputs = ({ value, onChange }) => {
+  const rgba = value || [1, 1, 1, 1];
+  const canonicalHex = rgbToHex(rgba).toUpperCase();
+  const [hexDraft, setHexDraft] = useState(canonicalHex);
+  const [isHexFocused, setIsHexFocused] = useState(false);
+  const displayHex = isHexFocused ? hexDraft : canonicalHex;
+
+  const handleHexChange = (raw) => {
+    setHexDraft(raw);
+    const cleaned = raw.trim().replace(/^#/, '');
+    if (/^[0-9a-fA-F]{6}$/.test(cleaned)) {
+      onChange(hexToRgb(`#${cleaned}`, rgba[3]));
+    }
+  };
+
+  const handleChannelChange = (index, raw) => {
+    const parsed = parseInt(raw, 10);
+    if (Number.isNaN(parsed)) return;
+    const clamped = Math.min(255, Math.max(0, parsed));
+    const next = [...rgba];
+    next[index] = clamped / 255;
+    onChange(next);
+  };
+
+  return (
+    <div className="color-value-row">
+      <input
+        type="text"
+        className="hex-input"
+        value={displayHex}
+        maxLength={7}
+        spellCheck={false}
+        onFocus={() => {
+          setHexDraft(canonicalHex);
+          setIsHexFocused(true);
+        }}
+        onChange={(e) => handleHexChange(e.target.value)}
+        onBlur={() => setIsHexFocused(false)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur();
+        }}
+      />
+      {['R', 'G', 'B'].map((label, i) => (
+        <label key={label} className="rgb-field">
+          <span>{label}</span>
+          <input
+            type="number"
+            min="0"
+            max="255"
+            value={Math.round(rgba[i] * 255)}
+            onChange={(e) => handleChannelChange(i, e.target.value)}
+          />
+        </label>
+      ))}
+    </div>
+  );
+};
+
 function App() {
   const canvasRef = useRef(null);
   const engineRef = useRef(null);
@@ -313,18 +386,6 @@ function App() {
     link.download = `simtex_${activePattern.id}_normal_${resolution}.png`;
     link.href = dataUrl;
     link.click();
-  };
-
-  const rgbToHex = (rgb) => {
-    const toHex = (c) => Math.round(c * 255).toString(16).padStart(2, '0');
-    return `#${toHex(rgb[0])}${toHex(rgb[1])}${toHex(rgb[2])}`;
-  };
-
-  const hexToRgb = (hex, alpha = 1.0) => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-    return [r, g, b, alpha];
   };
 
   // Feature A: toggle favorite
@@ -663,6 +724,10 @@ function App() {
                             hexToRgb(e.target.value, uniforms[u.id] ? uniforms[u.id][3] : 1.0)
                           )
                         }
+                      />
+                      <ColorValueInputs
+                        value={uniforms[u.id]}
+                        onChange={(rgba) => handleUniformChange(u.id, rgba)}
                       />
                       <div className="alpha-slider-row">
                         <span className="alpha-label">Alpha</span>
@@ -1077,6 +1142,14 @@ function App() {
         .color-input { width: 100%; height: 36px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: #1a1a20; cursor: pointer; padding: 4px; }
 
         .color-control-stack { display: flex; flex-direction: column; gap: 8px; }
+        .color-value-row { display: flex; gap: 6px; }
+        .hex-input { flex: 1.4; min-width: 0; background: #1a1a20; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px 6px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text); text-transform: uppercase; }
+        .hex-input:focus { border-color: var(--color-accent); outline: none; }
+        .rgb-field { flex: 1; display: flex; align-items: center; gap: 3px; min-width: 0; }
+        .rgb-field span { font-size: 9px; font-weight: 800; color: var(--color-text-dim); }
+        .rgb-field input { width: 100%; min-width: 0; background: #1a1a20; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px 4px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text); -moz-appearance: textfield; appearance: textfield; }
+        .rgb-field input::-webkit-inner-spin-button, .rgb-field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .rgb-field input:focus { border-color: var(--color-accent); outline: none; }
         .alpha-slider-row { display: flex; align-items: center; gap: 10px; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 4px; }
         .alpha-label { font-size: 9px; font-weight: 800; color: var(--color-text-dim); text-transform: uppercase; }
         .alpha-slider-row input { flex: 1; height: 12px; }
