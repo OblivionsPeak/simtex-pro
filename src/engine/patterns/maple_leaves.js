@@ -10,7 +10,6 @@ export default {
       float d = 1.0 + 0.5 * sin(5.0 * a) * (0.5 + 0.5 * sin(15.0 * a));
       return r - 0.4 * d;
     }
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     
     vec4 generate() {
       vec2 uv = v_uv * u_scale;

@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Coarse, wide-gap organic woven fibers used in heavy storage bags.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float h = step(0.7, fract(uv.x)) + step(0.7, fract(uv.y));

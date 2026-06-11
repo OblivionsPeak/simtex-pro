@@ -4,14 +4,7 @@ export default {
   category: 'Racing',
   description: 'Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float hash1(float n) { return fract(sin(n) * 43758.5453); }
-    float noise(vec2 p) {
-      vec2 i = floor(p); vec2 f = fract(p);
-      f = f * f * (3.0 - 2.0 * f);
-      return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-                 mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-    }
 
     vec4 generate() {
       vec2 uv = v_uv;

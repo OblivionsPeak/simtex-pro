@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'Dense organic debris and varying leaf shapes found on a forest floor.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv));

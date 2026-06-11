@@ -4,7 +4,6 @@ export default {
   category: 'Technology',
   description: 'High-density silicon wafer etching with localized circuit density.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 id = floor(v_uv * u_scale);
       vec2 gv = fract(v_uv * u_scale);

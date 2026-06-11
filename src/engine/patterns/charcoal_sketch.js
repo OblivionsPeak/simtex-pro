@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Cross-hatched noise lines mimicking hand-drawn charcoal or graphite sketches.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float mask = step(0.9, hash(uv));

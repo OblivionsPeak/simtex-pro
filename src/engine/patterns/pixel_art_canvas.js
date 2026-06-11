@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Large-block quantized color grid mimicking retro 8-bit digital canvases.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = floor(v_uv * u_scale);
       float n = hash(uv);

@@ -4,7 +4,6 @@ export default {
   category: 'Racing',
   description: 'High-detail granular road surface noise found on professional track layouts.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * u_scale);
       return mix(u_secondary_color, u_primary_color, n);

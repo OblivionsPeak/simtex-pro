@@ -4,7 +4,6 @@ export default {
   category: 'Technology',
   description: 'Dense, tangled bundles of high-speed digital wiring and fiber-optic strands.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale + sin(v_uv.x * 5.0));
       float n = hash(vec2(y, y));

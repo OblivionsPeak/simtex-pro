@@ -1,10 +1,9 @@
 export default {
   id: 'pine_bark_artisan',
   name: 'Pine Bark',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Rough, vertical flaky ridges found on mature pine trees.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
       float h = hash(vec2(y, y));

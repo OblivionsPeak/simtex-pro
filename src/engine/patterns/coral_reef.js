@@ -1,10 +1,9 @@
 export default {
   id: 'coral_reef_artisan',
   name: 'Coral Branch',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Branching organic calcium structures mimicking underwater coral reef formations.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float d = 1.0;

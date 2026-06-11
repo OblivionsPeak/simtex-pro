@@ -4,7 +4,6 @@ export default {
   category: 'Technology',
   description: 'Glowing bundles of light-conducting strands found in high-speed data transmission systems.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
       float n = hash(vec2(y, y));

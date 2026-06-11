@@ -1,7 +1,7 @@
 export default {
   id: 'snake_skin_v2_artisan',
   name: 'Viper Scales',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Interlocking diamond scales found in aggressive predatory reptilian hide.',
   shader: `
     vec4 generate() {

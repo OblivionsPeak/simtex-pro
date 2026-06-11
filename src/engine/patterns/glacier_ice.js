@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'Crackled crystalline planes with directional depth found in Arctic ice formations.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv));

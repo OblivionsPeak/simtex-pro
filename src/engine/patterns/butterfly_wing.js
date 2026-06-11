@@ -1,7 +1,7 @@
 export default {
   id: 'butterfly_wing_artisan',
   name: 'Chitin Scale',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Microscopic chitinous scales mimicking the vibrant iridescent patterns of exotic lepidoptera.',
   shader: `
     vec4 generate() {

@@ -4,7 +4,6 @@ export default {
   category: 'Industrial',
   description: 'Chaos-line noise mimicking tangled metal strands found in industrial abrasives.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * 1000.0) * hash(v_uv * 100.0);
       float mask = smoothstep(0.0, 0.2, n);

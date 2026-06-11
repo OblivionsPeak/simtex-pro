@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'Crystalline window-ice patterns and frost blooms found in extreme cold.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * 10.0);
       float crystal = step(0.9, hash(v_uv * 20.0 + n));

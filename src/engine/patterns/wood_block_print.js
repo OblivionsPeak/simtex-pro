@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Coarse carved relief texture mimicking traditional wood block printing techniques.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * 80.0);
       float h = hash(vec2(y, y));

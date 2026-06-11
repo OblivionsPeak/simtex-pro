@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'Smooth, irregular organic stone clusters mimicking riverbed masonry.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec2 random2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;

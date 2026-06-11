@@ -4,7 +4,6 @@ export default {
   category: 'Racing',
   description: 'Irregular sharp cellular noise mimicking track-side runoff gravel.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;

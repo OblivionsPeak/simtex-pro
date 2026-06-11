@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'Radial organic fibrous patterns found in the human eye iris.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * 2.0;
       float d = length(uv);

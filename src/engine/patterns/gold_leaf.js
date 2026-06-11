@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Irregular metallic foil noise and gold leaf textures for premium accents.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * 100.0) * hash(v_uv * 10.0);
       float mask = smoothstep(0.1, 0.3, n);

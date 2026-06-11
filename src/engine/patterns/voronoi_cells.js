@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Mathematical fractured cell structures often found in biological and geological formations.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec2 hash2(vec2 p) {
       return vec2(hash(p), hash(p + 1.0));
     }

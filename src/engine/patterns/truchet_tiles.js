@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Interlocking arc-based tiles mimicking complex organic circuitry and decorative pavement.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);

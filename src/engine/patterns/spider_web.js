@@ -1,7 +1,7 @@
 export default {
   id: 'spider_web_artisan',
   name: 'Silk Web',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Radial-concentric silk networks found in professional predatory arachnid structures.',
   shader: `
     vec4 generate() {

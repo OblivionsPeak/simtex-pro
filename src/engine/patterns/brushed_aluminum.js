@@ -4,7 +4,6 @@ export default {
   category: 'Industrial',
   description: 'High-frequency linear streaks mimicking professional metal brushing and finishing.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(vec2(v_uv.y * 1000.0, 0.0));
       return mix(u_secondary_color, u_primary_color, n);

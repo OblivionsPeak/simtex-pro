@@ -4,7 +4,6 @@ export default {
   category: 'Racing',
   description: 'Soft, directional fiber nap mimicking professional racing steering wheels and seats.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * u_scale) * hash(v_uv * u_scale * 0.5);
       return mix(u_secondary_color, u_primary_color, n);

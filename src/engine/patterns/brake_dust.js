@@ -4,7 +4,6 @@ export default {
   category: 'Racing',
   description: 'Fine anisotropic dark grit and metallic shavings found on race-worn wheel rims.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * 1000.0);
       return mix(u_secondary_color, u_primary_color, n);

@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Rough, crossing threads with a torn opening mimicking shredded heavy canvas.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float lines = step(0.8, hash(floor(uv.xx * 2.0))) * step(0.8, hash(floor(uv.yy * 2.0)));

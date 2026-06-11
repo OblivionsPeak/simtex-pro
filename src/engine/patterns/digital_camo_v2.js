@@ -4,7 +4,6 @@ export default {
   category: 'Racing',
   description: 'Advanced multi-scale digital camouflage with low-visibility spectral patterns.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(floor(v_uv * 10.0)) + hash(floor(v_uv * 40.0)) * 0.5;
       return mix(u_secondary_color, u_primary_color, n / 1.5);

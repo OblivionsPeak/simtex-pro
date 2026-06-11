@@ -1,3 +1,114 @@
+// Shared GLSL helper library. Each helper is injected into a pattern's
+// fragment shader only when the pattern calls it without defining its own
+// version — so patterns with custom noise variants are never overridden.
+const GLSL_HELPERS = [
+  {
+    name: 'hash',
+    defines: /float\s+hash\s*\(\s*vec2/,
+    deps: [],
+    proto: 'float hash(vec2 p);',
+    src: `
+    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`,
+  },
+  {
+    name: 'noise',
+    defines: /float\s+noise\s*\(\s*vec2/,
+    deps: ['hash'],
+    proto: 'float noise(vec2 p);',
+    src: `
+    float noise(vec2 p) {
+      vec2 i = floor(p); vec2 f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+    }`,
+  },
+  {
+    name: 'permute',
+    defines: /vec3\s+permute\s*\(/,
+    deps: [],
+    proto: 'vec3 permute(vec3 x);',
+    src: `
+    vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }`,
+  },
+  {
+    name: 'snoise',
+    defines: /float\s+snoise\s*\(\s*vec2/,
+    deps: ['permute'],
+    proto: 'float snoise(vec2 v);',
+    src: `
+    float snoise(vec2 v){
+      const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+      vec2 i  = floor(v + dot(v, C.yy) );
+      vec2 x0 = v -   i + dot(i, C.xx);
+      vec2 i1;
+      i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+      vec4 x12 = x0.xyxy + C.xxzz;
+      x12.xy -= i1;
+      i = mod(i, 289.0);
+      vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+      vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+      m = m*m ; m = m*m ;
+      vec3 x = 2.0 * fract(p * C.www) - 1.0;
+      vec3 h = abs(x) - 0.5;
+      vec3 ox = floor(x + 0.5);
+      vec3 a0 = x - ox;
+      m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+      vec3 g;
+      g.x  = a0.x  * x0.x  + h.x  * x0.y;
+      g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+      return 130.0 * dot(m, g);
+    }`,
+  },
+  {
+    name: 'fbm',
+    defines: /float\s+fbm\s*\(/,
+    deps: ['snoise'],
+    proto: 'float fbm(vec2 x);',
+    src: `
+    float fbm(vec2 x) {
+      float v = 0.0;
+      float a = 0.5;
+      vec2 shift = vec2(100.0);
+      mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+      for (int i = 0; i < 4; ++i) {
+        v += a * snoise(x);
+        x = rot * x * 2.0 + shift;
+        a *= 0.5;
+      }
+      return v;
+    }`,
+  },
+];
+
+// Returns the GLSL to prepend to a pattern shader: canonical helpers the
+// pattern calls but doesn't define, plus prototypes for helpers the pattern
+// defines itself but that injected code needs declared first.
+export function buildHelperPrelude(shaderSrc) {
+  const needed = new Set();
+  const mark = (helper) => {
+    if (needed.has(helper.name) || helper.defines.test(shaderSrc)) return;
+    needed.add(helper.name);
+    helper.deps.forEach(dep => mark(GLSL_HELPERS.find(h => h.name === dep)));
+  };
+  GLSL_HELPERS.forEach(h => {
+    const calls = new RegExp(`\\b${h.name}\\s*\\(`).test(shaderSrc);
+    if (calls) mark(h);
+  });
+
+  let prelude = '';
+  GLSL_HELPERS.forEach(h => {
+    if (needed.has(h.name)) {
+      prelude += h.src + '\n';
+    } else if (h.defines.test(shaderSrc) &&
+               GLSL_HELPERS.some(o => needed.has(o.name) && o.deps.includes(h.name))) {
+      // An injected helper depends on a function the pattern defines later
+      // in the source — declare the prototype so GLSL resolves the call.
+      prelude += '\n    ' + h.proto + '\n';
+    }
+  });
+  return prelude;
+}
+
 export class ShaderEngine {
   constructor(canvas) {
     this.canvas = canvas;
@@ -31,7 +142,6 @@ export class ShaderEngine {
   }
 
   async setShader(pattern) {
-    const gl = this.gl;
     const vertexSource = `
       attribute vec2 position;
       varying vec2 v_uv;
@@ -65,17 +175,37 @@ export class ShaderEngine {
       else fragmentSource += `uniform float ${u.id};\n`;
     });
 
+    fragmentSource += buildHelperPrelude(pattern.shader);
     fragmentSource += pattern.shader;
-    fragmentSource += `\nvoid main() { 
-      vec4 res = generate();
-      gl_FragColor = vec4(res.rgb, res.a * u_opacity); 
-    }`;
+
+    if (pattern.shader.includes('u_is_spec')) {
+      // Pattern implements its own spec-map output inside generate()
+      fragmentSource += `\nvoid main() {
+        vec4 res = generate();
+        gl_FragColor = vec4(res.rgb, res.a * u_opacity);
+      }`;
+    } else {
+      // Generic spec fallback: R = metallic (0, painted surface),
+      // G = roughness derived from luminance (brighter = glossier)
+      fragmentSource += `\nvoid main() {
+        vec4 res = generate();
+        if (u_is_spec > 0.5) {
+          float lum = dot(res.rgb, vec3(0.299, 0.587, 0.114));
+          res = vec4(0.0, clamp(1.0 - lum * 0.85, 0.05, 0.95), 0.0, res.a);
+        }
+        gl_FragColor = vec4(res.rgb, res.a * u_opacity);
+      }`;
+    }
 
     const newProgram = this.createProgram(vertexSource, fragmentSource);
-    if (!newProgram) return;
+    if (!newProgram) {
+      console.error(`[ShaderEngine] Failed to build shader for pattern "${pattern.id}"`);
+      return;
+    }
 
     this.program = newProgram;
     this.mapUniforms();
+    this.dirty = true;
   }
 
   mapUniforms() {
@@ -89,8 +219,15 @@ export class ShaderEngine {
   }
 
   startLoop() {
+    // All patterns are static (no u_time), so only redraw when uniforms,
+    // the shader, or the canvas size actually change.
     const frame = () => {
-      this.draw();
+      if (this.dirty || this.canvas.width !== this._lastW || this.canvas.height !== this._lastH) {
+        this._lastW = this.canvas.width;
+        this._lastH = this.canvas.height;
+        this.draw();
+        this.dirty = false;
+      }
       this.frameId = requestAnimationFrame(frame);
     };
     this.frameId = requestAnimationFrame(frame);
@@ -98,6 +235,7 @@ export class ShaderEngine {
 
   render(uniformValues = {}) {
     this.currentValues = { ...this.currentValues, ...uniformValues };
+    this.dirty = true;
   }
 
   draw() {
@@ -147,7 +285,10 @@ export class ShaderEngine {
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('[ShaderEngine] Program link error:', gl.getProgramInfoLog(program));
+      return null;
+    }
     return program;
   }
 
@@ -156,13 +297,17 @@ export class ShaderEngine {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return null;
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.error('[ShaderEngine] Shader compile error:', gl.getShaderInfoLog(shader));
+      return null;
+    }
     return shader;
   }
 
   export(width, height, uniforms) {
     const oldW = this.canvas.width;
     const oldH = this.canvas.height;
+    const oldValues = this.currentValues;
     this.canvas.width = width;
     this.canvas.height = height;
     this.currentValues = { ...this.currentValues, ...uniforms };
@@ -170,12 +315,15 @@ export class ShaderEngine {
     const dataUrl = this.canvas.toDataURL('image/png');
     this.canvas.width = oldW;
     this.canvas.height = oldH;
+    this.currentValues = oldValues;
+    this.dirty = true; // resizing cleared the canvas — repaint the preview
     return dataUrl;
   }
 
   exportNormalMap(width, height, uniforms, strength = 3.0) {
     const oldW = this.canvas.width;
     const oldH = this.canvas.height;
+    const oldValues = this.currentValues;
     this.canvas.width = width;
     this.canvas.height = height;
     this.currentValues = { ...this.currentValues, ...uniforms };
@@ -239,6 +387,8 @@ export class ShaderEngine {
 
     this.canvas.width = oldW;
     this.canvas.height = oldH;
+    this.currentValues = oldValues;
+    this.dirty = true; // resizing cleared the canvas — repaint the preview
 
     return out.toDataURL('image/png');
   }

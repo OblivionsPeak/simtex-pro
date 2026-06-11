@@ -4,7 +4,6 @@ export default {
   category: 'Abstract',
   description: 'Directional brush-stroke noise mimicking thick oil paint on canvas.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv.y * 50.0) + vec2(floor(uv.x * 2.0), 0.0));

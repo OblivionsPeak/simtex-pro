@@ -1,7 +1,7 @@
 export default {
   id: 'mushroom_gills_artisan',
   name: 'Fungi Gills',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Radiant organic ridges found on the underside of exotic fungal caps.',
   shader: `
     vec4 generate() {

@@ -1,7 +1,7 @@
 export default {
   id: 'desert_dunes_artisan',
   name: 'Sand Dunes',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Wavy ripple-sand patterns mimicking windswept desert landscapes.',
   shader: `
     vec4 generate() {

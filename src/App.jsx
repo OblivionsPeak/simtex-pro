@@ -300,6 +300,11 @@ function App() {
     const handleKeyDown = (e) => {
       const ctrl = e.ctrlKey || e.metaKey;
 
+      // Don't hijack keys while the user is in an input (sliders, search,
+      // preset name) — Escape is the only shortcut that still applies.
+      const tag = e.target.tagName;
+      if ((tag === 'INPUT' || tag === 'TEXTAREA') && e.key !== 'Escape') return;
+
       // Feature D: Escape — clear search+category or toggle sidebar
       if (e.key === 'Escape') {
         if (isSidebarOpen && searchQuery) {
@@ -321,42 +326,22 @@ function App() {
       // Feature C: Ctrl+Z — undo
       if (ctrl && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        setHistoryIndex(prev => {
-          const nextIdx = prev - 1;
-          if (nextIdx < 0) return prev;
-          setHistory(h => {
-            applyHistoryEntry(h[nextIdx]);
-            return h;
-          });
-          return nextIdx;
-        });
+        const nextIdx = historyIndex - 1;
+        if (nextIdx >= 0 && history[nextIdx]) {
+          applyHistoryEntry(history[nextIdx]);
+          setHistoryIndex(nextIdx);
+        }
         return;
       }
 
       // Feature C: Ctrl+Y or Ctrl+Shift+Z — redo
       if (ctrl && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
         e.preventDefault();
-        setHistoryIndex(prev => {
-          setHistory(h => {
-            const nextIdx = prev + 1;
-            if (nextIdx >= h.length) return h;
-            applyHistoryEntry(h[nextIdx]);
-            return h;
-          });
-          return prev; // updated inside setHistory callback; we do a two-step approach below
-        });
-        // Use a cleaner two-step redo
-        setHistory(h => {
-          setHistoryIndex(prev => {
-            const nextIdx = prev + 1;
-            if (nextIdx < h.length) {
-              applyHistoryEntry(h[nextIdx]);
-              return nextIdx;
-            }
-            return prev;
-          });
-          return h;
-        });
+        const nextIdx = historyIndex + 1;
+        if (nextIdx < history.length) {
+          applyHistoryEntry(history[nextIdx]);
+          setHistoryIndex(nextIdx);
+        }
         return;
       }
 
@@ -386,7 +371,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.0.4</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.1.0</small></h1>
             </div>
           </div>
 
@@ -727,7 +712,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.0.4</span>
+          <span className="version-label">v3.1.0</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates

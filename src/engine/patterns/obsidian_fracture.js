@@ -4,7 +4,6 @@ export default {
   category: 'Geology',
   description: 'Sharp, mirror-like volcanic glass fractures found in fresh obsidian flows.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(floor(v_uv * u_scale));
       return mix(u_secondary_color, u_primary_color, n);

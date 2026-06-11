@@ -1,7 +1,7 @@
 export default {
   id: 'frozen_lake_artisan',
   name: 'Ice Fractures',
-  category: 'Nature',
+  category: 'Natural',
   description: 'Angular ice cracks and crystalline fractures found in frozen lake and arctic simulation environments.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

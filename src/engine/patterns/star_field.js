@@ -4,7 +4,6 @@ export default {
   category: 'Natural',
   description: 'High-density thresholded noise clusters representing deep-space star fields.',
   shader: `
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     vec4 generate() {
       float n = hash(v_uv * u_scale);
       float mask = step(0.99, n);
