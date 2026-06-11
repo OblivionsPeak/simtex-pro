@@ -48,6 +48,13 @@ export default {
       col += vec3(specPeak);
 
       col = clamp(col, 0.0, 1.0);
+      if (u_is_spec > 0.5) {
+        // Candy coat: non-metallic clear coat, metallic only rises where flake sparkles
+        float sparkle = flake * flake2;
+        float metallic = mix(0.05, 0.3, sparkle);
+        float roughness = clamp(0.15 - gloss * 0.1, 0.05, 0.15);
+        return vec4(metallic, roughness, 0.0, u_opacity);
+      }
       return vec4(col, u_opacity);
     }
   `,

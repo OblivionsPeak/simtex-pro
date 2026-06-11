@@ -58,6 +58,12 @@ export default {
       col += u_base_color.rgb * shimmer;
 
       col = clamp(col, 0.0, 1.0);
+      if (u_is_spec > 0.5) {
+        // Metallic binder with bright aluminium flake glints; flakes slightly varied via shimmer
+        float metallic = mix(0.45, 1.0, flakeLight);
+        float roughness = clamp(mix(0.25, 0.08, flakeLight) + shimmer, 0.05, 0.3);
+        return vec4(metallic, roughness, 0.0, u_opacity);
+      }
       return vec4(col, u_opacity);
     }
   `,

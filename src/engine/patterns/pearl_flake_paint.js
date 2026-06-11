@@ -63,6 +63,12 @@ export default {
       col += vec3(gloss);
 
       col = clamp(col, 0.0, 1.0);
+      if (u_is_spec > 0.5) {
+        // Pearl: softer than metal flake — moderate metallic lift at mica, very glossy overall
+        float metallic = mix(0.3, 0.6, micaBright);
+        float roughness = mix(0.1, 0.04, micaBright);
+        return vec4(metallic, roughness, 0.0, u_opacity);
+      }
       return vec4(col, u_opacity);
     }
   `,

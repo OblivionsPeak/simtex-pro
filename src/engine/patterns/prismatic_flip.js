@@ -36,6 +36,12 @@ export default {
       float gloss = pow(max(0.0, 1.0 - abs(axis - 0.5) * 2.0), 4.0) * 0.18;
       col = clamp(col + gloss, 0.0, 1.0);
 
+      if (u_is_spec > 0.5) {
+        // Flip paint: moderate-high metallic, glossy; turbulence noise gives subtle variation
+        float metallic = clamp(0.65 + (n - 0.5) * 0.2, 0.0, 1.0);
+        float roughness = clamp(0.1 + (0.5 - n) * 0.08, 0.05, 0.18);
+        return vec4(metallic, roughness, 0.0, u_opacity);
+      }
       return vec4(col, u_opacity);
     }
   `,

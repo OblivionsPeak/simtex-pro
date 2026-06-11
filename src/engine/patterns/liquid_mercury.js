@@ -7,7 +7,12 @@ export default {
     vec4 generate() {
       float n = noise(v_uv * u_scale);
       float mask = smoothstep(0.4, 0.45, n);
-      return mix(u_secondary_color, u_primary_color, mask);
+      vec4 col = mix(u_secondary_color, u_primary_color, mask);
+      if (u_is_spec > 0.5) {
+        // Liquid metal: full metallic on blobs, near-zero roughness; voids slightly duller
+        return vec4(mix(0.85, 1.0, mask), mix(0.06, 0.02, mask), 0.0, col.a);
+      }
+      return col;
     }
   `,
   uniforms: [

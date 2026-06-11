@@ -1,7 +1,7 @@
 export default {
   id: 'reaction_diffusion_artisan',
   name: 'Reaction Diffusion',
-  category: 'Experimental',
+  category: 'Abstract',
   description: 'Organic biological growth and coral-like patterns mimicking chemical morphogenesis.',
   shader: `
     float noise(vec2 p) {

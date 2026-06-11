@@ -20,7 +20,14 @@ export default {
       float n = fbm(uv * 3.0);
       float n2 = fbm(uv * 5.0 + n);
       float mask = mix(n, n2, 0.5);
-      return mix(u_secondary_color, u_primary_color, mask);
+      vec4 col = mix(u_secondary_color, u_primary_color, mask);
+      if (u_is_spec > 0.5) {
+        // Chopped-fibre marbling modulates metallic and roughness so shreds read in reflections
+        float metallic = mix(0.3, 0.5, clamp(mask, 0.0, 1.0));
+        float roughness = clamp(0.2 - mask * 0.08, 0.1, 0.2);
+        return vec4(metallic, roughness, 0.0, col.a);
+      }
+      return col;
     }
   `,
   uniforms: [

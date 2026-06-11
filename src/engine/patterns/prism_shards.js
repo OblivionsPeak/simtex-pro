@@ -1,7 +1,7 @@
 export default {
   id: 'prism_shards_artisan',
   name: 'Prism Shards',
-  category: 'Experimental',
+  category: 'Abstract',
   description: 'Sharp refracted geometric light cells with internal color shifts across the spectrum.',
   shader: `
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }

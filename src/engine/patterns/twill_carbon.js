@@ -11,7 +11,12 @@ export default {
       float checker = mod(id.x + id.y, 2.0);
       float pattern = step(0.5, abs(gv.x - gv.y));
       if (checker > 0.5) pattern = 1.0 - pattern;
-      return mix(u_secondary_color, u_primary_color, pattern);
+      vec4 col = mix(u_secondary_color, u_primary_color, pattern);
+      if (u_is_spec > 0.5) {
+        // Lacquered carbon weave: metallic and roughness follow the twill so it reads in reflections
+        return vec4(mix(0.3, 0.5, pattern), mix(0.2, 0.12, pattern), 0.0, col.a);
+      }
+      return col;
     }
   `,
   uniforms: [

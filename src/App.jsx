@@ -18,7 +18,7 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('All');
 
   // Update State
-  const [updateStatus, setUpdateStatus] = useState('');
+  const [, setUpdateStatus] = useState('');
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const [isUpdateReady, setIsUpdateReady] = useState(false);
   const [updateInfo, setUpdateInfo] = useState(null);
@@ -43,6 +43,14 @@ function App() {
   // Feature C: Undo/Redo
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  // Slider drags are debounced into a single history entry
+  const historyTimerRef = useRef(null);
+
+  // Thumbnails: pattern id -> dataURL, generated progressively after mount
+  const [thumbs, setThumbs] = useState({});
+
+  // Seamless tiling export
+  const [seamlessExport, setSeamlessExport] = useState(false);
 
   // UV Transform
   const [uvScale, setUvScale] = useState([1.0, 1.0]);
@@ -86,6 +94,51 @@ function App() {
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, [isSidebarOpen]);
+
+  // Generate pattern thumbnails progressively on an offscreen engine.
+  // Chunked so the UI stays responsive while 280+ shaders compile.
+  useEffect(() => {
+    const off = document.createElement('canvas');
+    off.width = 96;
+    off.height = 96;
+    let engine;
+    try {
+      engine = new ShaderEngine(off);
+    } catch {
+      return; // no WebGL — cards just render without thumbnails
+    }
+    engine.stop(); // no animation loop needed; we draw synchronously
+
+    let cancelled = false;
+    let idx = 0;
+    const BATCH = 4;
+
+    const generateBatch = () => {
+      if (cancelled || idx >= PATTERNS.length) return;
+      const batch = {};
+      for (let n = 0; n < BATCH && idx < PATTERNS.length; n++, idx++) {
+        const p = PATTERNS[idx];
+        const defaults = {};
+        p.uniforms.forEach(u => { defaults[u.id] = u.default; });
+        engine.setShader(p);
+        engine.render({
+          ...defaults,
+          u_is_spec: 0.0,
+          u_opacity: 1.0,
+          u_uv_scale: [1.0, 1.0],
+          u_uv_rotation: 0.0,
+          u_uv_offset: [0.0, 0.0],
+        });
+        engine.draw();
+        batch[p.id] = off.toDataURL('image/png');
+      }
+      setThumbs(prev => ({ ...prev, ...batch }));
+      setTimeout(generateBatch, 30);
+    };
+    setTimeout(generateBatch, 300); // let the main canvas come up first
+
+    return () => { cancelled = true; };
+  }, []);
 
   // Handle Update Events
   useEffect(() => {
@@ -151,23 +204,26 @@ function App() {
     updateShader(pattern);
   };
 
-  // Feature C: handleUniformChange pushes to undo history
+  const pushHistory = (entry) => {
+    setHistory(prev => {
+      const truncated = prev.slice(0, historyIndex + 1);
+      return [...truncated, entry].slice(-30);
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 29));
+  };
+
+  // Feature C: variants push to history immediately (discrete action)
   const applyVariant = (variant) => {
     const newUniforms = { ...uniforms, ...variant.uniforms };
     setUniforms(newUniforms);
     if (engineRef.current) {
       engineRef.current.render({ ...newUniforms, u_is_spec: isSpecMap ? 1.0 : 0.0, u_opacity: masterOpacityRef.current });
     }
-
-    const entry = { patternId: activePattern.id, uniforms: newUniforms };
-    setHistory(prev => {
-      const truncated = prev.slice(0, historyIndex + 1);
-      const next = [...truncated, entry].slice(-30);
-      return next;
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 29));
+    pushHistory({ patternId: activePattern.id, uniforms: newUniforms });
   };
 
+  // Feature C: slider/color changes render immediately but debounce the
+  // history push, so a drag becomes one undo step instead of dozens
   const handleUniformChange = (id, value) => {
     const newUniforms = { ...uniforms, [id]: value };
     setUniforms(newUniforms);
@@ -175,13 +231,10 @@ function App() {
       engineRef.current.render({ ...newUniforms, u_is_spec: isSpecMap ? 1.0 : 0.0, u_opacity: masterOpacityRef.current });
     }
 
-    const entry = { patternId: activePattern.id, uniforms: newUniforms };
-    setHistory(prev => {
-      const truncated = prev.slice(0, historyIndex + 1);
-      const next = [...truncated, entry].slice(-30);
-      return next;
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 29));
+    clearTimeout(historyTimerRef.current);
+    historyTimerRef.current = setTimeout(() => {
+      pushHistory({ patternId: activePattern.id, uniforms: newUniforms });
+    }, 400);
   };
 
   useEffect(() => {
@@ -192,12 +245,15 @@ function App() {
 
   const downloadTexture = () => {
     if (!engineRef.current) return;
-    const dataUrl = engineRef.current.export(resolution, resolution, {
+    const exportUniforms = {
       ...uniforms,
       u_is_spec: isSpecMap ? 1.0 : 0.0,
-    });
+    };
+    const dataUrl = seamlessExport
+      ? engineRef.current.exportSeamless(resolution, resolution, exportUniforms)
+      : engineRef.current.export(resolution, resolution, exportUniforms);
     const link = document.createElement('a');
-    link.download = `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}_${resolution}.png`;
+    link.download = `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}${seamlessExport ? '_seamless' : ''}_${resolution}.png`;
     link.href = dataUrl;
     link.click();
   };
@@ -371,7 +427,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.1.0</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.2.0</small></h1>
             </div>
           </div>
 
@@ -421,11 +477,20 @@ function App() {
                 className={`pattern-card ${activePattern.id === p.id ? 'active' : ''}`}
                 onClick={() => handlePatternChange(p)}
               >
-                <div className="card-header">
-                  <div className="pattern-name">{p.name}</div>
-                  <div className="pattern-category">{p.category}</div>
+                <div className="card-body">
+                  {thumbs[p.id] ? (
+                    <img className="pattern-thumb" src={thumbs[p.id]} alt="" draggable={false} />
+                  ) : (
+                    <div className="pattern-thumb placeholder" />
+                  )}
+                  <div className="card-text">
+                    <div className="card-header">
+                      <div className="pattern-name">{p.name}</div>
+                      <div className="pattern-category">{p.category}</div>
+                    </div>
+                    <div className="pattern-desc">{p.description}</div>
+                  </div>
                 </div>
-                <div className="pattern-desc">{p.description}</div>
                 {/* Feature A: star button */}
                 <button
                   className={`fav-star ${favorites.includes(p.id) ? 'active' : ''}`}
@@ -712,7 +777,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.1.0</span>
+          <span className="version-label">v3.2.0</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -735,6 +800,13 @@ function App() {
           <div className="actions">
             <button className="btn-secondary" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <Maximize size={18} />
+            </button>
+            <button
+              className={`btn-secondary btn-seamless ${seamlessExport ? 'active' : ''}`}
+              onClick={() => setSeamlessExport(s => !s)}
+              title={seamlessExport ? 'Seamless tiling export ON — edges will wrap perfectly' : 'Seamless tiling export OFF'}
+            >
+              <span style={{fontSize:'10px', fontWeight:800, letterSpacing:'0.05em'}}>TILE</span>
             </button>
             <button className="btn-secondary btn-normal" onClick={downloadNormalMap} title="Export Normal Map">
               <span style={{fontSize:'11px', fontWeight:800, letterSpacing:'0.05em'}}>NRM</span>
@@ -864,6 +936,18 @@ function App() {
           position: relative;
         }
         .pattern-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); background: #16161c; }
+        .card-body { display: flex; gap: 10px; align-items: flex-start; }
+        .card-text { flex: 1; min-width: 0; }
+        .pattern-thumb {
+          width: 44px;
+          height: 44px;
+          border-radius: 6px;
+          flex-shrink: 0;
+          border: 1px solid rgba(255,255,255,0.08);
+          object-fit: cover;
+          background: #1a1a20;
+        }
+        .pattern-thumb.placeholder { background: linear-gradient(135deg, #15151a, #1d1d24); }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
         .pattern-category { font-size: 9px; font-weight: 800; color: var(--color-accent); text-transform: uppercase; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 4px; }
         .pattern-card.active { background: rgba(37, 99, 235, 0.1); border-color: var(--color-accent); box-shadow: var(--shadow-glow); }
@@ -1067,6 +1151,7 @@ function App() {
         .uv-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
         .uv-btn.active { background: rgba(37,99,235,0.25); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.4); }
         .btn-normal { width: 42px; height: 42px; font-size: 10px; }
+        .btn-seamless.active { background: rgba(37,99,235,0.3); color: var(--color-accent); box-shadow: var(--shadow-glow); }
         .tile-badge { background: var(--color-accent); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.08em; }
         .canvas-overlay { display: flex; align-items: center; gap: 8px; }
       `}</style>

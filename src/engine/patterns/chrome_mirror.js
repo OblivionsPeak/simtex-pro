@@ -49,6 +49,10 @@ export default {
       col *= mix(0.55, 1.0, edgeDark);
 
       col = clamp(col, 0.0, 1.0);
+      if (u_is_spec > 0.5) {
+        // Polished chrome: fully metallic, near-mirror roughness with micro waviness
+        return vec4(1.0, clamp(0.03 + micro * 2.0, 0.02, 0.05), 0.0, u_opacity);
+      }
       return vec4(col, u_opacity);
     }
   `,

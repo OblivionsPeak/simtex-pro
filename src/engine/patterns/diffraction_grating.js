@@ -1,7 +1,7 @@
 export default {
   id: 'diffraction_grating_artisan',
   name: 'Diffraction Grating',
-  category: 'Experimental',
+  category: 'Abstract',
   description: 'Rainbow-like spectral interference bands mimicking light diffraction on surfaces.',
   shader: `
     vec4 generate() {

@@ -1,6 +1,6 @@
 export default {
   id: 'desert_dunes_artisan',
-  name: 'Sand Dunes',
+  name: 'Desert Dunes',
   category: 'Natural',
   description: 'Wavy ripple-sand patterns mimicking windswept desert landscapes.',
   shader: `

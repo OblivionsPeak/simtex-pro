@@ -48,6 +48,12 @@ export default {
       vec3 col = fiberCol + u_tint.rgb * resinMask * u_tint_strength * 0.55;
       col += u_tint.rgb * btmP * (1.0 - topP) * u_tint_strength * 0.18;
 
+      if (u_is_spec > 0.5) {
+        // Weave-modulated metallic; fibre spec streaks glossier than resin gaps
+        float metallic = mix(0.3, 0.5, clamp(topP + topSpec * 0.5, 0.0, 1.0));
+        float roughness = clamp(0.18 - topP * 0.04 - topSpec * 0.06, 0.08, 0.2);
+        return vec4(metallic, roughness, 0.0, u_opacity);
+      }
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
   `,

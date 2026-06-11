@@ -1,7 +1,7 @@
 export default {
   id: 'lichtenberg_trees_artisan',
   name: 'Lichtenberg Trees',
-  category: 'Experimental',
+  category: 'Abstract',
   description: 'Fractal electrical discharge patterns found in high-voltage dielectric breakdown.',
   shader: `
     vec4 generate() {

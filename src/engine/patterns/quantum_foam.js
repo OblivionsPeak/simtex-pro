@@ -1,7 +1,7 @@
 export default {
   id: 'quantum_foam_artisan',
   name: 'Quantum Foam',
-  category: 'Experimental',
+  category: 'Abstract',
   description: 'Abstract probability interference and grain noise mimicking fluctuations at the Planck scale.',
   shader: `
     vec4 generate() {

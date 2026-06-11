@@ -1,7 +1,7 @@
 export default {
   id: 'radial_gradient_artisan',
   name: 'Master Radial',
-  category: 'Utility',
+  category: 'Abstract',
   description: 'Focus-aligned radial gradient transition.',
   shader: `
     vec4 generate() {

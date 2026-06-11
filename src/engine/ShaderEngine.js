@@ -320,6 +320,64 @@ export class ShaderEngine {
     return dataUrl;
   }
 
+  // Seamless-tile export: blends the rendered texture with a half-offset
+  // wrapped copy of itself, feathered from the centre outward, so opposite
+  // edges are guaranteed identical (GIMP "Make Seamless" technique).
+  exportSeamless(width, height, uniforms, feather = 0.45) {
+    const oldW = this.canvas.width;
+    const oldH = this.canvas.height;
+    const oldValues = this.currentValues;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.currentValues = { ...this.currentValues, ...uniforms };
+    this.draw();
+
+    const src = document.createElement('canvas');
+    src.width = width;
+    src.height = height;
+    const sctx = src.getContext('2d');
+    sctx.drawImage(this.canvas, 0, 0);
+    const inData = sctx.getImageData(0, 0, width, height).data;
+
+    const out = document.createElement('canvas');
+    out.width = width;
+    out.height = height;
+    const octx = out.getContext('2d');
+    const outData = octx.createImageData(width, height);
+    const od = outData.data;
+
+    const halfW = width >> 1;
+    const halfH = height >> 1;
+    const inner = 1.0 - feather;
+
+    for (let y = 0; y < height; y++) {
+      const wy = (y + halfH) % height;
+      const cy = Math.abs(y / height - 0.5) * 2.0;
+      for (let x = 0; x < width; x++) {
+        const wx = (x + halfW) % width;
+        const c = Math.max(Math.abs(x / width - 0.5) * 2.0, cy);
+        // 0 in the centre, 1 at the edges, smooth ramp across the feather band
+        let m = (c - inner) / feather;
+        m = m <= 0 ? 0 : m >= 1 ? 1 : m * m * (3 - 2 * m);
+        const i = (y * width + x) * 4;
+        const j = (wy * width + wx) * 4;
+        od[i]     = inData[i]     + (inData[j]     - inData[i])     * m;
+        od[i + 1] = inData[i + 1] + (inData[j + 1] - inData[i + 1]) * m;
+        od[i + 2] = inData[i + 2] + (inData[j + 2] - inData[i + 2]) * m;
+        od[i + 3] = inData[i + 3] + (inData[j + 3] - inData[i + 3]) * m;
+      }
+    }
+
+    octx.putImageData(outData, 0, 0);
+
+    this.canvas.width = oldW;
+    this.canvas.height = oldH;
+    this.currentValues = oldValues;
+    this.dirty = true;
+
+    return out.toDataURL('image/png');
+  }
+
   exportNormalMap(width, height, uniforms, strength = 3.0) {
     const oldW = this.canvas.width;
     const oldH = this.canvas.height;
