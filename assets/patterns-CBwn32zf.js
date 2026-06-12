@@ -2116,9 +2116,9 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col += smoothstep(0.30, 0.0, abs(uv.y - 0.78)) * 0.05;
       col += smoothstep(0.22, 0.0, abs(uv.y - 0.18)) * 0.02;
 
-      // masking tape wobble — pulled by hand round a curved tank
-      float wob = (noise(vec2(uv.y * 9.0, 1.3)) - 0.5) * 0.006
-                + (noise(vec2(uv.y * 41.0, 5.1)) - 0.5) * 0.0018;
+      // whisper of tape-edge texture — the band must still read dead straight
+      float wob = (noise(vec2(uv.y * 9.0, 1.3)) - 0.5) * 0.001
+                + (noise(vec2(uv.y * 41.0, 5.1)) - 0.5) * 0.0004;
       float dx = abs(uv.x - 0.5 + wob);
 
       float d = dx - bw;                               // signed: inside band < 0
@@ -5320,8 +5320,8 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       // so the bands meet in a point — a true chevron, not a barber pole
       float fold = abs(uv.x - 0.5);
       float c = (fold * 1.2 + uv.y) * n;                // chevron coordinate
-      // stencilled edges bleed slightly: wobble the boundary
-      float wob = (noise(uv * 28.0) - 0.5) * 0.10;
+      // faint stencil bleed only — chevron edges must still read straight
+      float wob = (noise(uv * 28.0) - 0.5) * 0.012;
       float band = fract(c + wob);
       float aa = n * 0.006;
       // 0 = warn stripe, 1 = dark stripe, soft transitions both directions
@@ -5446,8 +5446,8 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       // as a sweeping arc rather than a ring
       vec2 centre = vec2(-0.35, -0.85 + u_arc_sweep * 0.5);
 
-      // hand-painted wobble along the arc edge
-      float wob = (noise(uv * 9.0) - 0.5) * 0.012 + (noise(uv * 33.0) - 0.5) * 0.004;
+      // faint brush texture only — the arc edge should sweep clean
+      float wob = (noise(uv * 9.0) - 0.5) * 0.002 + (noise(uv * 33.0) - 0.5) * 0.0008;
 
       float d = arcband_hrt1(uv, centre, 1.35) + wob;
 
@@ -6863,8 +6863,8 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       // panel sheen rolling across the body
       col += smoothstep(0.5, 0.0, abs(uv.x - 0.82)) * 0.03;
 
-      // masking-tape wobble: the painter pulled tape, not a laser
-      float wob = (noise(vec2(uv.y * 11.0, 3.7)) - 0.5) * 0.004;
+      // whisper of masking-tape texture — stripes must still read dead straight
+      float wob = (noise(vec2(uv.y * 11.0, 3.7)) - 0.5) * 0.0008;
 
       // fold to one stripe: distance from centreline, then from stripe centre
       float dx = abs(uv.x - 0.5 + wob);
@@ -15065,9 +15065,9 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col += smoothstep(0.5, 0.0, abs(uv.x + uv.y - 1.55)) * 0.03;
 
       // sash axis: roughly 45 degrees, distance measured across the sash
-      // hand-masked: the line breathes slightly along its length
+      // whisper of edge texture — the sash must still read dead straight
       float along = (uv.x + uv.y) * 0.7071;             // position along the sash
-      float wob = (noise(vec2(along * 8.0, 2.4)) - 0.5) * 0.008;
+      float wob = (noise(vec2(along * 8.0, 2.4)) - 0.5) * 0.0012;
       float d = (uv.x - uv.y) * 0.7071 + wob;           // signed distance from sash centre
 
       float w = u_sash_width * 0.5;                     // total sash half-width
