@@ -25,9 +25,9 @@ export default {
       col += smoothstep(0.30, 0.0, abs(uv.y - 0.78)) * 0.05;
       col += smoothstep(0.22, 0.0, abs(uv.y - 0.18)) * 0.02;
 
-      // masking tape wobble — pulled by hand round a curved tank
-      float wob = (noise(vec2(uv.y * 9.0, 1.3)) - 0.5) * 0.006
-                + (noise(vec2(uv.y * 41.0, 5.1)) - 0.5) * 0.0018;
+      // whisper of tape-edge texture — the band must still read dead straight
+      float wob = (noise(vec2(uv.y * 9.0, 1.3)) - 0.5) * 0.001
+                + (noise(vec2(uv.y * 41.0, 5.1)) - 0.5) * 0.0004;
       float dx = abs(uv.x - 0.5 + wob);
 
       float d = dx - bw;                               // signed: inside band < 0

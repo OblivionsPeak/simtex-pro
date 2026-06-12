@@ -18,8 +18,8 @@ export default {
       // so the bands meet in a point — a true chevron, not a barber pole
       float fold = abs(uv.x - 0.5);
       float c = (fold * 1.2 + uv.y) * n;                // chevron coordinate
-      // stencilled edges bleed slightly: wobble the boundary
-      float wob = (noise(uv * 28.0) - 0.5) * 0.10;
+      // faint stencil bleed only — chevron edges must still read straight
+      float wob = (noise(uv * 28.0) - 0.5) * 0.012;
       float band = fract(c + wob);
       float aa = n * 0.006;
       // 0 = warn stripe, 1 = dark stripe, soft transitions both directions

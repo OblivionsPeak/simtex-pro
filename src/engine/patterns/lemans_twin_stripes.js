@@ -25,8 +25,8 @@ export default {
       // panel sheen rolling across the body
       col += smoothstep(0.5, 0.0, abs(uv.x - 0.82)) * 0.03;
 
-      // masking-tape wobble: the painter pulled tape, not a laser
-      float wob = (noise(vec2(uv.y * 11.0, 3.7)) - 0.5) * 0.004;
+      // whisper of masking-tape texture — stripes must still read dead straight
+      float wob = (noise(vec2(uv.y * 11.0, 3.7)) - 0.5) * 0.0008;
 
       // fold to one stripe: distance from centreline, then from stripe centre
       float dx = abs(uv.x - 0.5 + wob);

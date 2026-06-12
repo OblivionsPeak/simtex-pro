@@ -23,8 +23,8 @@ export default {
       // as a sweeping arc rather than a ring
       vec2 centre = vec2(-0.35, -0.85 + u_arc_sweep * 0.5);
 
-      // hand-painted wobble along the arc edge
-      float wob = (noise(uv * 9.0) - 0.5) * 0.012 + (noise(uv * 33.0) - 0.5) * 0.004;
+      // faint brush texture only — the arc edge should sweep clean
+      float wob = (noise(uv * 9.0) - 0.5) * 0.002 + (noise(uv * 33.0) - 0.5) * 0.0008;
 
       float d = arcband_hrt1(uv, centre, 1.35) + wob;
 

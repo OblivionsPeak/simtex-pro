@@ -21,9 +21,9 @@ export default {
       col += smoothstep(0.5, 0.0, abs(uv.x + uv.y - 1.55)) * 0.03;
 
       // sash axis: roughly 45 degrees, distance measured across the sash
-      // hand-masked: the line breathes slightly along its length
+      // whisper of edge texture — the sash must still read dead straight
       float along = (uv.x + uv.y) * 0.7071;             // position along the sash
-      float wob = (noise(vec2(along * 8.0, 2.4)) - 0.5) * 0.008;
+      float wob = (noise(vec2(along * 8.0, 2.4)) - 0.5) * 0.0012;
       float d = (uv.x - uv.y) * 0.7071 + wob;           // signed distance from sash centre
 
       float w = u_sash_width * 0.5;                     // total sash half-width
