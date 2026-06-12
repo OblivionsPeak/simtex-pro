@@ -35,3 +35,7 @@ If you want to contribute or build from source:
 
 ## License
 MIT License. See `LICENSE` for details.
+
+## Support
+
+SimTex Pro is free. If it earns a place in your livery workflow, you can [support development on Ko-fi](https://ko-fi.com/metalprophecymedia).

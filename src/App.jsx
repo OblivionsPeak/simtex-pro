@@ -917,6 +917,15 @@ function App() {
           </div>
 
           <div className="actions">
+            <a
+              className="support-link"
+              href="https://ko-fi.com/metalprophecymedia"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="SimTex Pro is free — tips keep it growing"
+            >
+              ♥ Support
+            </a>
             <button className="btn-secondary" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <Maximize size={18} />
             </button>
@@ -1075,6 +1084,8 @@ function App() {
           background: #1a1a20;
         }
         .pattern-thumb.placeholder { background: linear-gradient(135deg, #15151a, #1d1d24); }
+        .support-link { color: var(--color-text-dim); font-size: 11px; text-decoration: none; margin-right: 6px; white-space: nowrap; transition: color .15s; align-self: center; }
+        .support-link:hover { color: var(--color-accent); }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
         .pattern-category { font-size: 9px; font-weight: 800; color: var(--color-accent); text-transform: uppercase; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 4px; }
         .pattern-card.active { background: rgba(37, 99, 235, 0.1); border-color: var(--color-accent); box-shadow: var(--shadow-glow); }
