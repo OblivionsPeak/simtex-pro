@@ -11132,8 +11132,8 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       // --- rays: alternating wedges around the disc ---
       float n = u_ray_count;                            // ray pairs
       float a = ang / 6.28318 * n;                      // ray-space coordinate
-      // hand-cut vinyl: each ray edge wanders slightly, more so further out
-      float wob = (noise(vec2(floor(a + 0.5) * 7.3, r * 4.0)) - 0.5) * 0.10 * r * 3.0;
+      // faint cut-edge texture only — rays must fan out dead straight
+      float wob = (noise(vec2(floor(a + 0.5) * 7.3, r * 4.0)) - 0.5) * 0.012 * r * 3.0;
       float saw = abs(fract(a + wob) - 0.5) * 2.0;      // 0 at ray centre, 1 between
 
       // ray fill with anti-aliased edge that widens with radius
