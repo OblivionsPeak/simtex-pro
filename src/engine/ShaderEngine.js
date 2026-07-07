@@ -304,6 +304,10 @@ export class ShaderEngine {
     return shader;
   }
 
+  // All exports resolve to a PNG Blob. Blobs avoid the giant base64 strings
+  // toDataURL builds (a 4K PNG data URL is tens of MB of string); the
+  // toBlob() snapshot is taken synchronously at call time, so restoring the
+  // preview state right after is safe.
   export(width, height, uniforms) {
     const oldW = this.canvas.width;
     const oldH = this.canvas.height;
@@ -312,12 +316,12 @@ export class ShaderEngine {
     this.canvas.height = height;
     this.currentValues = { ...this.currentValues, ...uniforms };
     this.draw();
-    const dataUrl = this.canvas.toDataURL('image/png');
+    const blob = new Promise(resolve => this.canvas.toBlob(resolve, 'image/png'));
     this.canvas.width = oldW;
     this.canvas.height = oldH;
     this.currentValues = oldValues;
     this.dirty = true; // resizing cleared the canvas — repaint the preview
-    return dataUrl;
+    return blob;
   }
 
   // Seamless-tile export: blends the rendered texture with a half-offset
@@ -375,7 +379,7 @@ export class ShaderEngine {
     this.currentValues = oldValues;
     this.dirty = true;
 
-    return out.toDataURL('image/png');
+    return new Promise(resolve => out.toBlob(resolve, 'image/png'));
   }
 
   exportNormalMap(width, height, uniforms, strength = 3.0) {
@@ -448,6 +452,6 @@ export class ShaderEngine {
     this.currentValues = oldValues;
     this.dirty = true; // resizing cleared the canvas — repaint the preview
 
-    return out.toDataURL('image/png');
+    return new Promise(resolve => out.toBlob(resolve, 'image/png'));
   }
 }

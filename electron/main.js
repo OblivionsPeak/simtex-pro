@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
@@ -12,13 +13,22 @@ log.info('App starting...');
 
 let mainWindow;
 
+// vite-plugin-electron emits this file and the preload as .cjs
+// (see vite.config.js entryFileNames: '[name].cjs'), so at runtime the
+// preload lives next to us as preload.cjs. Fall back to preload.js in
+// case the build config ever changes.
+function resolvePreload() {
+  const cjs = path.join(__dirname, 'preload.cjs');
+  return fs.existsSync(cjs) ? cjs : path.join(__dirname, 'preload.js');
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     icon: path.join(__dirname, '../build/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Ensure this matches actual file
+      preload: resolvePreload(),
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -37,6 +47,12 @@ function createWindow() {
   // are registered before any update-status messages arrive.
   mainWindow.once('ready-to-show', () => {
     setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 3000);
+  });
+
+  // Drop the reference once closed so update events don't try to send
+  // to a destroyed webContents (optional chaining below then no-ops).
+  mainWindow.on('closed', () => {
+    mainWindow = null;
   });
 }
 
@@ -85,7 +101,7 @@ autoUpdater.on('update-available', (info) => {
   mainWindow?.webContents.send('update-available-data', info);
 });
 
-autoUpdater.on('update-not-available', (info) => {
+autoUpdater.on('update-not-available', () => {
   log.info('Update not available.');
   mainWindow?.webContents.send('update-status', 'Your system is up to date.');
 });
@@ -96,7 +112,8 @@ autoUpdater.on('error', (err) => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  const percent = Math.floor(progressObj.percentage);
+  // electron-updater's progress object uses `percent` (0-100)
+  const percent = Math.floor(progressObj.percent);
   mainWindow?.webContents.send('update-progress', percent);
 });
 

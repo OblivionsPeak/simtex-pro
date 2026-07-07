@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { ShaderEngine } from './engine/ShaderEngine';
 import { PATTERNS, CATEGORIES } from './engine/patterns';
+import { loadThumbs, saveThumbs } from './engine/thumbCache';
 import { Download, Layers, Shield, Settings, Zap, Info, Maximize, Search, X, Star } from 'lucide-react';
+import pkg from '../package.json';
+
+const APP_VERSION = pkg.version;
 
 // Patterns added within the last 21 days get a NEW badge
 const NEW_BADGE_CUTOFF = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
@@ -140,10 +144,12 @@ function App() {
 
   // Filtered Patterns
   const filteredPatterns = useMemo(() => {
+    const q = searchQuery.toLowerCase();
     const filtered = PATTERNS.filter(p => {
       const matchesSearch =
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q);
       const matchesCategory =
         activeCategory === 'All' ||
         (activeCategory === 'Favorites' ? favorites.includes(p.id) : p.category === activeCategory);
@@ -162,63 +168,81 @@ function App() {
     const engine = new ShaderEngine(canvasRef.current);
     engineRef.current = engine;
     updateShader(activePattern);
+    // baseline history entry so the very first tweak is undoable
+    pushHistory({ patternId: activePattern.id, uniforms: patternDefaults(activePattern) });
     return () => engine.stop();
   }, [canvasRef]);
 
-  // Handle viewport resizing
+  // Handle viewport resizing — render at device-pixel resolution so the
+  // preview stays crisp on high-DPI displays (capped at 2x for GPU sanity)
   useEffect(() => {
     const handleResize = () => {
       if (!engineRef.current || !canvasRef.current) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const sidebarWidth = isSidebarOpen ? 340 : 0;
-      canvasRef.current.width = window.innerWidth - sidebarWidth - 40;
-      canvasRef.current.height = window.innerHeight - 100;
+      const cssW = window.innerWidth - sidebarWidth - 40;
+      const cssH = window.innerHeight - 100;
+      canvasRef.current.width = Math.round(cssW * dpr);
+      canvasRef.current.height = Math.round(cssH * dpr);
+      canvasRef.current.style.width = cssW + 'px';
+      canvasRef.current.style.height = cssH + 'px';
     };
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, [isSidebarOpen]);
 
-  // Generate pattern thumbnails progressively on an offscreen engine.
-  // Chunked so the UI stays responsive while 280+ shaders compile.
+  // Pattern thumbnails: served from the IndexedDB cache when this app
+  // version already rendered them; only misses compile shaders, chunked so
+  // the UI stays responsive. First visit renders all, later visits none.
   useEffect(() => {
-    const off = document.createElement('canvas');
-    off.width = 96;
-    off.height = 96;
-    let engine;
-    try {
-      engine = new ShaderEngine(off);
-    } catch {
-      return; // no WebGL — cards just render without thumbnails
-    }
-    engine.stop(); // no animation loop needed; we draw synchronously
-
     let cancelled = false;
-    let idx = 0;
-    const BATCH = 4;
 
-    const generateBatch = () => {
-      if (cancelled || idx >= PATTERNS.length) return;
-      const batch = {};
-      for (let n = 0; n < BATCH && idx < PATTERNS.length; n++, idx++) {
-        const p = PATTERNS[idx];
-        const defaults = {};
-        p.uniforms.forEach(u => { defaults[u.id] = u.default; });
-        engine.setShader(p);
-        engine.render({
-          ...defaults,
-          u_is_spec: 0.0,
-          u_opacity: 1.0,
-          u_uv_scale: [1.0, 1.0],
-          u_uv_rotation: 0.0,
-          u_uv_offset: [0.0, 0.0],
-        });
-        engine.draw();
-        batch[p.id] = off.toDataURL('image/png');
+    (async () => {
+      const cached = await loadThumbs(APP_VERSION).catch(() => ({}));
+      if (cancelled) return;
+      const missing = PATTERNS.filter(p => !cached[p.id]);
+      if (Object.keys(cached).length) setThumbs(prev => ({ ...cached, ...prev }));
+      if (!missing.length) return;
+
+      const off = document.createElement('canvas');
+      off.width = 96;
+      off.height = 96;
+      let engine;
+      try {
+        engine = new ShaderEngine(off);
+      } catch {
+        return; // no WebGL — cards just render without thumbnails
       }
-      setThumbs(prev => ({ ...prev, ...batch }));
-      setTimeout(generateBatch, 30);
-    };
-    setTimeout(generateBatch, 300); // let the main canvas come up first
+      engine.stop(); // no animation loop needed; we draw synchronously
+
+      let idx = 0;
+      const BATCH = 4;
+      const generateBatch = () => {
+        if (cancelled || idx >= missing.length) return;
+        const batch = {};
+        for (let n = 0; n < BATCH && idx < missing.length; n++, idx++) {
+          const p = missing[idx];
+          const defaults = {};
+          p.uniforms.forEach(u => { defaults[u.id] = u.default; });
+          engine.setShader(p);
+          engine.render({
+            ...defaults,
+            u_is_spec: 0.0,
+            u_opacity: 1.0,
+            u_uv_scale: [1.0, 1.0],
+            u_uv_rotation: 0.0,
+            u_uv_offset: [0.0, 0.0],
+          });
+          engine.draw();
+          batch[p.id] = off.toDataURL('image/png');
+        }
+        setThumbs(prev => ({ ...prev, ...batch }));
+        saveThumbs(APP_VERSION, batch).catch(() => {}); // best-effort persist
+        setTimeout(generateBatch, 30);
+      };
+      setTimeout(generateBatch, 300); // let the main canvas come up first
+    })();
 
     return () => { cancelled = true; };
   }, []);
@@ -266,17 +290,22 @@ function App() {
     });
   }, [uvScale, uvRotation, uvOffset, tilingPreview]);
 
-  // Bug 1 fix: use masterOpacityRef.current so stale closure never loses the current opacity
-  const updateShader = async (pattern) => {
-    if (!engineRef.current) return;
+  const patternDefaults = (pattern) => {
     const defaults = {};
-    pattern.uniforms.forEach(u => {
-      defaults[u.id] = u.default;
-    });
-    setUniforms(defaults);
+    pattern.uniforms.forEach(u => { defaults[u.id] = u.default; });
+    return defaults;
+  };
+
+  // Bug 1 fix: use masterOpacityRef.current so stale closure never loses the
+  // current opacity. `overrides` lets preset loads apply their saved uniforms
+  // in the same pass as the shader swap (no setTimeout races).
+  const updateShader = async (pattern, overrides = null) => {
+    if (!engineRef.current) return;
+    const values = { ...patternDefaults(pattern), ...(overrides || {}) };
+    setUniforms(values);
     await engineRef.current.setShader(pattern);
     engineRef.current.render({
-      ...defaults,
+      ...values,
       u_is_spec: isSpecMap ? 1.0 : 0.0,
       u_opacity: masterOpacityRef.current,
     });
@@ -285,6 +314,9 @@ function App() {
   const handlePatternChange = (pattern) => {
     setActivePattern(pattern);
     updateShader(pattern);
+    // baseline history entry: the first slider tweak on a pattern can be
+    // undone back to its defaults, and undo walks across pattern switches
+    pushHistory({ patternId: pattern.id, uniforms: patternDefaults(pattern) });
   };
 
   const pushHistory = (entry) => {
@@ -326,66 +358,67 @@ function App() {
     }
   }, [isSpecMap]);
 
-  const downloadTexture = () => {
+  // Blob + object URL downloads: no multi-MB base64 strings in memory
+  const saveBlob = (blob, filename) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = url;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  const downloadTexture = async () => {
     if (!engineRef.current) return;
     const exportUniforms = {
       ...uniforms,
       u_is_spec: isSpecMap ? 1.0 : 0.0,
     };
-    const dataUrl = seamlessExport
+    const blob = await (seamlessExport
       ? engineRef.current.exportSeamless(resolution, resolution, exportUniforms)
-      : engineRef.current.export(resolution, resolution, exportUniforms);
-    const link = document.createElement('a');
-    link.download = `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}${seamlessExport ? '_seamless' : ''}_${resolution}.png`;
-    link.href = dataUrl;
-    link.click();
+      : engineRef.current.export(resolution, resolution, exportUniforms));
+    saveBlob(blob, `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}${seamlessExport ? '_seamless' : ''}_${resolution}.png`);
   };
 
   // Export Set: diffuse + spec + normal with matching filenames, one click.
   // Downloads are staggered so the browser doesn't swallow them.
-  const downloadSet = () => {
+  const downloadSet = async () => {
     if (!engineRef.current) return;
     const e = engineRef.current;
     const base = `simtex_${activePattern.id}${seamlessExport ? '_seamless' : ''}_${resolution}`;
-    const save = (dataUrl, suffix) => {
-      const link = document.createElement('a');
-      link.download = `${base}_${suffix}.png`;
-      link.href = dataUrl;
-      link.click();
-    };
+    const pause = (ms) => new Promise(r => setTimeout(r, ms));
 
     const diffUniforms = { ...uniforms, u_is_spec: 0.0 };
-    save(
-      seamlessExport
+    saveBlob(
+      await (seamlessExport
         ? e.exportSeamless(resolution, resolution, diffUniforms)
-        : e.export(resolution, resolution, diffUniforms),
-      'diff'
+        : e.export(resolution, resolution, diffUniforms)),
+      `${base}_diff.png`
     );
-    setTimeout(() => {
-      const specUniforms = { ...uniforms, u_is_spec: 1.0 };
-      save(
-        seamlessExport
-          ? e.exportSeamless(resolution, resolution, specUniforms)
-          : e.export(resolution, resolution, specUniforms),
-        'spec'
-      );
-    }, 400);
-    setTimeout(() => {
-      save(e.exportNormalMap(resolution, resolution, { ...uniforms, u_is_spec: 0.0, u_opacity: 1.0 }), 'normal');
-    }, 800);
+    await pause(400);
+    const specUniforms = { ...uniforms, u_is_spec: 1.0 };
+    saveBlob(
+      await (seamlessExport
+        ? e.exportSeamless(resolution, resolution, specUniforms)
+        : e.export(resolution, resolution, specUniforms)),
+      `${base}_spec.png`
+    );
+    await pause(400);
+    saveBlob(
+      await e.exportNormalMap(resolution, resolution, { ...uniforms, u_is_spec: 0.0, u_opacity: 1.0 }),
+      `${base}_normal.png`
+    );
   };
 
-  const downloadNormalMap = () => {
+  const downloadNormalMap = async () => {
     if (!engineRef.current) return;
-    const dataUrl = engineRef.current.exportNormalMap(resolution, resolution, {
+    const blob = await engineRef.current.exportNormalMap(resolution, resolution, {
       ...uniforms,
       u_is_spec: 0.0,
       u_opacity: 1.0,
     });
-    const link = document.createElement('a');
-    link.download = `simtex_${activePattern.id}_normal_${resolution}.png`;
-    link.href = dataUrl;
-    link.click();
+    saveBlob(blob, `simtex_${activePattern.id}_normal_${resolution}.png`);
   };
 
   // Feature A: toggle favorite
@@ -397,7 +430,8 @@ function App() {
     });
   };
 
-  // Feature B: save preset
+  // Feature B: save preset — captures the full look: uniforms, UV transform,
+  // and master opacity (older presets without uv/opacity still load fine)
   const savePreset = () => {
     const name = presetNameInput.trim() || activePattern.name;
     const preset = {
@@ -405,6 +439,8 @@ function App() {
       patternId: activePattern.id,
       name,
       uniforms: { ...uniforms },
+      uv: { scale: [...uvScale], rotation: uvRotation, offset: [...uvOffset] },
+      opacity: masterOpacity,
     };
     setPresets(prev => {
       const next = [...prev, preset].slice(-20);
@@ -426,34 +462,37 @@ function App() {
   const loadPreset = (preset) => {
     const pattern = PATTERNS.find(p => p.id === preset.patternId);
     if (!pattern) return;
-    handlePatternChange(pattern);
-    // Set uniforms after pattern change (pattern change resets, so schedule after)
-    setTimeout(() => {
-      setUniforms(preset.uniforms);
-      if (engineRef.current) {
-        engineRef.current.render({
-          ...preset.uniforms,
-          u_is_spec: isSpecMap ? 1.0 : 0.0,
-          u_opacity: masterOpacityRef.current,
-        });
-      }
-    }, 50);
+    setActivePattern(pattern);
+    if (typeof preset.opacity === 'number') {
+      masterOpacityRef.current = preset.opacity;
+      setMasterOpacity(preset.opacity);
+    }
+    if (preset.uv) {
+      setUvScale(preset.uv.scale);
+      setUvRotation(preset.uv.rotation);
+      setUvOffset(preset.uv.offset);
+    }
+    // saved uniforms apply in the same pass as the shader swap
+    updateShader(pattern, preset.uniforms);
+    pushHistory({ patternId: pattern.id, uniforms: { ...patternDefaults(pattern), ...preset.uniforms } });
   };
 
-  // Feature C: undo/redo helpers
-  const applyHistoryEntry = useCallback((entry) => {
+  // Feature C: undo/redo helpers. When the entry belongs to a different
+  // pattern, the shader program must be swapped too — rendering another
+  // pattern's uniforms into the current program shows the wrong texture.
+  const applyHistoryEntry = useCallback(async (entry) => {
     const pattern = PATTERNS.find(p => p.id === entry.patternId);
-    if (pattern && pattern.id !== activePattern.id) {
+    if (!pattern || !engineRef.current) return;
+    if (pattern.id !== activePattern.id) {
       setActivePattern(pattern);
+      await engineRef.current.setShader(pattern);
     }
     setUniforms(entry.uniforms);
-    if (engineRef.current) {
-      engineRef.current.render({
-        ...entry.uniforms,
-        u_is_spec: isSpecMap ? 1.0 : 0.0,
-        u_opacity: masterOpacityRef.current,
-      });
-    }
+    engineRef.current.render({
+      ...entry.uniforms,
+      u_is_spec: isSpecMap ? 1.0 : 0.0,
+      u_opacity: masterOpacityRef.current,
+    });
   }, [activePattern.id, isSpecMap]);
 
   // Feature C + D: keyboard shortcuts
@@ -515,14 +554,21 @@ function App() {
             ? Math.max(0, currentIdx - 1)
             : Math.min(filteredPatterns.length - 1, currentIdx + 1);
         if (nextIdx !== currentIdx) {
-          handlePatternChange(filteredPatterns[nextIdx]);
+          e.preventDefault(); // the list scrolls via scrollIntoView, not the page
+          const next = filteredPatterns[nextIdx];
+          handlePatternChange(next);
+          document.getElementById(`pattern-card-${next.id}`)
+            ?.scrollIntoView({ block: 'nearest' });
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSidebarOpen, searchQuery, filteredPatterns, activePattern, history, historyIndex, applyHistoryEntry]);
+    // uniforms/resolution/seamlessExport/isSpecMap keep Ctrl+D's closure
+    // fresh — without them a slider tweak inside the history debounce window
+    // exported stale values
+  }, [isSidebarOpen, searchQuery, filteredPatterns, activePattern, history, historyIndex, applyHistoryEntry, uniforms, resolution, seamlessExport, isSpecMap]);
 
   return (
     <div className="app-container">
@@ -532,7 +578,7 @@ function App() {
           <div className="sidebar-header">
             <div className="logo">
               <Shield size={24} color="var(--color-accent)" />
-              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v3.4.0</small></h1>
+              <h1>SIMTEX<span>PRO</span> <small className="v-tag">v{APP_VERSION}</small></h1>
             </div>
           </div>
 
@@ -584,10 +630,21 @@ function App() {
           </div>
           <div className="pattern-grid">
             {filteredPatterns.length > 0 ? filteredPatterns.map(p => (
-              <button
+              // div, not button: the fav star inside is a real <button>, and
+              // nested buttons are invalid HTML with flaky click behavior
+              <div
                 key={p.id}
+                id={`pattern-card-${p.id}`}
+                role="button"
+                tabIndex={0}
                 className={`pattern-card ${activePattern.id === p.id ? 'active' : ''}`}
                 onClick={() => handlePatternChange(p)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handlePatternChange(p);
+                  }
+                }}
               >
                 <div className="card-body">
                   {thumbs[p.id] ? (
@@ -614,7 +671,7 @@ function App() {
                 >
                   {favorites.includes(p.id) ? '★' : '☆'}
                 </button>
-              </button>
+              </div>
             )) : (
               <div className="no-results">No patterns found for "{searchQuery || activeCategory}"</div>
             )}
@@ -670,23 +727,10 @@ function App() {
                   </div>
                   <div className="variants-row" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {activePattern.variants.map((v, i) => (
-                      <button 
-                        key={i} 
-                        className="variant-btn" 
+                      <button
+                        key={i}
+                        className="variant-btn"
                         onClick={() => applyVariant(v)}
-                        style={{
-                          background: '#1a1a20',
-                          border: '1px solid var(--color-border)',
-                          color: '#fff',
-                          padding: '6px 10px',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          cursor: 'pointer',
-                          flex: '1 1 calc(50% - 6px)',
-                          transition: 'border-color 0.2s',
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-accent)'}
-                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                       >
                         {v.name}
                       </button>
@@ -896,7 +940,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <span className="version-label">v3.4.0</span>
+          <span className="version-label">v{APP_VERSION}</span>
           {isElectron && (
             <button className="check-updates-link" onClick={() => window.electronAPI?.checkForUpdates()}>
               Check for Updates
@@ -1070,7 +1114,23 @@ function App() {
           border: 1px solid rgba(255,255,255,0.05);
           transition: all 0.2s;
           position: relative;
+          cursor: pointer; /* card is a div now (fav star nests a real button) */
+          user-select: none;
         }
+        .pattern-card:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+
+        .variant-btn {
+          background: #1a1a20;
+          border: 1px solid var(--color-border);
+          color: #fff;
+          padding: 6px 10px;
+          border-radius: 4px;
+          font-size: 11px;
+          cursor: pointer;
+          flex: 1 1 calc(50% - 6px);
+          transition: border-color 0.2s;
+        }
+        .variant-btn:hover { border-color: var(--color-accent); }
         .pattern-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); background: #16161c; }
         .card-body { display: flex; gap: 10px; align-items: flex-start; }
         .card-text { flex: 1; min-width: 0; }
