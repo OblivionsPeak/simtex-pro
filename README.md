@@ -14,7 +14,7 @@ SimTex Pro is a procedural texture and pattern generator for sim racing liveries
 - **Master opacity** control
 - **UV transform** — scale, rotation, offset, with a 2×2 tiling preview toggle
 - **iRacing spec map mode** — R = metallic, G = roughness, matched to iRacing's channel layout
-- Runs entirely in the browser; also available as a Windows desktop app
+- Runs entirely in the browser — nothing to install
 
 ## Exports
 
@@ -37,12 +37,6 @@ All exports available at **1K, 2K, or 4K** resolution.
 | `Esc` | Clear search + category filter, or toggle sidebar |
 | `↑` / `↓` | Navigate patterns |
 
-## Desktop App (Windows)
-
-1. Download the latest installer from [Releases](https://github.com/OblivionsPeak/simtex-pro/releases).
-2. Run it — one-click NSIS install with desktop and start menu shortcuts.
-3. The app auto-updates as new versions and patterns are released.
-
 ## Development
 
 ```bash
@@ -52,7 +46,6 @@ npm install
 npm run dev       # local dev server (Vite)
 npm run build     # production web build
 npm run deploy    # publish web app to GitHub Pages (gh-pages -d dist)
-npm run dist      # build the Windows desktop app (electron-builder)
 ```
 
 Patterns live in `src/engine/patterns/` — one file per pattern. Categories are derived from the pattern data itself, so adding a pattern with a new category automatically extends the filter UI. Before committing new patterns, run the shader verification tool:
