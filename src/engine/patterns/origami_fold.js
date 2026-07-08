@@ -57,8 +57,8 @@
         );
 
         // Number of radiating folds from this point
-        int numRays = int(3.0 + floor(hash11(fi * 7.0) * complexity * 1.5));
-        numRays = min(numRays, 7);
+        // GLSL ES 1.0 has no int min() — clamp in float space before casting
+        int numRays = int(min(3.0 + floor(hash11(fi * 7.0) * complexity * 1.5), 7.0));
 
         for (int j = 0; j < 7; j++) {
           if (j >= numRays) break;

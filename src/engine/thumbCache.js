@@ -1,5 +1,5 @@
-// IndexedDB cache for pattern thumbnails. Generating 400+ thumbnails means
-// compiling 400+ shaders every visit; caching the rendered PNGs makes repeat
+// IndexedDB cache for pattern thumbnails. Generating 500+ thumbnails means
+// compiling 500+ shaders every visit; caching the rendered PNGs makes repeat
 // loads instant. Entries are keyed by pattern id and salted with the app
 // version — any release invalidates the whole cache, so pattern tweaks that
 // don't change the id (wobble fixes, recolors) still get fresh thumbs.

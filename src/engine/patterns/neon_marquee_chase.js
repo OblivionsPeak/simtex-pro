@@ -68,6 +68,7 @@ export default {
     { id: 'u_rows', name: 'Bulb Rows', type: 'float', min: 2.0, max: 8.0, default: 4.0 },
     { id: 'u_bulb_count', name: 'Bulbs Per Row', type: 'float', min: 6.0, max: 24.0, default: 12.0 },
     { id: 'u_glow', name: 'Halo Spill', type: 'float', min: 0.0, max: 2.0, default: 1.0 },
-    { id: 'u_lit_color', name: 'Filament Glow', type: 'color', default: [1.0, 0.85, 0.55, 1.0] }
+    { id: 'u_lit_color', name: 'Filament Glow', type: 'color', default: [1.0, 0.85, 0.55, 1.0] },
+    { id: 'u_panel_color', name: 'Channel Enamel', type: 'color', default: [0.48, 0.08, 0.07, 1.0] }
   ]
 };

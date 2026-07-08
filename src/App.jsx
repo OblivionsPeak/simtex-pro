@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { ShaderEngine } from './engine/ShaderEngine';
 import { PATTERNS, CATEGORIES } from './engine/patterns';
 import { loadThumbs, saveThumbs } from './engine/thumbCache';
-import { Download, Layers, Shield, Settings, Zap, Info, Maximize, Search, X, Star } from 'lucide-react';
+import { Download, Layers, Shield, Settings, Zap, Info, Maximize, Search, X, Star, Send } from 'lucide-react';
 import pkg from '../package.json';
 
 const APP_VERSION = pkg.version;
@@ -132,6 +132,18 @@ function App() {
 
   // Seamless tiling export
   const [seamlessExport, setSeamlessExport] = useState(false);
+
+  // Clearcoat bridge: opened as a popup from Clearcoat with ?bridge=clearcoat,
+  // we can postMessage seamless exports straight back to the opener window
+  const [isBridgeMode] = useState(() =>
+    new URLSearchParams(window.location.search).get('bridge') === 'clearcoat' && !!window.opener
+  );
+  const [bridgeStatus, setBridgeStatus] = useState('idle'); // idle | sending | sent | error
+  const bridgeTimerRef = useRef(null);
+
+  // Name of the last-applied variant of the active pattern (null = base look);
+  // cleared on pattern change / preset load, used to label bridge sends
+  const [activeVariantName, setActiveVariantName] = useState(null);
 
   // UV Transform
   const [uvScale, setUvScale] = useState([1.0, 1.0]);
@@ -313,6 +325,7 @@ function App() {
 
   const handlePatternChange = (pattern) => {
     setActivePattern(pattern);
+    setActiveVariantName(null);
     updateShader(pattern);
     // baseline history entry: the first slider tweak on a pattern can be
     // undone back to its defaults, and undo walks across pattern switches
@@ -331,6 +344,7 @@ function App() {
   const applyVariant = (variant) => {
     const newUniforms = { ...uniforms, ...variant.uniforms };
     setUniforms(newUniforms);
+    setActiveVariantName(variant.name);
     if (engineRef.current) {
       engineRef.current.render({ ...newUniforms, u_is_spec: isSpecMap ? 1.0 : 0.0, u_opacity: masterOpacityRef.current });
     }
@@ -379,6 +393,47 @@ function App() {
       ? engineRef.current.exportSeamless(resolution, resolution, exportUniforms)
       : engineRef.current.export(resolution, resolution, exportUniforms));
     saveBlob(blob, `simtex_${activePattern.id}_${isSpecMap ? 'spec' : 'diff'}${seamlessExport ? '_seamless' : ''}_${resolution}.png`);
+  };
+
+  // Clearcoat bridge: seamless-export the current look and postMessage it to
+  // the opener (Clearcoat). Same uniform plumbing as downloadTexture, always
+  // seamless (Clearcoat imports tiling patterns).
+  const sendToClearcoat = async () => {
+    if (!engineRef.current || bridgeStatus === 'sending') return;
+    clearTimeout(bridgeTimerRef.current);
+    if (!window.opener || window.opener.closed) {
+      setBridgeStatus('error');
+      return;
+    }
+    setBridgeStatus('sending');
+    try {
+      const res = resolution || 1024;
+      const blob = await engineRef.current.exportSeamless(res, res, {
+        ...uniforms,
+        u_is_spec: isSpecMap ? 1.0 : 0.0,
+      });
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+      // opener may have closed while we were rendering
+      if (!window.opener || window.opener.closed) {
+        setBridgeStatus('error');
+        return;
+      }
+      window.opener.postMessage({
+        type: 'simtex-texture',
+        name: activeVariantName ? `${activePattern.name} — ${activeVariantName}` : activePattern.name,
+        dataUrl,
+      }, '*');
+      setBridgeStatus('sent');
+      bridgeTimerRef.current = setTimeout(() => setBridgeStatus('idle'), 2000);
+    } catch {
+      setBridgeStatus('error');
+      bridgeTimerRef.current = setTimeout(() => setBridgeStatus('idle'), 2000);
+    }
   };
 
   // Export Set: diffuse + spec + normal with matching filenames, one click.
@@ -463,6 +518,7 @@ function App() {
     const pattern = PATTERNS.find(p => p.id === preset.patternId);
     if (!pattern) return;
     setActivePattern(pattern);
+    setActiveVariantName(null);
     if (typeof preset.opacity === 'number') {
       masterOpacityRef.current = preset.opacity;
       setMasterOpacity(preset.opacity);
@@ -987,6 +1043,22 @@ function App() {
               <Download size={18} />
               <span>Export PNG</span>
             </button>
+            {isBridgeMode && (
+              <button
+                className={`btn-primary btn-bridge ${bridgeStatus}`}
+                onClick={sendToClearcoat}
+                disabled={bridgeStatus === 'sending' || bridgeStatus === 'error'}
+                title="Export the current pattern seamlessly and send it to the Clearcoat window that opened SimTex"
+              >
+                <Send size={18} />
+                <span>
+                  {bridgeStatus === 'sending' && 'Sending…'}
+                  {bridgeStatus === 'sent' && 'Sent ✓'}
+                  {bridgeStatus === 'error' && 'Clearcoat closed'}
+                  {bridgeStatus === 'idle' && 'Send to Clearcoat'}
+                </span>
+              </button>
+            )}
             <button
               className="btn-primary btn-set"
               onClick={downloadSet}
@@ -1386,6 +1458,9 @@ function App() {
         .uv-btn.active { background: rgba(37,99,235,0.25); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.4); }
         .btn-normal { width: 42px; height: 42px; font-size: 10px; }
         .btn-seamless.active { background: rgba(37,99,235,0.3); color: var(--color-accent); box-shadow: var(--shadow-glow); }
+        .btn-bridge.sent { background: #16a34a; }
+        .btn-bridge.error { background: #dc2626; cursor: not-allowed; }
+        .btn-bridge:disabled { transform: none; opacity: 0.85; }
         .btn-set { background: rgba(37,99,235,0.18); color: var(--color-accent); border: 1px solid rgba(37,99,235,0.45); box-shadow: none; }
         .btn-set:hover { background: rgba(37,99,235,0.3); transform: translateY(-1px); }
         .tile-badge { background: var(--color-accent); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.08em; }

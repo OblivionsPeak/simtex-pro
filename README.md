@@ -6,7 +6,7 @@ SimTex Pro is a procedural texture and pattern generator for sim racing liveries
 
 ## Features
 
-- **422 patterns across 14 categories** (Abstract, Architecture, Cosmos, Geology, Geometric, Heritage, Industrial, Natural, Ocean, Organic, Racing, Retro, Technology, Textile)
+- **502 patterns across 14 categories** (Abstract, Architecture, Cosmos, Geology, Geometric, Heritage, Industrial, Natural, Ocean, Organic, Racing, Retro, Technology, Textile)
 - Search and category filtering, including a **Favorites** category
 - Newest-first sorting with **NEW** badges on recently added patterns
 - **Presets** — save and recall named parameter setups (stored locally)
