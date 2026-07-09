@@ -18,7 +18,8 @@ for (const f of files) {
   PATTERNS.push((await import(`./src/engine/patterns/${f}`)).default);
 }
 
-const CELL = 160, LABEL = 16, COLS = 7, ROWS = 12;
+const CELL = parseInt(new URLSearchParams(location.search).get('size'), 10) || 160;
+const LABEL = 16, COLS = 7, ROWS = 12;
 const perSheet = COLS * ROWS;
 
 const glCanvas = document.createElement('canvas');
@@ -43,7 +44,7 @@ for (let s = 0; s * perSheet < sorted.length; s++) {
   if (onlySheet !== null && s !== parseInt(onlySheet, 10)) continue;
   const batch = sorted.slice(s * perSheet, (s + 1) * perSheet);
   const sheet = document.createElement('canvas');
-  sheet.width = COLS * CELL;
+  sheet.width = Math.min(COLS, batch.length) * CELL;
   sheet.height = Math.ceil(batch.length / COLS) * (CELL + LABEL);
   const ctx = sheet.getContext('2d');
   ctx.fillStyle = '#181818';
