@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>catalog contact sheets</title></head>
+<body>
+<div id="sheets"></div>
+<pre id="status">rendering…</pre>
+<script type="module">
+// Renders every pattern at its defaults into contact sheets (7 cols of
+// 160px cells + label), each emitted as a data URL inside a <div data-sheet>.
+// Driven headless: dump-dom, then extract the base64 payloads.
+// patterns.js needs Vite's import.meta.glob — headless serving is plain http,
+// so discover pattern modules from the directory listing like compile-test does
+import { ShaderEngine } from './src/engine/ShaderEngine.js';
+
+const listing = await (await fetch('./src/engine/patterns/')).text();
+const files = [...listing.matchAll(/href="([^"]+\.js)"/g)].map(m => m[1]);
+const PATTERNS = [];
+for (const f of files) {
+  PATTERNS.push((await import(`./src/engine/patterns/${f}`)).default);
+}
+
+const CELL = 160, LABEL = 16, COLS = 7, ROWS = 12;
+const perSheet = COLS * ROWS;
+
+const glCanvas = document.createElement('canvas');
+glCanvas.width = glCanvas.height = CELL;
+const engine = new ShaderEngine(glCanvas);
+engine.stop(); // no rAF loop — we drive draws manually
+
+const sorted = [...PATTERNS].sort((a, b) => a.id.localeCompare(b.id));
+const out = document.getElementById('sheets');
+
+// ?sheet=N renders just that sheet (headless runs paginate); no param = all.
+// ?only=id1,id2 filters to specific pattern ids (renders as sheet 0).
+const params = new URLSearchParams(location.search);
+const onlySheet = params.get('sheet');
+const onlyIds = params.get('only');
+if (onlyIds) {
+  const want = new Set(onlyIds.split(','));
+  for (let i = sorted.length - 1; i >= 0; i--) if (!want.has(sorted[i].id)) sorted.splice(i, 1);
+}
+
+for (let s = 0; s * perSheet < sorted.length; s++) {
+  if (onlySheet !== null && s !== parseInt(onlySheet, 10)) continue;
+  const batch = sorted.slice(s * perSheet, (s + 1) * perSheet);
+  const sheet = document.createElement('canvas');
+  sheet.width = COLS * CELL;
+  sheet.height = Math.ceil(batch.length / COLS) * (CELL + LABEL);
+  const ctx = sheet.getContext('2d');
+  ctx.fillStyle = '#181818';
+  ctx.fillRect(0, 0, sheet.width, sheet.height);
+  ctx.font = '11px monospace';
+
+  for (let i = 0; i < batch.length; i++) {
+    const p = batch[i];
+    try {
+      await engine.setShader(p);
+      const defaults = { u_opacity: 1.0, u_uv_scale: [1, 1], u_uv_rotation: 0, u_uv_offset: [0, 0], u_is_spec: 0.0 };
+      p.uniforms.forEach(u => { defaults[u.id] = u.default; });
+      engine.currentValues = defaults;
+      engine.draw();
+      const x = (i % COLS) * CELL;
+      const y = Math.floor(i / COLS) * (CELL + LABEL);
+      ctx.drawImage(glCanvas, x, y);
+      ctx.fillStyle = '#ddd';
+      ctx.fillText(p.id.slice(0, 24), x + 2, y + CELL + 12);
+    } catch (e) {
+      ctx.fillStyle = '#f33';
+      ctx.fillText('ERR ' + p.id.slice(0, 20), (i % COLS) * CELL + 2, Math.floor(i / COLS) * (CELL + LABEL) + 20);
+    }
+  }
+  const div = document.createElement('div');
+  div.dataset.sheet = s;
+  div.textContent = sheet.toDataURL('image/png');
+  out.appendChild(div);
+}
+document.getElementById('status').textContent = 'DONE';
+</script></body></html>
