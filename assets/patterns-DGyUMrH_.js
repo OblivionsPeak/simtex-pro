@@ -666,12 +666,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb -= wear;
       return color;
     }
-  `,uniforms:[{id:`u_scale`,name:`Curb Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Color B`,type:`color`,default:[1,1,1,1]}]},N=e({default:()=>P}),P={id:`arcade_carpet`,name:`Arcade Carpet`,category:`Retro`,added:`2026-06-11`,description:`Blacklight bowling-alley carpet circa 1992 — neon confetti triangles, squiggles, rings and zigzag bolts glowing out of a deep ultraviolet pile.`,shader:`
-    mat2 rot2_ac(float a) {
-      float c = cos(a); float s = sin(a);
-      return mat2(c, -s, s, c);
-    }
-
+  `,uniforms:[{id:`u_scale`,name:`Curb Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Color B`,type:`color`,default:[1,1,1,1]}]},N=e({default:()=>P}),P={id:`arcade_carpet`,name:`Arcade Carpet`,category:`Retro`,added:`2026-06-11`,description:`Blacklight bowling-alley carpet circa 1992 — neon triangles, squiggles, rings and dots glowing out of a deep ultraviolet pile.`,shader:`
     vec3 neon_ac(float h) {
       if (h < 0.2) return vec3(0.05, 1.00, 0.95);  // electric cyan
       if (h < 0.4) return vec3(1.00, 0.12, 0.85);  // hot magenta
@@ -679,75 +674,46 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (h < 0.8) return vec3(1.00, 0.55, 0.05);  // blaze orange
       return vec3(0.60, 0.30, 1.00);               // ultraviolet purple
     }
-
-    // signed distance to one confetti glyph, selected by 'pick'
+    // distance to one confetti glyph, selected by pick
     float glyph_ac(vec2 p, float pick) {
-      if (pick < 0.25) {
-        // hollow triangle
+      if (pick < 0.25) {          // hollow triangle
         float an = atan(p.y, p.x);
-        float seg = 2.0943951; // 2*pi/3
+        float seg = 2.0943951;
         float tri = cos(floor(0.5 + an / seg) * seg - an) * length(p);
-        return abs(tri - 0.22) - 0.05;
-      } else if (pick < 0.5) {
-        // squiggle stroke
-        float w = sin(p.x * 14.0) * 0.12;
-        float d = abs(p.y - w) - 0.045;
-        return max(d, abs(p.x) - 0.32);
-      } else if (pick < 0.75) {
-        // ring
-        return abs(length(p) - 0.22) - 0.055;
-      }
-      // zigzag bolt
-      float zx = fract(p.x * 3.2) - 0.5;
-      float zig = (abs(zx) * 2.0 - 0.5) * 0.20;
-      float d = abs(p.y - zig) - 0.05;
-      return max(d, abs(p.x) - 0.30);
+        return abs(tri - 0.2) - 0.045;
+      } else if (pick < 0.5) {    // squiggle stroke
+        float w = sin(p.x * 13.0) * 0.11;
+        return max(abs(p.y - w) - 0.04, abs(p.x) - 0.3);
+      } else if (pick < 0.75) {   // ring
+        return abs(length(p) - 0.2) - 0.05;
+      }                           // bold dot
+      return length(p) - 0.11;
     }
-
     vec4 generate() {
       vec2 uv = v_uv * u_density;
-      vec2 cell = floor(uv);
-      vec2 f = fract(uv) - 0.5;
-
-      // UV-soaked carpet pile: mottled near-black with faint purple fibre noise
-      vec3 base = u_bg_color.rgb;
-      float pile = noise(v_uv * 220.0) * 0.5 + noise(v_uv * 47.0) * 0.5;
-      base *= 0.75 + pile * 0.5;
-      base += vec3(0.02, 0.0, 0.05) * noise(v_uv * 9.0);
-
-      vec3 col = base;
-
-      // one confetti glyph per cell with random spin / size / jitter / hue
-      float h1 = hash(cell);
-      float h2 = hash(cell + 19.7);
-      float h3 = hash(cell + 53.1);
-      vec2 jitter = vec2(hash(cell + 7.3), hash(cell + 91.4)) * 0.3 - 0.15;
-      vec2 p = rot2_ac(h2 * 6.2831) * ((f - jitter) / (0.7 + h3 * 0.6));
-      float d = glyph_ac(p, h1);
-
-      vec3 ink = neon_ac(hash(cell + 37.7));
-      float body = 1.0 - smoothstep(0.0, 0.025, d);
-      float halo = exp(-max(d, 0.0) * 14.0) * u_glow * 0.55;
-
-      // the pile eats a little of the print — fibre-level fade
-      float fade = 0.78 + 0.22 * noise(v_uv * 160.0);
-      col = mix(col, ink * fade, body);
-      col += ink * halo * fade;
-
-      // scattered micro-flecks between the big glyphs
-      vec2 fuv = v_uv * u_density * 4.0;
-      vec2 fc = floor(fuv);
-      vec2 ff = fract(fuv) - 0.5;
-      float fh = hash(fc + 311.0);
-      if (fh > 0.86) {
-        float fd = length(ff) - 0.07;
-        float fleck = 1.0 - smoothstep(0.0, 0.05, fd);
-        col += neon_ac(hash(fc + 77.0)) * fleck * 0.8 * fade;
+      // UV pile: dark base with fibrous mottle so it reads as carpet
+      vec3 col = u_bg_color.rgb * (0.7 + 0.5 * (fbm(uv * 6.0) * 0.5 + 0.5));
+      // scatter glyphs: 3x3 neighborhood, one glyph per cell
+      for (int j = -1; j <= 1; j++) {
+        for (int i = -1; i <= 1; i++) {
+          vec2 cell = floor(uv) + vec2(float(i), float(j));
+          if (hash(cell + 0.7) < 0.25) continue;   // breathing room
+          vec2 ctr = cell + 0.5 + (vec2(hash(cell + 1.1), hash(cell + 2.2)) - 0.5) * 0.5;
+          float a = hash(cell + 3.3) * 6.28318;
+          vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (uv - ctr);
+          float d = glyph_ac(p * (0.8 + hash(cell + 4.4) * 0.5), hash(cell + 5.5));
+          vec3 neon = neon_ac(hash(cell + 6.6));
+          float body = smoothstep(0.012, -0.012, d);
+          float halo = exp(-max(d, 0.0) * 12.0) * u_glow * 0.5;
+          col = mix(col, neon, body);
+          col += neon * halo * (1.0 - body);       // blacklight bloom
+        }
       }
-
+      // pile speckle over everything
+      col *= 0.92 + 0.08 * hash(floor(uv * 60.0));
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Confetti Density`,type:`float`,min:3,max:12,default:6},{id:`u_glow`,name:`Blacklight Glow`,type:`float`,min:0,max:2,default:1},{id:`u_bg_color`,name:`Carpet Pile`,type:`color`,default:[.05,.01,.1,1]}]},F=e({default:()=>I}),I={id:`argyle_knit_artisan`,name:`Argyle Knit`,category:`Abstract`,added:`2026-04-15`,description:`Classic diamond-checkered textile pattern with structural crossing threads.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Confetti Density`,type:`float`,min:3,max:12,default:6},{id:`u_glow`,name:`Blacklight Glow`,type:`float`,min:0,max:2,default:1},{id:`u_bg_color`,name:`Carpet Pile`,type:`color`,default:[.05,.01,.1,1]}],variants:[{name:`Bowling Alley 92`,uniforms:{u_bg_color:[.05,.01,.1,1],u_glow:1,u_density:6}},{name:`Laser Tag Lobby`,uniforms:{u_bg_color:[.01,.03,.09,1],u_glow:1.6,u_density:8}},{name:`Cinema Mezzanine`,uniforms:{u_bg_color:[.08,.02,.04,1],u_glow:.6,u_density:5}}]},F=e({default:()=>I}),I={id:`argyle_knit_artisan`,name:`Argyle Knit`,category:`Abstract`,added:`2026-04-15`,description:`Classic diamond-checkered textile pattern with structural crossing threads.`,shader:`
     vec4 generate() {
       mat2 m = mat2(0.707, -0.707, 0.707, 0.707);
       vec2 uv = m * v_uv * u_scale;
@@ -4626,22 +4592,28 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 col = 0.5 + 0.5 * cos(3.14159 * (n + vec3(0, 0.2, 0.4)));
       return vec4(col, 1.0);
     }
-  `,uniforms:[]},ii=e({default:()=>ai}),ai={id:`expanded_grating_pro`,name:`Expanded Metal`,category:`Industrial`,added:`2026-04-15`,description:`Heavy industrial walkway grating with diamond-slotted apertures.`,shader:`
+  `,uniforms:[]},ii=e({default:()=>ai}),ai={id:`expanded_grating_pro`,name:`Expanded Metal`,category:`Industrial`,added:`2026-04-15`,description:`Expanded-metal walkway grating — staggered diamond apertures with twisted, light-catching strands.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
+      // expanded metal is a staggered bond: offset alternate rows half a cell
+      uv.x += step(1.0, mod(floor(uv.y), 2.0)) * 0.5;
       vec2 gv = fract(uv) - 0.5;
-      
-      float d = abs(gv.x) + abs(gv.y);
-      float mask = step(0.4, d);
-      
-      // Slit shadow
-      float shadow = smoothstep(0.4, 0.45, d) * 0.3;
-      
-      vec4 color = mix(u_secondary_color, u_primary_color, mask);
-      color.rgb -= shadow;
-      return color;
+      float d = abs(gv.x) + abs(gv.y) * 1.6;   // elongated diamonds
+      float hole = smoothstep(0.31, 0.34, d);  // 1 = metal, 0 = aperture
+      // strand shading: the metal between holes twists — light rakes across
+      float twist = sin((gv.x - gv.y) * 6.0 + 1.2);
+      vec3 rib = u_primary_color.rgb * (0.65 + 0.35 * twist);
+      // sheared top edge catches a hard highlight along the upper hole rim
+      float rim = smoothstep(0.05, 0.0, abs(d - 0.36)) * clamp(-gv.y * 4.0, 0.0, 1.0);
+      rib += rim * 0.35;
+      // mild wear mottling
+      rib *= 0.9 + 0.1 * snoise(uv * 3.0);
+      // aperture: dark with a hint of depth gradient
+      vec3 ap = u_secondary_color.rgb * (0.7 + 0.3 * clamp(gv.y + 0.5, 0.0, 1.0));
+      vec3 col = mix(ap, rib, hole);
+      return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Steel Rib`,type:`color`,default:[.3,.3,.33,1]},{id:`u_secondary_color`,name:`Aperture`,type:`color`,default:[0,0,0,1]}]},oi=e({default:()=>si}),si={id:`exposed_aggregate`,name:`Exposed Aggregate`,category:`Natural`,added:`2026-05-01`,description:`Exposed aggregate concrete with embedded smooth pebbles in warm stone colors set in a dark cement matrix.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:5,max:50,default:14},{id:`u_primary_color`,name:`Steel Rib`,type:`color`,default:[.55,.56,.6,1]},{id:`u_secondary_color`,name:`Aperture`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Walkway`,uniforms:{u_primary_color:[.55,.56,.6,1],u_secondary_color:[.04,.04,.05,1],u_scale:14}},{name:`Rusted Catwalk`,uniforms:{u_primary_color:[.5,.32,.2,1],u_secondary_color:[.06,.03,.02,1],u_scale:12}},{name:`Anodized Grille`,uniforms:{u_primary_color:[.2,.22,.28,1],u_secondary_color:[.02,.02,.03,1],u_scale:24}}]},oi=e({default:()=>si}),si={id:`exposed_aggregate`,name:`Exposed Aggregate`,category:`Natural`,added:`2026-05-01`,description:`Exposed aggregate concrete with embedded smooth pebbles in warm stone colors set in a dark cement matrix.`,shader:`
     // --- helpers BEFORE generate() ---
 
     vec2 voronoi_rand_ea(vec2 p) {
@@ -9901,104 +9873,43 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.0, gills);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Gill Count`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Gill Ridge`,type:`color`,default:[.8,.75,.7,1]},{id:`u_secondary_color`,name:`Cap Depth`,type:`color`,default:[.4,.35,.3,1]}]},Tl=e({default:()=>El}),El={id:`mylar_heatshield`,name:`Mylar Heat Shield`,category:`Racing`,added:`2026-05-01`,description:`Crinkled mylar or aluminium heat shield foil with bright specular hotspots and crinkle shadow valleys.`,shader:`
-    // --- helpers BEFORE generate() ---
-
-    float hash1_mh(vec2 p) {
-      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-    }
-
-    float smoothnoise_mh(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      float a = hash1_mh(i);
-      float b = hash1_mh(i + vec2(1.0, 0.0));
-      float c = hash1_mh(i + vec2(0.0, 1.0));
-      float d = hash1_mh(i + vec2(1.0, 1.0));
-      return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-    }
-
-    // FBM for wrinkle surface
-    float fbm_mh(vec2 p) {
-      float v = 0.0;
-      float a = 0.5;
-      vec2  s = vec2(1.0);
-      for (int i = 0; i < 4; i++) {
-        v += a * smoothnoise_mh(p * s);
-        s *= 2.1;
-        a *= 0.50;
-      }
-      return v;
-    }
-
-    // Approximate gradient of FBM for surface normal
-    vec2 fbm_gradient(vec2 p) {
-      float eps = 0.02;
-      float dx = fbm_mh(p + vec2(eps, 0.0)) - fbm_mh(p - vec2(eps, 0.0));
-      float dy = fbm_mh(p + vec2(0.0, eps)) - fbm_mh(p - vec2(0.0, eps));
-      return vec2(dx, dy) / (2.0 * eps);
-    }
-
+  `,uniforms:[{id:`u_scale`,name:`Gill Count`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Gill Ridge`,type:`color`,default:[.8,.75,.7,1]},{id:`u_secondary_color`,name:`Cap Depth`,type:`color`,default:[.4,.35,.3,1]}]},Tl=e({default:()=>El}),El={id:`mylar_heatshield`,name:`Mylar Heat Shield`,category:`Racing`,added:`2026-05-01`,description:`Crumpled gold mylar foil — crease facets with directional striations and hard specular flashes.`,shader:`
     vec4 generate() {
-      vec2 uv = v_uv;
-
-      // Crinkle noise coordinates — scaled by crinkle intensity
-      vec2 crinkleUV = uv * u_crinkle;
-
-      // Height field from FBM
-      float height = fbm_mh(crinkleUV);
-
-      // Surface gradient — used as a fake normal perturbation
-      vec2 grad = fbm_gradient(crinkleUV);
-
-      // Perturbed "normal" in 2D (we simulate a z component)
-      // Normal direction: (-grad.x, -grad.y, 1.0) normalized approximately
-      float normal_z = 1.0 / sqrt(1.0 + dot(grad, grad) * 0.5);
-      float normal_x = -grad.x * normal_z * 0.4;
-      float normal_y = -grad.y * normal_z * 0.4;
-
-      // Light direction — coming from upper-left (simulated environment)
-      vec3 light_dir = normalize(vec3(0.4, 0.6, 1.0));
-      vec3 n = normalize(vec3(normal_x, normal_y, normal_z));
-      float ndotl = clamp(dot(n, light_dir), 0.0, 1.0);
-
-      // Environment: bright sky gradient from above
-      float sky_env = clamp(0.5 + 0.5 * normal_y, 0.0, 1.0);
-
-      // Specular reflection — approximate mirror highlight
-      vec3 view_dir = vec3(0.0, 0.0, 1.0);
-      vec3 reflect_dir = vec3(-normal_x * 2.0, -normal_y * 2.0, 1.0);
-      float spec_raw = clamp(reflect_dir.z, 0.0, 1.0);
-      float spec = pow(spec_raw, 18.0) * u_reflectivity;
-
-      // Foil base color
-      vec3 foil = u_foil_color.rgb;
-      // Shadow color: dark version of foil
-      vec3 shadow_col = foil * 0.15;
-      // Bright highlight: near white with foil tint
-      vec3 highlight_col = mix(foil, vec3(1.0, 1.0, 1.0), 0.7);
-
-      // Compose: diffuse bounce + specular hotspot
-      vec3 col = mix(shadow_col, foil, ndotl);
-      // Sky environment adds secondary bounce
-      col = mix(col, foil * 1.1, sky_env * 0.25);
-      // Specular hotspot is bright white
-      col += highlight_col * spec;
-
-      // Height-based crinkle texture: ridges catch more light
-      float ridge = smoothstep(0.45, 0.65, height);
-      col = mix(col, foil * 1.2, ridge * 0.15);
-
-      // Micro-sheen: fine dimple structure
-      float micro = smoothnoise_mh(uv * 80.0 * u_crinkle);
-      col += (micro - 0.5) * 0.04;
-
-      col = clamp(col, 0.0, 1.0);
-
-      return vec4(col * u_opacity, u_opacity);
+      vec2 uv = v_uv * u_crinkle * 2.0;
+      // crumple facets: voronoi cells, each a flat-ish plane of foil
+      vec2 cell = floor(uv);
+      float d1 = 8.0; float d2 = 8.0;
+      vec2 id1 = vec2(0.0); vec2 pt1 = vec2(0.0);
+      for (int j = -1; j <= 1; j++) {
+        for (int i = -1; i <= 1; i++) {
+          vec2 c = cell + vec2(float(i), float(j));
+          vec2 pt = c + vec2(hash(c + 1.1), hash(c + 2.2));
+          float d = length(uv - pt);
+          if (d < d1) { d2 = d1; d1 = d; id1 = c; pt1 = pt; }
+          else if (d < d2) { d2 = d; }
+        }
+      }
+      // each facet: parallel micro-ridges in its own random direction
+      float ang = hash(id1 + 3.3) * 6.28318;
+      vec2 dir = vec2(cos(ang), sin(ang));
+      float ridge = sin(dot(uv - pt1, dir) * (14.0 + hash(id1 + 4.4) * 18.0)
+                        + hash(id1 + 5.5) * 6.28);
+      // facet base tone varies like tilted planes catching different light
+      float facetLum = 0.45 + 0.65 * hash(id1 + 6.6);
+      vec3 foil = u_foil_color.rgb * facetLum;
+      // ridge shading + hard specular flash on ridge crests of bright facets
+      foil *= 0.78 + 0.22 * ridge;
+      float flash = pow(max(ridge, 0.0), 10.0) * smoothstep(0.6, 1.0, facetLum) * u_reflectivity;
+      foil = mix(foil, vec3(1.0, 0.99, 0.92), clamp(flash, 0.0, 0.85));
+      // crease lines between facets: bright catch-light edge then dark fold
+      float border = d2 - d1;
+      foil = mix(vec3(1.0, 0.97, 0.85) * 0.9 * u_reflectivity, foil, smoothstep(0.0, 0.05, border));
+      foil *= 0.7 + 0.3 * smoothstep(0.0, 0.18, border);
+      // fine foil micro-grain
+      foil *= 0.96 + 0.04 * snoise(uv * 30.0);
+      return vec4(clamp(foil, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_foil_color`,name:`Foil Color`,type:`color`,default:[.92,.75,.25,1]},{id:`u_crinkle`,name:`Crinkle Intensity`,type:`float`,min:1,max:10,default:4},{id:`u_reflectivity`,name:`Highlight Brightness`,type:`float`,min:.3,max:2,default:1.4}]},Dl=e({default:()=>Ol}),Ol={id:`nanotech_cells_artisan`,name:`Nano Plating`,category:`Technology`,added:`2026-04-16`,description:`Microscopic hexagonal active plating designed for dynamic aerodynamic surfaces.`,shader:`
+  `,uniforms:[{id:`u_foil_color`,name:`Foil Color`,type:`color`,default:[.92,.72,.22,1]},{id:`u_crinkle`,name:`Crinkle Intensity`,type:`float`,min:1,max:10,default:4},{id:`u_reflectivity`,name:`Highlight Brightness`,type:`float`,min:.3,max:2,default:1.1}],variants:[{name:`Gold NASA`,uniforms:{u_foil_color:[.92,.72,.22,1],u_crinkle:4,u_reflectivity:1.1}},{name:`Silver Emergency`,uniforms:{u_foil_color:[.75,.77,.8,1],u_crinkle:5,u_reflectivity:1.3}},{name:`Copper Shield`,uniforms:{u_foil_color:[.8,.45,.25,1],u_crinkle:3,u_reflectivity:1}}]},Dl=e({default:()=>Ol}),Ol={id:`nanotech_cells_artisan`,name:`Nano Plating`,category:`Technology`,added:`2026-04-16`,description:`Microscopic hexagonal active plating designed for dynamic aerodynamic surfaces.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -15577,31 +15488,61 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float dash = step(0.9, fract(v_uv.x * 2.0 + h));
       return mix(u_secondary_color, u_primary_color, dash * h);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Star Streak`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,0,1]}]},Hm=e({default:()=>Um}),Um={id:`steel_wool_artisan`,name:`Steel Wool`,category:`Industrial`,added:`2026-04-15`,description:`Chaos-line noise mimicking tangled metal strands found in industrial abrasives.`,shader:`
-    vec4 generate() {
-      float n = hash(v_uv * 1000.0) * hash(v_uv * 100.0);
-      float mask = smoothstep(0.0, 0.2, n);
-      return mix(u_secondary_color, u_primary_color, mask);
+  `,uniforms:[{id:`u_primary_color`,name:`Star Streak`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,0,1]}]},Hm=e({default:()=>Um}),Um={id:`steel_wool_artisan`,name:`Steel Wool`,category:`Industrial`,added:`2026-04-15`,description:`Tangled swirling metal fibers — layered strand nests with directional sheen.`,shader:`
+    // one nest layer: contour lines of a domain-warped field — the level
+    // sets read as long curling fibers
+    float strands(vec2 p, float seed, float freq) {
+      vec2 warp = vec2(fbm(p * 0.5 + seed), fbm(p * 0.5 + seed + 9.0));
+      float n = fbm(p * 0.7 + warp * u_swirl * 1.6 + seed * 3.0) * 0.5 + 0.5;
+      float band = abs(fract(n * freq) - 0.5) * 2.0;
+      return smoothstep(0.8, 0.1, band);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Steel Strand`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[.1,.1,.15,1]}]},Wm=e({default:()=>Gm}),Gm={id:`stitched_leather_pro`,name:`Stitched Leather`,category:`Organic`,added:`2026-04-15`,description:`Premium pebbled leather texture with perimeter stitching simulation.`,shader:`
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
-      vec2 gv = fract(uv) - 0.5;
-      float d = length(gv);
-      float pebble = smoothstep(0.4, 0.5, d);
-      
-      float stitch_v = step(0.98, fract(v_uv.x * 100.0)) * step(0.01, v_uv.y) * step(v_uv.y, 0.99);
-      float stitch_h = step(0.98, fract(v_uv.y * 100.0)) * step(0.01, v_uv.x) * step(v_uv.x, 0.99);
-      float stitch = max(stitch_v, stitch_h) * u_show_stitch;
-      
-      vec4 leather = vec4(0.15, 0.08, 0.05, 1.0);
-      vec4 thread = vec4(0.8, 0.7, 0.1, 1.0);
-      
-      vec4 color = mix(leather, leather * 0.8, pebble);
-      return mix(color, thread, stitch);
+      vec3 col = u_secondary_color.rgb;
+      // three overlapping nests, brightest on top
+      for (int i = 0; i < 3; i++) {
+        float fi = float(i);
+        float m = strands(uv + fi * 13.7, fi * 7.0 + 1.0, 7.0 + fi * 3.0);
+        // deeper layers darker, top layer catches light
+        float tone = 0.45 + fi * 0.3;
+        // glint where strands align with the light axis
+        float glint = pow(m, 6.0) * max(0.4 + 0.6 * sin(uv.x * 1.7 + fi * 2.0), 0.0);
+        vec3 strand = u_primary_color.rgb * tone + glint * 0.5;
+        col = mix(col, strand, m * (0.5 + fi * 0.25));
+      }
+      // sparse abrasive sparkle
+      col += vec3(0.3) * step(0.998, hash(floor(uv * 24.0)));
+      return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:100,default:40},{id:`u_show_stitch`,name:`Show Stitch`,type:`float`,min:0,max:1,default:1}]},Km=e({default:()=>qm}),qm={id:`stucco_dash`,name:`Stucco Dash`,category:`Architecture`,added:`2026-06-12`,description:`Rough-cast render — wet mortar thrown against the wall, every lump and crater throwing its own shadow, sharp aggregate poking through the skin and broad trowel passes ghosting beneath.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Nest Scale`,type:`float`,min:1,max:12,default:3},{id:`u_swirl`,name:`Swirl`,type:`float`,min:.2,max:2,default:1},{id:`u_primary_color`,name:`Steel Strand`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[.1,.1,.15,1]}],variants:[{name:`Fresh Pad`,uniforms:{u_primary_color:[.7,.7,.75,1],u_secondary_color:[.1,.1,.15,1],u_swirl:1}},{name:`Copper Scourer`,uniforms:{u_primary_color:[.78,.5,.3,1],u_secondary_color:[.15,.08,.05,1],u_swirl:1.3}},{name:`Burnt Wool`,uniforms:{u_primary_color:[.45,.4,.38,1],u_secondary_color:[.05,.04,.04,1],u_swirl:.7}}]},Wm=e({default:()=>Gm}),Gm={id:`stitched_leather_pro`,name:`Stitched Leather`,category:`Organic`,added:`2026-04-15`,description:`Pebbled upholstery leather with diamond seam channels and dashed thread stitching.`,shader:`
+    vec4 generate() {
+      vec2 uv = v_uv * u_scale;
+      // pebble grain: two scales of cellular-ish noise shading
+      float g1 = snoise(uv * 1.6);
+      float g2 = snoise(uv * 4.2 + 7.0);
+      float grain = 0.5 + 0.28 * g1 + 0.18 * g2;
+      vec3 leather = u_leather_color.rgb * (0.72 + 0.4 * grain);
+      // soft sheen where the pebbles crest
+      leather += vec3(0.06) * smoothstep(0.55, 0.9, grain);
+
+      // diamond quilt seams: channels along both diagonals
+      vec2 dg = vec2(uv.x + uv.y, uv.x - uv.y) * 0.18;
+      float s1 = abs(fract(dg.x) - 0.5);
+      float s2 = abs(fract(dg.y) - 0.5);
+      float seam = min(s1, s2);
+      // pressed channel: darker trough with a soft shoulder
+      float channel = smoothstep(0.06, 0.015, seam);
+      leather *= 1.0 - channel * 0.35;
+
+      // dashed thread down the channel centre
+      float along = (s1 < s2) ? dg.y : dg.x;
+      float dash = step(0.5, fract(along * 14.0));
+      float thread = smoothstep(0.012, 0.004, seam) * dash * u_show_stitch;
+      vec3 col = mix(leather, u_thread_color.rgb * (0.8 + 0.2 * fract(along * 14.0)), thread);
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:100,default:30},{id:`u_show_stitch`,name:`Show Stitch`,type:`float`,min:0,max:1,default:1},{id:`u_leather_color`,name:`Leather`,type:`color`,default:[.32,.18,.1,1]},{id:`u_thread_color`,name:`Thread`,type:`color`,default:[.85,.72,.4,1]}],variants:[{name:`Saddle Interior`,uniforms:{u_leather_color:[.32,.18,.1,1],u_thread_color:[.85,.72,.4,1],u_show_stitch:1}},{name:`Black Nappa Red Stitch`,uniforms:{u_leather_color:[.09,.09,.1,1],u_thread_color:[.85,.15,.15,1],u_show_stitch:1}},{name:`Oxblood Plain`,uniforms:{u_leather_color:[.28,.1,.1,1],u_thread_color:[.7,.6,.5,1],u_show_stitch:0}}]},Km=e({default:()=>qm}),qm={id:`stucco_dash`,name:`Stucco Dash`,category:`Architecture`,added:`2026-06-12`,description:`Rough-cast render — wet mortar thrown against the wall, every lump and crater throwing its own shadow, sharp aggregate poking through the skin and broad trowel passes ghosting beneath.`,shader:`
     float hash_std(vec2 p) {
       return fract(sin(dot(p, vec2(241.3, 179.9))) * 39719.4571);
     }
