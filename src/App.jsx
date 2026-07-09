@@ -145,6 +145,11 @@ function App() {
   // cleared on pattern change / preset load, used to label bridge sends
   const [activeVariantName, setActiveVariantName] = useState(null);
 
+  // Custom image pattern: name of the loaded file (texture lives in the
+  // engine for the whole session; it is not persisted across reloads)
+  const [imageName, setImageName] = useState(null);
+  const imageInputRef = useRef(null);
+
   // UV Transform
   const [uvScale, setUvScale] = useState([1.0, 1.0]);
   const [uvRotation, setUvRotation] = useState(0.0);
@@ -371,6 +376,24 @@ function App() {
       engineRef.current.render({ u_is_spec: isSpecMap ? 1.0 : 0.0 });
     }
   }, [isSpecMap]);
+
+  // Custom image pattern: decode the picked file and hand it to the engine
+  const loadCustomImage = async (file) => {
+    if (!file || !engineRef.current) return;
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      engineRef.current.setTexture('u_image', img);
+      engineRef.current.render({}); // repaint with the new texture
+      setImageName(file.name);
+    } catch {
+      setImageName(null);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  };
 
   // Blob + object URL downloads: no multi-MB base64 strings in memory
   const saveBlob = (blob, filename) => {
@@ -775,6 +798,32 @@ function App() {
                   }}
                 />
               </div>
+
+              {activePattern.isImage && (
+                <div className="control-group image-loader">
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      loadCustomImage(e.target.files[0]);
+                      e.target.value = ''; // re-picking the same file re-fires
+                    }}
+                  />
+                  <button
+                    className="btn-load-image"
+                    onClick={() => imageInputRef.current?.click()}
+                    title="Load a PNG, JPG, or WebP to use as the texture"
+                  >
+                    {imageName ? `Image: ${imageName.length > 24 ? imageName.slice(0, 21) + '…' : imageName}` : '+ Load Image (PNG / JPG)…'}
+                  </button>
+                  <p className="image-hint">
+                    Your image never leaves the browser. It lasts for this session — all
+                    exports work on it: seamless tiling, spec map, and normal map.
+                  </p>
+                </div>
+              )}
 
               {activePattern.variants && activePattern.variants.length > 0 && (
                 <div className="control-group variants-control" style={{ marginBottom: '16px' }}>
@@ -1448,6 +1497,22 @@ function App() {
           transition: background 0.2s;
         }
         .preset-cancel-btn:hover { background: rgba(255,255,255,0.12); }
+
+        /* Custom image loader */
+        .btn-load-image {
+          width: 100%;
+          padding: 10px 12px;
+          font-size: 11px;
+          font-weight: 700;
+          border-radius: 8px;
+          background: rgba(37, 99, 235, 0.12);
+          border: 1px dashed rgba(37, 99, 235, 0.45);
+          color: var(--color-accent);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-load-image:hover { background: rgba(37, 99, 235, 0.22); border-style: solid; }
+        .image-hint { font-size: 10px; color: var(--color-text-dim); line-height: 1.4; margin-top: 6px; }
 
         .uv-controls { display: flex; flex-direction: column; gap: 6px; }
         .uv-row { display: flex; gap: 12px; }

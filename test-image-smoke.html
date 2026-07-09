@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>image smoke</title></head>
+<body><pre id="out">running...</pre>
+<script type="module">
+import { ShaderEngine } from './src/engine/ShaderEngine.js';
+import pattern from './src/engine/patterns/custom_image.js';
+
+const out = document.getElementById('out');
+try {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const e = new ShaderEngine(canvas);
+  e.stop();
+  await e.setShader(pattern);
+  const defaults = {};
+  pattern.uniforms.forEach(u => { defaults[u.id] = u.default; });
+  e.render(defaults);
+  e.draw();
+  const gl = e.gl;
+  const read = (x, y) => {
+    const px = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    return [...px].slice(0, 3);
+  };
+  const placeholder = read(2, 2); // checker corner, should be dark grey not black
+
+  // top half red, bottom half green
+  const src = document.createElement('canvas');
+  src.width = 64; src.height = 64;
+  const ctx = src.getContext('2d');
+  ctx.fillStyle = '#ff0000'; ctx.fillRect(0, 0, 64, 32);
+  ctx.fillStyle = '#00ff00'; ctx.fillRect(0, 32, 64, 32);
+  e.setTexture('u_image', src);
+  e.draw();
+  const top = read(32, 60);   // GL y=60 = near top of view = top of image
+  const bot = read(32, 4);
+
+  const checks = [
+    ['placeholder not black', placeholder.some(c => c > 8) && placeholder.every(c => c < 60)],
+    ['top is red',   top[0] > 200 && top[1] < 50],
+    ['bottom is green', bot[1] > 200 && bot[0] < 50],
+  ];
+  out.textContent = checks.map(([n, ok]) => (ok ? 'PASS ' : 'FAIL ') + n).join('\n')
+    + '\nraw ' + JSON.stringify({ placeholder, top, bot });
+} catch (err) {
+  out.textContent = 'ERROR ' + err.message;
+}
+</script></body></html>

@@ -117,6 +117,7 @@ export class ShaderEngine {
 
     this.program = null;
     this.uniforms = {};
+    this.textures = {};   // sampler uniform name -> WebGLTexture
     this.currentValues = {
       u_opacity: 1.0,
       u_uv_scale: [1.0, 1.0],
@@ -238,6 +239,28 @@ export class ShaderEngine {
     this.dirty = true;
   }
 
+  // Upload an image (HTMLImageElement / ImageBitmap / canvas) as the texture
+  // behind a sampler2D uniform. NPOT-safe: CLAMP_TO_EDGE + LINEAR, no mips —
+  // patterns tile via fract() in the shader instead of REPEAT wrap.
+  setTexture(name, source) {
+    const gl = this.gl;
+    let tex = this.textures[name];
+    if (!tex) {
+      tex = gl.createTexture();
+      this.textures[name] = tex;
+    }
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    // v_uv has a bottom-left origin; images are top-left — flip on upload
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    this.dirty = true;
+  }
+
   draw() {
     if (!this.program) return;
     const gl = this.gl;
@@ -263,6 +286,22 @@ export class ShaderEngine {
         gl.uniform1f(loc, value);
       }
     });
+
+    // Bind uploaded textures to whatever sampler uniforms this program has.
+    // u_has_image is derived from actual texture state so shaders can draw a
+    // placeholder — it can never drift from reality via presets/undo.
+    let unit = 0;
+    Object.entries(this.textures).forEach(([name, tex]) => {
+      const loc = this.uniforms[name];
+      if (!loc) return;
+      gl.activeTexture(gl.TEXTURE0 + unit);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(loc, unit);
+      unit++;
+    });
+    if (this.uniforms.u_has_image) {
+      gl.uniform1f(this.uniforms.u_has_image, this.textures.u_image ? 1.0 : 0.0);
+    }
 
     const posAttrib = gl.getAttribLocation(this.program, 'position');
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
