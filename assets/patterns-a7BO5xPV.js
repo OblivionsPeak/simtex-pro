@@ -2142,7 +2142,32 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_grain`,name:`Grain Frequency`,type:`float`,min:10,max:150,default:60},{id:`u_base_color`,name:`Base Gold`,type:`color`,default:[.85,.68,.18,1]},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.5}]},st=e({default:()=>ct}),ct={id:`brutalist_formwork`,name:`Brutalist Formwork`,category:`Architecture`,added:`2026-06-12`,description:`Béton brut — raw concrete cast against timber boards, every plank leaving its grain and a slight step at the joint, with cone tie holes in a surveyed grid and rain streaks bleeding down from them.`,shader:`
+  `,uniforms:[{id:`u_grain`,name:`Grain Frequency`,type:`float`,min:10,max:150,default:60},{id:`u_base_color`,name:`Base Gold`,type:`color`,default:[.85,.68,.18,1]},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.5}]},st=e({default:()=>ct}),ct={id:`brushed_titanium`,name:`Brushed Titanium`,category:`Industrial`,added:`2026-07-09`,description:`Anisotropic brushed titanium — long horizontal grain, two soft highlight bands following the panel curvature, and sparse hand-length scratches. Cool blue-white cast.`,shader:`
+    vec4 generate() {
+      vec2 uv = v_uv;
+      float streak = fbm(vec2(uv.x * 2.0, uv.y * u_grain)) * 0.5 + 0.5;
+      float fine = noise(vec2(uv.x * 40.0, uv.y * u_grain * 6.0));
+      float lum = 0.46 + (streak - 0.5) * 0.36 + (fine - 0.5) * 0.10;
+
+      // two broad highlight bands, as if lit across the curvature
+      float t1 = (uv.y - 0.30 - 0.06 * sin(uv.x * 3.0)) / 0.09;
+      float t2 = (uv.y - 0.74 + 0.04 * sin(uv.x * 2.2)) / 0.13;
+      float band1 = exp(-t1 * t1);
+      float band2 = exp(-t2 * t2);
+      lum += (band1 * 0.18 + band2 * 0.09) * u_sheen;
+
+      // sparse long scratches on random rows
+      float row = floor(uv.y * 900.0);
+      float sc = step(0.992, hash(vec2(row, 3.7)));
+      float sx = hash(vec2(row, 9.1));
+      float sl = 0.12 + hash(vec2(row, 12.7)) * 0.4;
+      sc *= step(sx, uv.x) * step(uv.x, sx + sl);
+      lum += sc * (hash(vec2(row, 5.5)) - 0.5) * 0.22;
+
+      vec3 col = lum * vec3(0.955, 0.985, 1.045);
+      return vec4(clamp(col, 0.0, 1.0), 1.0);
+    }
+  `,uniforms:[{id:`u_grain`,name:`Grain Density`,type:`float`,min:100,max:600,default:300},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:2,default:1}]},lt=e({default:()=>ut}),ut={id:`brutalist_formwork`,name:`Brutalist Formwork`,category:`Architecture`,added:`2026-06-12`,description:`Béton brut — raw concrete cast against timber boards, every plank leaving its grain and a slight step at the joint, with cone tie holes in a surveyed grid and rain streaks bleeding down from them.`,shader:`
     float hash_bru(vec2 p) {
       return fract(sin(dot(p, vec2(419.2, 371.9))) * 39217.5371);
     }
@@ -2221,7 +2246,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_board_count`,name:`Board Courses`,type:`float`,min:4,max:24,default:10},{id:`u_staining`,name:`Rain Staining`,type:`float`,min:0,max:1,default:.55},{id:`u_concrete_color`,name:`Concrete`,type:`color`,default:[.62,.61,.58,1]}]},lt=e({default:()=>ut}),ut={id:`bubblewrap`,name:`Bubble Wrap`,category:`Abstract`,added:`2026-05-01`,description:`Air-filled plastic bubble wrap with hemispherical highlights, rim Fresnel, and clear film between bubbles.`,shader:`
+  `,uniforms:[{id:`u_board_count`,name:`Board Courses`,type:`float`,min:4,max:24,default:10},{id:`u_staining`,name:`Rain Staining`,type:`float`,min:0,max:1,default:.55},{id:`u_concrete_color`,name:`Concrete`,type:`color`,default:[.62,.61,.58,1]}]},dt=e({default:()=>ft}),ft={id:`bubblewrap`,name:`Bubble Wrap`,category:`Abstract`,added:`2026-05-01`,description:`Air-filled plastic bubble wrap with hemispherical highlights, rim Fresnel, and clear film between bubbles.`,shader:`
     // Offset hexagonal grid â€” bubbles in a brick layout for efficiency
     vec2 bubbleCell(vec2 uv, out vec2 cellId) {
       // Brick offset: every other row shifts by 0.5
@@ -2305,14 +2330,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_bubble_size`,type:`float`,default:14,min:4,max:30,name:`Bubble Scale`},{id:`u_film_color`,type:`color`,default:[.88,.9,.82,1],name:`Plastic Film`},{id:`u_tint`,type:`color`,default:[.75,.85,.92,1],name:`Bubble Tint`}]},dt=e({default:()=>ft}),ft={id:`burlap_sack_artisan`,name:`Burlap Sack`,category:`Abstract`,added:`2026-04-15`,description:`Coarse, wide-gap organic woven fibers used in heavy storage bags.`,shader:`
+  `,uniforms:[{id:`u_bubble_size`,type:`float`,default:14,min:4,max:30,name:`Bubble Scale`},{id:`u_film_color`,type:`color`,default:[.88,.9,.82,1],name:`Plastic Film`},{id:`u_tint`,type:`color`,default:[.75,.85,.92,1],name:`Bubble Tint`}]},pt=e({default:()=>mt}),mt={id:`burlap_sack_artisan`,name:`Burlap Sack`,category:`Abstract`,added:`2026-04-15`,description:`Coarse, wide-gap organic woven fibers used in heavy storage bags.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float h = step(0.7, fract(uv.x)) + step(0.7, fract(uv.y));
       float mask = clamp(h, 0.0, 1.0);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fibre Size`,type:`float`,min:5,max:40,default:15},{id:`u_primary_color`,name:`Fibre`,type:`color`,default:[.6,.5,.35,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[.15,.1,.05,1]}]},pt=e({default:()=>mt}),mt={id:`butterfly_wing_artisan`,name:`Chitin Scale`,category:`Natural`,added:`2026-04-16`,description:`Microscopic chitinous scales mimicking the vibrant iridescent patterns of exotic lepidoptera.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fibre Size`,type:`float`,min:5,max:40,default:15},{id:`u_primary_color`,name:`Fibre`,type:`color`,default:[.6,.5,.35,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[.15,.1,.05,1]}]},ht=e({default:()=>gt}),gt={id:`butterfly_wing_artisan`,name:`Chitin Scale`,category:`Natural`,added:`2026-04-16`,description:`Microscopic chitinous scales mimicking the vibrant iridescent patterns of exotic lepidoptera.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
@@ -2321,7 +2346,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 col = 0.5 + 0.5 * cos(3.14159 * (v_uv.x + v_uv.y + vec3(0, 0.33, 0.67)));
       return vec4(col * mask, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:20,max:200,default:80}]},ht=e({default:()=>gt}),gt={id:`cable_knit`,name:`Cable Knit`,category:`Textile`,added:`2026-07-07`,description:`Chunky sweater cables — twisted braid columns over a purled background.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:20,max:200,default:80}]},_t=e({default:()=>vt}),vt={id:`cable_knit`,name:`Cable Knit`,category:`Textile`,added:`2026-07-07`,description:`Chunky sweater cables — twisted braid columns over a purled background.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float col_ = floor(uv.x);
@@ -2358,7 +2383,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cable Density`,type:`float`,min:3,max:20,default:8},{id:`u_twist`,name:`Twist Rate`,type:`float`,min:.4,max:3,default:1.2},{id:`u_primary_color`,name:`Cable Yarn`,type:`color`,default:[.9,.87,.8,1]},{id:`u_secondary_color`,name:`Purl Ground`,type:`color`,default:[.75,.7,.62,1]}],variants:[{name:`Aran Cream`,uniforms:{u_primary_color:[.9,.87,.8,1],u_secondary_color:[.75,.7,.62,1],u_twist:1.2}},{name:`Fisherman Navy`,uniforms:{u_primary_color:[.18,.24,.4,1],u_secondary_color:[.12,.16,.28,1],u_twist:1}},{name:`Forest Lodge`,uniforms:{u_primary_color:[.3,.42,.28,1],u_secondary_color:[.2,.28,.18,1],u_twist:1.6}}]},_t=e({default:()=>vt}),vt={id:`cactus_needles_artisan`,name:`Cactus Spine`,category:`Natural`,added:`2026-04-16`,description:`Geometric star-cluster spines found on high-fidelity xerophytic vegetation.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cable Density`,type:`float`,min:3,max:20,default:8},{id:`u_twist`,name:`Twist Rate`,type:`float`,min:.4,max:3,default:1.2},{id:`u_primary_color`,name:`Cable Yarn`,type:`color`,default:[.9,.87,.8,1]},{id:`u_secondary_color`,name:`Purl Ground`,type:`color`,default:[.75,.7,.62,1]}],variants:[{name:`Aran Cream`,uniforms:{u_primary_color:[.9,.87,.8,1],u_secondary_color:[.75,.7,.62,1],u_twist:1.2}},{name:`Fisherman Navy`,uniforms:{u_primary_color:[.18,.24,.4,1],u_secondary_color:[.12,.16,.28,1],u_twist:1}},{name:`Forest Lodge`,uniforms:{u_primary_color:[.3,.42,.28,1],u_secondary_color:[.2,.28,.18,1],u_twist:1.6}}]},yt=e({default:()=>bt}),bt={id:`cactus_needles_artisan`,name:`Cactus Spine`,category:`Natural`,added:`2026-04-16`,description:`Geometric star-cluster spines found on high-fidelity xerophytic vegetation.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
@@ -2369,7 +2394,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = star * step(d, 0.4) * step(0.7, hash(i_uv));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Spine Clusters`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Sharp Needle`,type:`color`,default:[.9,.9,.8,1]},{id:`u_secondary_color`,name:`Cactus Base`,type:`color`,default:[.2,.4,.1,1]}]},yt=e({default:()=>bt}),bt={id:`cafe_racer_band`,name:`Cafe Racer Band`,category:`Heritage`,added:`2026-06-12`,description:`A single broad nose band flanked by twin painted keylines — matte band over gloss body, masked edges with the faintest tape wobble, and a lifetime of hand polishing.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Spine Clusters`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Sharp Needle`,type:`color`,default:[.9,.9,.8,1]},{id:`u_secondary_color`,name:`Cactus Base`,type:`color`,default:[.2,.4,.1,1]}]},xt=e({default:()=>St}),St={id:`cafe_racer_band`,name:`Cafe Racer Band`,category:`Heritage`,added:`2026-06-12`,description:`A single broad nose band flanked by twin painted keylines — matte band over gloss body, masked edges with the faintest tape wobble, and a lifetime of hand polishing.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -2429,7 +2454,37 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_band_width`,name:`Band Width`,type:`float`,min:.12,max:.55,default:.3},{id:`u_keyline_gap`,name:`Keyline Offset`,type:`float`,min:.012,max:.08,default:.03},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.74,.75,.77,1]},{id:`u_band_color`,name:`Band Colour`,type:`color`,default:[.12,.12,.13,1]}]},xt=e({default:()=>St}),St={id:`candy_paint`,name:`Candy Paint`,category:`Racing`,added:`2026-04-30`,description:`Deep glossy candy-coat automotive paint with a saturated translucent hue over a dark metallic base.`,shader:`
+  `,uniforms:[{id:`u_band_width`,name:`Band Width`,type:`float`,min:.12,max:.55,default:.3},{id:`u_keyline_gap`,name:`Keyline Offset`,type:`float`,min:.012,max:.08,default:.03},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.74,.75,.77,1]},{id:`u_band_color`,name:`Band Colour`,type:`color`,default:[.12,.12,.13,1]}]},Ct=e({default:()=>wt}),wt={id:`camo_prism`,name:`Camo Prism`,category:`Geometric`,added:`2026-07-09`,description:`Low-poly faceted camouflage in five graphite tones, the lattice gently warped so facets read hand-cut — with rare burnt-orange prisms breaking the field.`,shader:`
+    vec4 generate() {
+      vec2 uv = v_uv;
+      // gentle warp so the facets read hand-cut, not gridded
+      vec2 wuv = uv + vec2(fbm(uv * 2.0 + 5.0), fbm(uv * 2.0 + 23.0)) * u_warp;
+      vec2 p = wuv * u_scale;
+      vec2 id = floor(p);
+      vec2 f = fract(p);
+
+      // each cell splits into two triangles along a random diagonal
+      float diagPick = step(0.5, hash(id + 6.6));
+      float tri = diagPick > 0.5 ? step(f.x, f.y) : step(f.x + f.y, 1.0);
+      vec2 tkey = id + vec2(tri * 0.37 + diagPick * 0.71, tri * 0.53);
+
+      // facet tone from a slow field, quantised to a five-step palette
+      float fv = fbm((id + 0.5) / u_scale * 4.0) * 0.5 + 0.5;
+      float t = clamp(fv + (hash(tkey * 1.3 + 2.2) - 0.5) * 0.30, 0.0, 1.0);
+      t = floor(t * 5.0) / 4.0;
+      vec3 col = mix(vec3(0.10, 0.11, 0.125), vec3(0.27, 0.30, 0.34), min(t, 1.0));
+
+      // flat facet lighting jitter
+      col *= 0.88 + 0.24 * hash(tkey + 8.8);
+
+      // rare accent facet
+      if (hash(tkey + 4.4) > 1.0 - u_accent && fv > 0.35 && fv < 0.75) {
+        col = vec3(1.0, 0.47, 0.094);
+      }
+
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_scale`,name:`Facet Density`,type:`float`,min:6,max:24,default:12},{id:`u_warp`,name:`Lattice Warp`,type:`float`,min:0,max:.2,default:.08},{id:`u_accent`,name:`Accent Facets`,type:`float`,min:0,max:.15,default:.035}]},Tt=e({default:()=>Et}),Et={id:`candy_paint`,name:`Candy Paint`,category:`Racing`,added:`2026-04-30`,description:`Deep glossy candy-coat automotive paint with a saturated translucent hue over a dark metallic base.`,shader:`
 
     // Convert hue [0-1] to RGB
     vec3 hue2rgb(float h) {
@@ -2483,14 +2538,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_hue`,name:`Hue`,type:`float`,min:0,max:1,default:.02},{id:`u_depth`,name:`Depth`,type:`float`,min:.5,max:3,default:1.5}]},Ct=e({default:()=>wt}),wt={id:`canvas_rip_artisan`,name:`Canvas Rip`,category:`Abstract`,added:`2026-04-15`,description:`Rough, crossing threads with a torn opening mimicking shredded heavy canvas.`,shader:`
+  `,uniforms:[{id:`u_hue`,name:`Hue`,type:`float`,min:0,max:1,default:.02},{id:`u_depth`,name:`Depth`,type:`float`,min:.5,max:3,default:1.5}]},Dt=e({default:()=>Ot}),Ot={id:`canvas_rip_artisan`,name:`Canvas Rip`,category:`Abstract`,added:`2026-04-15`,description:`Rough, crossing threads with a torn opening mimicking shredded heavy canvas.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float lines = step(0.8, hash(floor(uv.xx * 2.0))) * step(0.8, hash(floor(uv.yy * 2.0)));
       float rip = step(0.5 + hash(v_uv * 5.0) * 0.2, v_uv.x);
       return mix(u_secondary_color, u_primary_color, lines * rip);
     }
-  `,uniforms:[{id:`u_scale`,name:`Thread Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Thread`,type:`color`,default:[.9,.85,.8,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.1,.1,.1,0]}]},Tt=e({default:()=>Et}),Et={id:`carbon_kevlar_weave`,name:`Carbon-Kevlar Weave`,category:`Racing`,added:`2026-07-07`,description:`Hybrid twill of black carbon and gold aramid yarns — the motorsport composite look.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Thread Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Thread`,type:`color`,default:[.9,.85,.8,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.1,.1,.1,0]}]},kt=e({default:()=>At}),At={id:`carbon_kevlar_weave`,name:`Carbon-Kevlar Weave`,category:`Racing`,added:`2026-07-07`,description:`Hybrid twill of black carbon and gold aramid yarns — the motorsport composite look.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -2514,12 +2569,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       yarn.rgb += u_sheen * pow(max(sin(across * 3.14159), 0.0), 8.0) * 0.35;
       return yarn;
     }
-  `,uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:8,max:120,default:46},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Carbon Yarn`,type:`color`,default:[.07,.07,.08,1]},{id:`u_secondary_color`,name:`Aramid Yarn`,type:`color`,default:[.72,.55,.12,1]}],variants:[{name:`Gold Aramid`,uniforms:{u_primary_color:[.07,.07,.08,1],u_secondary_color:[.72,.55,.12,1],u_sheen:.6}},{name:`Red Hybrid`,uniforms:{u_primary_color:[.07,.07,.08,1],u_secondary_color:[.6,.08,.1,1],u_sheen:.7}},{name:`Blue Hybrid`,uniforms:{u_primary_color:[.06,.06,.08,1],u_secondary_color:[.1,.3,.65,1],u_sheen:.7}}]},Dt=e({default:()=>Ot}),Ot={id:`carpet_velour_artisan`,name:`Velour Carpet`,category:`Racing`,added:`2026-04-16`,description:`Soft, deep pile industrial carpet found in premium grand touring interiors.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:8,max:120,default:46},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Carbon Yarn`,type:`color`,default:[.07,.07,.08,1]},{id:`u_secondary_color`,name:`Aramid Yarn`,type:`color`,default:[.72,.55,.12,1]}],variants:[{name:`Gold Aramid`,uniforms:{u_primary_color:[.07,.07,.08,1],u_secondary_color:[.72,.55,.12,1],u_sheen:.6}},{name:`Red Hybrid`,uniforms:{u_primary_color:[.07,.07,.08,1],u_secondary_color:[.6,.08,.1,1],u_sheen:.7}},{name:`Blue Hybrid`,uniforms:{u_primary_color:[.06,.06,.08,1],u_secondary_color:[.1,.3,.65,1],u_sheen:.7}}]},jt=e({default:()=>Mt}),Mt={id:`carpet_velour_artisan`,name:`Velour Carpet`,category:`Racing`,added:`2026-04-16`,description:`Soft, deep pile industrial carpet found in premium grand touring interiors.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * u_scale) + hash(v_uv * u_scale * 0.5) * 0.5;
       return mix(u_secondary_color, u_primary_color, n / 1.5);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pile Density`,type:`float`,min:50,max:500,default:200},{id:`u_primary_color`,name:`絨毯 (Carpet Top)`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Pile Base`,type:`color`,default:[.05,.05,.08,1]}]},kt=e({default:()=>At}),At={id:`cassette_reels`,name:`Cassette Reels`,category:`Retro`,added:`2026-06-11`,description:`Mixtape faces tiled edge to edge — smoked windows, toothed white hubs winding chocolate-brown tape, cream labels with hand-ruled lines and a hot accent stripe.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pile Density`,type:`float`,min:50,max:500,default:200},{id:`u_primary_color`,name:`絨毯 (Carpet Top)`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Pile Base`,type:`color`,default:[.05,.05,.08,1]}]},Nt=e({default:()=>Pt}),Pt={id:`cassette_reels`,name:`Cassette Reels`,category:`Retro`,added:`2026-06-11`,description:`Mixtape faces tiled edge to edge — smoked windows, toothed white hubs winding chocolate-brown tape, cream labels with hand-ruled lines and a hot accent stripe.`,shader:`
     // rounded-rectangle signed distance
     float rrect_cr(vec2 p, vec2 b, float r) {
       vec2 q = abs(p) - b + r;
@@ -2605,7 +2660,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_tiles`,name:`Cassettes Across`,type:`float`,min:1,max:6,default:2},{id:`u_shell_color`,name:`Shell Plastic`,type:`color`,default:[.16,.16,.18,1]},{id:`u_label_color`,name:`Label Card`,type:`color`,default:[.92,.88,.78,1]},{id:`u_accent_color`,name:`Label Stripe`,type:`color`,default:[.9,.35,.1,1]}]},jt=e({default:()=>Mt}),Mt={id:`cast_iron`,name:`Cast Iron`,category:`Industrial`,added:`2026-05-01`,description:`Raw cast iron with a coarse sand-mold grain, dark matte grey surface, and occasional small porosity dimples from casting.`,shader:`
+  `,uniforms:[{id:`u_tiles`,name:`Cassettes Across`,type:`float`,min:1,max:6,default:2},{id:`u_shell_color`,name:`Shell Plastic`,type:`color`,default:[.16,.16,.18,1]},{id:`u_label_color`,name:`Label Card`,type:`color`,default:[.92,.88,.78,1]},{id:`u_accent_color`,name:`Label Stripe`,type:`color`,default:[.9,.35,.1,1]}]},Ft=e({default:()=>It}),It={id:`cast_iron`,name:`Cast Iron`,category:`Industrial`,added:`2026-05-01`,description:`Raw cast iron with a coarse sand-mold grain, dark matte grey surface, and occasional small porosity dimples from casting.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 4; i++) {
@@ -2665,7 +2720,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_grain`,name:`Grain`,type:`float`,min:5,max:50,default:22},{id:`u_base_color`,name:`Iron Color`,type:`color`,default:[.28,.27,.26,1]},{id:`u_roughness`,name:`Roughness`,type:`float`,min:.3,max:2,default:1}]},Nt=e({default:()=>Pt}),Pt={id:`caustic_light_net`,name:`Caustic Light Net`,category:`Ocean`,added:`2026-06-11`,description:`Dancing webs of refracted sunlight crisscrossing a shallow pool floor, with bright knots where the filaments converge.`,shader:`
+  `,uniforms:[{id:`u_grain`,name:`Grain`,type:`float`,min:5,max:50,default:22},{id:`u_base_color`,name:`Iron Color`,type:`color`,default:[.28,.27,.26,1]},{id:`u_roughness`,name:`Roughness`,type:`float`,min:.3,max:2,default:1}]},Lt=e({default:()=>Rt}),Rt={id:`caustic_light_net`,name:`Caustic Light Net`,category:`Ocean`,added:`2026-06-11`,description:`Dancing webs of refracted sunlight crisscrossing a shallow pool floor, with bright knots where the filaments converge.`,shader:`
     // Ridged-noise filament: bright where noise crosses zero
     float ridge_cln(vec2 p) {
       return 1.0 - abs(snoise(p));
@@ -2718,7 +2773,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Net Scale`,type:`float`,min:2,max:16,default:6},{id:`u_intensity`,name:`Sun Intensity`,type:`float`,min:.2,max:2,default:1},{id:`u_light_color`,name:`Sunlight Color`,type:`color`,default:[.85,.95,1,1]},{id:`u_floor_color`,name:`Floor Color`,type:`color`,default:[.1,.42,.55,1]}]},Ft=e({default:()=>It}),It={id:`celtic_knotwork`,name:`Celtic Knotwork`,category:`Heritage`,added:`2026-07-07`,description:`Interlaced plait bands weaving over and under on the diagonal — endless knot borders.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Net Scale`,type:`float`,min:2,max:16,default:6},{id:`u_intensity`,name:`Sun Intensity`,type:`float`,min:.2,max:2,default:1},{id:`u_light_color`,name:`Sunlight Color`,type:`color`,default:[.85,.95,1,1]},{id:`u_floor_color`,name:`Floor Color`,type:`color`,default:[.1,.42,.55,1]}]},zt=e({default:()=>Bt}),Bt={id:`celtic_knotwork`,name:`Celtic Knotwork`,category:`Heritage`,added:`2026-07-07`,description:`Interlaced plait bands weaving over and under on the diagonal — endless knot borders.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // diagonal coordinates
@@ -2756,7 +2811,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb *= 1.0 - clamp(shadow, 0.0, 1.0) * underB * 0.35;
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Knot Density`,type:`float`,min:2,max:16,default:6},{id:`u_band`,name:`Band Width`,type:`float`,min:.12,max:.4,default:.26},{id:`u_primary_color`,name:`Band`,type:`color`,default:[.82,.65,.25,1]},{id:`u_accent_color`,name:`Band Outline`,type:`color`,default:[.3,.2,.06,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.22,.14,1]}],variants:[{name:`Book of Kells`,uniforms:{u_primary_color:[.82,.65,.25,1],u_accent_color:[.3,.2,.06,1],u_secondary_color:[.1,.22,.14,1],u_band:.26}},{name:`Stone Carving`,uniforms:{u_primary_color:[.68,.66,.62,1],u_accent_color:[.3,.29,.27,1],u_secondary_color:[.45,.44,.41,1],u_band:.3}},{name:`Silver Torc`,uniforms:{u_primary_color:[.8,.82,.86,1],u_accent_color:[.25,.27,.32,1],u_secondary_color:[.08,.09,.12,1],u_band:.22}}]},Lt=e({default:()=>Rt}),Rt={id:`cephalopod_chromatophores_artisan`,name:`Cephalopod Chromatophores`,category:`Organic`,added:`2026-05-13`,description:`Dynamic, cellular color-changing spots that vary in size and density over a fleshy base layer.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Knot Density`,type:`float`,min:2,max:16,default:6},{id:`u_band`,name:`Band Width`,type:`float`,min:.12,max:.4,default:.26},{id:`u_primary_color`,name:`Band`,type:`color`,default:[.82,.65,.25,1]},{id:`u_accent_color`,name:`Band Outline`,type:`color`,default:[.3,.2,.06,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.22,.14,1]}],variants:[{name:`Book of Kells`,uniforms:{u_primary_color:[.82,.65,.25,1],u_accent_color:[.3,.2,.06,1],u_secondary_color:[.1,.22,.14,1],u_band:.26}},{name:`Stone Carving`,uniforms:{u_primary_color:[.68,.66,.62,1],u_accent_color:[.3,.29,.27,1],u_secondary_color:[.45,.44,.41,1],u_band:.3}},{name:`Silver Torc`,uniforms:{u_primary_color:[.8,.82,.86,1],u_accent_color:[.25,.27,.32,1],u_secondary_color:[.08,.09,.12,1],u_band:.22}}]},Vt=e({default:()=>Ht}),Ht={id:`cephalopod_chromatophores_artisan`,name:`Cephalopod Chromatophores`,category:`Organic`,added:`2026-05-13`,description:`Dynamic, cellular color-changing spots that vary in size and density over a fleshy base layer.`,shader:`
     vec2 random2( vec2 p ) {
         return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
@@ -2791,7 +2846,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return mix(fleshColor, u_spot_color, spotMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Scale`,type:`float`,min:2,max:30,default:12},{id:`u_base_color`,name:`Fleshy Base`,type:`color`,default:[.7,.3,.3,1]},{id:`u_spot_color`,name:`Chromatophore`,type:`color`,default:[.1,.1,.1,1]},{id:`u_pulse`,name:`Pulse Phase`,type:`float`,min:0,max:100,default:0}]},zt=e({default:()=>Bt}),Bt={id:`chain_mail_artisan`,name:`Chain Mail`,category:`Industrial`,added:`2026-04-15`,description:`Interlocking metal ring structures used in protective armor and fencing.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Scale`,type:`float`,min:2,max:30,default:12},{id:`u_base_color`,name:`Fleshy Base`,type:`color`,default:[.7,.3,.3,1]},{id:`u_spot_color`,name:`Chromatophore`,type:`color`,default:[.1,.1,.1,1]},{id:`u_pulse`,name:`Pulse Phase`,type:`float`,min:0,max:100,default:0}]},Ut=e({default:()=>Wt}),Wt={id:`chain_mail_artisan`,name:`Chain Mail`,category:`Industrial`,added:`2026-04-15`,description:`Interlocking metal ring structures used in protective armor and fencing.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -2799,19 +2854,19 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.05, 0.0, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Ring Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Wire Metal`,type:`color`,default:[.7,.7,.72,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.02,.02,1]}]},Vt=e({default:()=>Ht}),Ht={id:`chalkboard_dust_artisan`,name:`Chalk Dust`,category:`Abstract`,added:`2026-04-16`,description:`Smudged powdery residue and chalk markings found on weathered racing boards.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Ring Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Wire Metal`,type:`color`,default:[.7,.7,.72,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.02,.02,1]}]},Gt=e({default:()=>Kt}),Kt={id:`chalkboard_dust_artisan`,name:`Chalk Dust`,category:`Abstract`,added:`2026-04-16`,description:`Smudged powdery residue and chalk markings found on weathered racing boards.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * 1000.0);
       return mix(u_secondary_color, u_primary_color, n * 0.5);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Chalk Mark`,type:`color`,default:[.9,.9,.9,1]},{id:`u_secondary_color`,name:`Slate Base`,type:`color`,default:[.1,.1,.12,1]}]},Ut=e({default:()=>Wt}),Wt={id:`charcoal_sketch_artisan`,name:`Charcoal Sketch`,category:`Abstract`,added:`2026-04-15`,description:`Cross-hatched noise lines mimicking hand-drawn charcoal or graphite sketches.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Chalk Mark`,type:`color`,default:[.9,.9,.9,1]},{id:`u_secondary_color`,name:`Slate Base`,type:`color`,default:[.1,.1,.12,1]}]},qt=e({default:()=>Jt}),Jt={id:`charcoal_sketch_artisan`,name:`Charcoal Sketch`,category:`Abstract`,added:`2026-04-15`,description:`Cross-hatched noise lines mimicking hand-drawn charcoal or graphite sketches.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float mask = step(0.9, hash(uv));
       mask += step(0.95, hash(uv.yx + 10.0));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:50,max:200,default:100},{id:`u_primary_color`,name:`Pencil Lead`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.92,1]}]},Gt=e({default:()=>Kt}),Kt={id:`checker_fade`,name:`Checker Fade`,category:`Racing`,added:`2026-07-07`,description:`Checkerboard dissolving into solid color — the classic livery flank graphic.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:50,max:200,default:100},{id:`u_primary_color`,name:`Pencil Lead`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.92,1]}]},Yt=e({default:()=>Xt}),Xt={id:`checker_fade`,name:`Checker Fade`,category:`Racing`,added:`2026-07-07`,description:`Checkerboard dissolving into solid color — the classic livery flank graphic.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5) + 0.5;
@@ -2825,7 +2880,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float m = checker * alive;
       return mix(u_secondary_color, u_primary_color, m);
     }
-  `,uniforms:[{id:`u_scale`,name:`Checker Size`,type:`float`,min:4,max:48,default:14},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_fade_start`,name:`Fade Start`,type:`float`,min:0,max:1,default:.25},{id:`u_fade_width`,name:`Fade Width`,type:`float`,min:.05,max:1,default:.5},{id:`u_primary_color`,name:`Checker`,type:`color`,default:[.05,.05,.06,1]},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.95,.95,.93,1]}],variants:[{name:`Finish Line`,uniforms:{u_primary_color:[.05,.05,.06,1],u_secondary_color:[.95,.95,.93,1],u_fade_start:.25,u_fade_width:.5,u_rotate:0}},{name:`Red Rush`,uniforms:{u_primary_color:[.85,.08,.1,1],u_secondary_color:[.98,.97,.95,1],u_fade_start:.15,u_fade_width:.65,u_rotate:15}},{name:`Midnight`,uniforms:{u_primary_color:[.1,.65,.95,1],u_secondary_color:[.04,.05,.09,1],u_fade_start:.3,u_fade_width:.45,u_rotate:45}}]},qt=e({default:()=>Jt}),Jt={id:`chitinous_exoskeleton_artisan`,name:`Chitinous Exoskeleton`,category:`Organic`,added:`2026-05-13`,description:`Iridescent, segmented insectoid armor plating with deep, structural color shifting.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Checker Size`,type:`float`,min:4,max:48,default:14},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_fade_start`,name:`Fade Start`,type:`float`,min:0,max:1,default:.25},{id:`u_fade_width`,name:`Fade Width`,type:`float`,min:.05,max:1,default:.5},{id:`u_primary_color`,name:`Checker`,type:`color`,default:[.05,.05,.06,1]},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.95,.95,.93,1]}],variants:[{name:`Finish Line`,uniforms:{u_primary_color:[.05,.05,.06,1],u_secondary_color:[.95,.95,.93,1],u_fade_start:.25,u_fade_width:.5,u_rotate:0}},{name:`Red Rush`,uniforms:{u_primary_color:[.85,.08,.1,1],u_secondary_color:[.98,.97,.95,1],u_fade_start:.15,u_fade_width:.65,u_rotate:15}},{name:`Midnight`,uniforms:{u_primary_color:[.1,.65,.95,1],u_secondary_color:[.04,.05,.09,1],u_fade_start:.3,u_fade_width:.45,u_rotate:45}}]},Zt=e({default:()=>Qt}),Qt={id:`chitinous_exoskeleton_artisan`,name:`Chitinous Exoskeleton`,category:`Organic`,added:`2026-05-13`,description:`Iridescent, segmented insectoid armor plating with deep, structural color shifting.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
     float noise(vec2 p) {
       vec2 i = floor(p); vec2 f = fract(p);
@@ -2866,7 +2921,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return iridColor;
     }
-  `,uniforms:[{id:`u_scale`,name:`Plate Scale`,type:`float`,min:2,max:20,default:6},{id:`u_color_a`,name:`Iridescence Base`,type:`color`,default:[.1,.2,.5,1]},{id:`u_color_b`,name:`Iridescence Mid`,type:`color`,default:[.5,.1,.6,1]},{id:`u_color_c`,name:`Iridescence High`,type:`color`,default:[.1,.8,.4,1]}]},Yt=e({default:()=>Xt}),Xt={id:`choc_chip_camo`,name:`Chocolate Chip Camo`,category:`Organic`,added:`2026-05-12`,description:`Broad waves of base color overlaid with small, high-contrast pebbles to mimic a rocky desert floor.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Plate Scale`,type:`float`,min:2,max:20,default:6},{id:`u_color_a`,name:`Iridescence Base`,type:`color`,default:[.1,.2,.5,1]},{id:`u_color_b`,name:`Iridescence Mid`,type:`color`,default:[.5,.1,.6,1]},{id:`u_color_c`,name:`Iridescence High`,type:`color`,default:[.1,.8,.4,1]}]},$t=e({default:()=>en}),en={id:`choc_chip_camo`,name:`Chocolate Chip Camo`,category:`Organic`,added:`2026-05-12`,description:`Broad waves of base color overlaid with small, high-contrast pebbles to mimic a rocky desert floor.`,shader:`
     
     vec2 random2( vec2 p ) {
       return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
@@ -2920,14 +2975,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Desert Storm`,uniforms:{u_color_base:[.75,.65,.5,1],u_color_1:[.6,.5,.35,1],u_color_2:[.45,.35,.25,1],u_color_chip:[.9,.85,.75,1],u_color_shadow:[.1,.08,.05,1]}},{name:`Mars Surface`,uniforms:{u_color_base:[.65,.3,.15,1],u_color_1:[.5,.2,.1,1],u_color_2:[.8,.45,.25,1],u_color_chip:[.95,.65,.4,1],u_color_shadow:[.15,.05,.02,1]}},{name:`Urban Rubble`,uniforms:{u_color_base:[.55,.55,.6,1],u_color_1:[.4,.4,.45,1],u_color_2:[.3,.3,.35,1],u_color_chip:[.85,.85,.9,1],u_color_shadow:[.1,.1,.15,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.14,1],u_color_1:[.08,.08,.1,1],u_color_2:[.05,.05,.06,1],u_color_chip:[.2,.2,.22,1],u_color_shadow:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base Sand`,type:`color`,default:[.75,.65,.5,1]},{id:`u_color_1`,name:`Wave 1`,type:`color`,default:[.6,.5,.35,1]},{id:`u_color_2`,name:`Wave 2`,type:`color`,default:[.45,.35,.25,1]},{id:`u_color_chip`,name:`Pebble Color`,type:`color`,default:[.9,.85,.75,1]},{id:`u_color_shadow`,name:`Shadow Color`,type:`color`,default:[.1,.08,.05,1]}]},Zt=e({default:()=>Qt}),Qt={id:`chopped_carbon_artisan`,name:`Chopped Carbon`,category:`Industrial`,added:`2026-04-15`,description:`Randomly oriented forged carbon fragments mimicking premium high-performance composites.`,shader:`
+  `,variants:[{name:`Desert Storm`,uniforms:{u_color_base:[.75,.65,.5,1],u_color_1:[.6,.5,.35,1],u_color_2:[.45,.35,.25,1],u_color_chip:[.9,.85,.75,1],u_color_shadow:[.1,.08,.05,1]}},{name:`Mars Surface`,uniforms:{u_color_base:[.65,.3,.15,1],u_color_1:[.5,.2,.1,1],u_color_2:[.8,.45,.25,1],u_color_chip:[.95,.65,.4,1],u_color_shadow:[.15,.05,.02,1]}},{name:`Urban Rubble`,uniforms:{u_color_base:[.55,.55,.6,1],u_color_1:[.4,.4,.45,1],u_color_2:[.3,.3,.35,1],u_color_chip:[.85,.85,.9,1],u_color_shadow:[.1,.1,.15,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.14,1],u_color_1:[.08,.08,.1,1],u_color_2:[.05,.05,.06,1],u_color_chip:[.2,.2,.22,1],u_color_shadow:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base Sand`,type:`color`,default:[.75,.65,.5,1]},{id:`u_color_1`,name:`Wave 1`,type:`color`,default:[.6,.5,.35,1]},{id:`u_color_2`,name:`Wave 2`,type:`color`,default:[.45,.35,.25,1]},{id:`u_color_chip`,name:`Pebble Color`,type:`color`,default:[.9,.85,.75,1]},{id:`u_color_shadow`,name:`Shadow Color`,type:`color`,default:[.1,.08,.05,1]}]},tn=e({default:()=>nn}),nn={id:`chopped_carbon_artisan`,name:`Chopped Carbon`,category:`Industrial`,added:`2026-04-15`,description:`Randomly oriented forged carbon fragments mimicking premium high-performance composites.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
       float mask = hash(i_uv);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fragment Size`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Resin Deep`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Fiber Flake`,type:`color`,default:[.2,.2,.25,1]}]},$t=e({default:()=>en}),en={id:`chrome_mirror`,name:`Chrome Mirror`,category:`Industrial`,added:`2026-04-30`,description:`Mirror-polished chrome finish with gradient reflection bands simulating sky, horizon, and ground environment.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fragment Size`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Resin Deep`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Fiber Flake`,type:`color`,default:[.2,.2,.25,1]}]},rn=e({default:()=>an}),an={id:`chrome_mirror`,name:`Chrome Mirror`,category:`Industrial`,added:`2026-04-30`,description:`Mirror-polished chrome finish with gradient reflection bands simulating sky, horizon, and ground environment.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv;
@@ -2979,7 +3034,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_contrast`,name:`Reflection Contrast`,type:`float`,min:.5,max:3,default:2},{id:`u_band_count`,name:`Band Count`,type:`float`,min:2,max:12,default:6}]},tn=e({default:()=>nn}),nn={id:`cinder_block`,name:`Cinder Block`,category:`Architecture`,added:`2026-06-12`,description:`Standard CMU wall — 2:1 concrete masonry units in running bond, struck mortar joints in shadow, the hollow cores ghosting darker through each face and slag-speckled grey aggregate throughout.`,shader:`
+  `,uniforms:[{id:`u_contrast`,name:`Reflection Contrast`,type:`float`,min:.5,max:3,default:2},{id:`u_band_count`,name:`Band Count`,type:`float`,min:2,max:12,default:6}]},on=e({default:()=>sn}),sn={id:`cinder_block`,name:`Cinder Block`,category:`Architecture`,added:`2026-06-12`,description:`Standard CMU wall — 2:1 concrete masonry units in running bond, struck mortar joints in shadow, the hollow cores ghosting darker through each face and slag-speckled grey aggregate throughout.`,shader:`
     float hash_cbk(vec2 p) {
       return fract(sin(dot(p, vec2(199.7, 263.3))) * 40417.8311);
     }
@@ -3060,7 +3115,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_courses`,name:`Courses`,type:`float`,min:3,max:14,default:6},{id:`u_core_shadow`,name:`Core Shadow`,type:`float`,min:0,max:1,default:.7},{id:`u_block_color`,name:`Concrete`,type:`color`,default:[.64,.63,.6,1]}]},rn=e({default:()=>an}),an={id:`circle_packing`,name:`Circle Packing`,category:`Geometric`,added:`2026-07-07`,description:`Generative circle packing — big rounds with ever-smaller circles crowding the gaps.`,shader:`
+  `,uniforms:[{id:`u_courses`,name:`Courses`,type:`float`,min:3,max:14,default:6},{id:`u_core_shadow`,name:`Core Shadow`,type:`float`,min:0,max:1,default:.7},{id:`u_block_color`,name:`Concrete`,type:`color`,default:[.64,.63,.6,1]}]},cn=e({default:()=>ln}),ln={id:`circle_packing`,name:`Circle Packing`,category:`Geometric`,added:`2026-07-07`,description:`Generative circle packing — big rounds with ever-smaller circles crowding the gaps.`,shader:`
     float circles(vec2 uv, float gridScale, float seed, float coverage, out float tone) {
       vec2 cell = floor(uv * gridScale);
       vec2 f = fract(uv * gridScale) - 0.5;
@@ -3092,7 +3147,59 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Packing Scale`,type:`float`,min:1,max:10,default:3},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.1,.12,1]},{id:`u_primary_color`,name:`Circles 1`,type:`color`,default:[.9,.55,.15,1]},{id:`u_accent_color`,name:`Circles 2`,type:`color`,default:[.85,.85,.82,1]},{id:`u_pop_color`,name:`Circles 3`,type:`color`,default:[.25,.55,.6,1]}],variants:[{name:`Poster Print`,uniforms:{u_secondary_color:[.1,.1,.12,1],u_primary_color:[.9,.55,.15,1],u_accent_color:[.85,.85,.82,1],u_pop_color:[.25,.55,.6,1]}},{name:`Candy Shop`,uniforms:{u_secondary_color:[.96,.93,.9,1],u_primary_color:[.95,.45,.6,1],u_accent_color:[.45,.75,.9,1],u_pop_color:[.98,.8,.3,1]}},{name:`Ball Pit Night`,uniforms:{u_secondary_color:[.05,.05,.08,1],u_primary_color:[.7,.2,.75,1],u_accent_color:[.15,.65,.85,1],u_pop_color:[.9,.85,.2,1]}}]},on=e({default:()=>sn}),sn={id:`circuit_traces_pro`,name:`Circuit Traces`,category:`Technology`,added:`2026-04-15`,description:`Pro-grade PCB layout with branching traces and circular nodes.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Packing Scale`,type:`float`,min:1,max:10,default:3},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.1,.12,1]},{id:`u_primary_color`,name:`Circles 1`,type:`color`,default:[.9,.55,.15,1]},{id:`u_accent_color`,name:`Circles 2`,type:`color`,default:[.85,.85,.82,1]},{id:`u_pop_color`,name:`Circles 3`,type:`color`,default:[.25,.55,.6,1]}],variants:[{name:`Poster Print`,uniforms:{u_secondary_color:[.1,.1,.12,1],u_primary_color:[.9,.55,.15,1],u_accent_color:[.85,.85,.82,1],u_pop_color:[.25,.55,.6,1]}},{name:`Candy Shop`,uniforms:{u_secondary_color:[.96,.93,.9,1],u_primary_color:[.95,.45,.6,1],u_accent_color:[.45,.75,.9,1],u_pop_color:[.98,.8,.3,1]}},{name:`Ball Pit Night`,uniforms:{u_secondary_color:[.05,.05,.08,1],u_primary_color:[.7,.2,.75,1],u_accent_color:[.15,.65,.85,1],u_pop_color:[.9,.85,.2,1]}}]},un=e({default:()=>dn}),dn={id:`circuit_ghost`,name:`Circuit Ghost`,category:`Technology`,added:`2026-07-09`,description:`A dense lattice of dormant PCB traces with pads and vias, tone-on-tone in deep teal — while a few powered nets glow live across the board.`,shader:`
+    float seg_cg(vec2 p, vec2 a, vec2 b) {
+      vec2 pa = p - a;
+      vec2 ba = b - a;
+      float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+      return length(pa - ba * h);
+    }
+
+    vec4 generate() {
+      vec2 p = fract(v_uv) * u_scale;
+      vec2 id = floor(p);
+      vec2 f = fract(p) - 0.5;
+
+      vec3 col = vec3(0.035, 0.059, 0.067);
+      float h1 = hash(id + 1.7);
+
+      // truchet routing: traces meet at edge midpoints so runs connect
+      float d = 8.0;
+      if (h1 < 0.28) {
+        d = seg_cg(f, vec2(-0.5, 0.0), vec2(0.5, 0.0));
+      } else if (h1 < 0.56) {
+        d = seg_cg(f, vec2(0.0, -0.5), vec2(0.0, 0.5));
+      } else if (h1 < 0.68) {
+        d = min(seg_cg(f, vec2(-0.5, 0.0), vec2(0.0, 0.0)),
+                seg_cg(f, vec2(0.0, 0.0), vec2(0.0, 0.5)));
+      } else if (h1 < 0.80) {
+        d = min(seg_cg(f, vec2(0.5, 0.0), vec2(0.0, 0.0)),
+                seg_cg(f, vec2(0.0, 0.0), vec2(0.0, -0.5)));
+      } else if (h1 < 0.90) {
+        d = seg_cg(f, vec2(-0.5, -0.5), vec2(0.5, 0.5));  // 45-degree jog
+      }
+
+      // powered nets come in contiguous super-cells so they read as circuits
+      float live = step(1.0 - u_live, hash(floor(id / 3.0) + 8.8));
+
+      float trace = smoothstep(u_weight, u_weight - 0.02, d);
+      vec3 gcol = mix(vec3(0.086, 0.157, 0.173), vec3(0.14, 0.245, 0.26), hash(id + 2.9));
+      col = mix(col, gcol, trace);
+      if (live > 0.5 && d < 4.0) {
+        col += vec3(0.0, 1.0, 0.78) * (trace * 0.9 + exp(-d * 9.0) * 0.35);
+      }
+
+      // pads on a fraction of routed cells
+      if (hash(id + 5.1) > 0.88 && h1 < 0.90) {
+        float pd = length(f);
+        float ring = smoothstep(0.16, 0.14, pd) - smoothstep(0.085, 0.065, pd);
+        vec3 padCol = live > 0.5 ? vec3(0.0, 1.0, 0.78) : vec3(0.19, 0.31, 0.33);
+        col = mix(col, padCol, clamp(ring, 0.0, 1.0));
+      }
+
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_scale`,name:`Trace Density`,type:`float`,min:8,max:40,default:22},{id:`u_live`,name:`Live Nets`,type:`float`,min:0,max:.3,default:.08},{id:`u_weight`,name:`Trace Weight`,type:`float`,min:.025,max:.1,default:.045}]},fn=e({default:()=>pn}),pn={id:`circuit_traces_pro`,name:`Circuit Traces`,category:`Technology`,added:`2026-04-15`,description:`Pro-grade PCB layout with branching traces and circular nodes.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     
     vec4 generate() {
@@ -3114,7 +3221,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, clamp(mask, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Logic Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Trace Color`,type:`color`,default:[0,.8,.4,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[.02,.05,.02,1]}]},cn=e({default:()=>ln}),ln={id:`city_streets_map`,name:`City Streets Map`,category:`Technology`,added:`2026-07-07`,description:`Aerial street map — irregular blocks, minor lanes, and bold arterial roads.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Logic Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Trace Color`,type:`color`,default:[0,.8,.4,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[.02,.05,.02,1]}]},mn=e({default:()=>hn}),hn={id:`city_streets_map`,name:`City Streets Map`,category:`Technology`,added:`2026-07-07`,description:`Aerial street map — irregular blocks, minor lanes, and bold arterial roads.`,shader:`
     float roadLine(float x, float jitterSeed, float w) {
       float cell = floor(x);
       float off = hash(vec2(cell, jitterSeed)) * 0.5 - 0.25;
@@ -3140,7 +3247,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_park_color.rgb, park * (1.0 - minor) * (1.0 - major) * (1.0 - diag));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Block Density`,type:`float`,min:4,max:30,default:12},{id:`u_road`,name:`Street Width`,type:`float`,min:.02,max:.2,default:.07},{id:`u_highlight`,name:`Arterial Tint`,type:`float`,min:0,max:1,default:.6},{id:`u_secondary_color`,name:`Blocks`,type:`color`,default:[.9,.88,.84,1]},{id:`u_primary_color`,name:`Streets`,type:`color`,default:[1,1,1,1]},{id:`u_accent_color`,name:`Arterials`,type:`color`,default:[.98,.8,.35,1]},{id:`u_park_color`,name:`Parks`,type:`color`,default:[.7,.85,.65,1]}],variants:[{name:`Paper Atlas`,uniforms:{u_secondary_color:[.9,.88,.84,1],u_primary_color:[1,1,1,1],u_accent_color:[.98,.8,.35,1],u_park_color:[.7,.85,.65,1],u_highlight:.6}},{name:`Night Nav`,uniforms:{u_secondary_color:[.07,.08,.11,1],u_primary_color:[.25,.28,.35,1],u_accent_color:[.2,.7,.95,1],u_park_color:[.08,.14,.1,1],u_highlight:.9}},{name:`Blueprint City`,uniforms:{u_secondary_color:[.08,.2,.42,1],u_primary_color:[.75,.85,.95,1],u_accent_color:[1,1,1,1],u_park_color:[.1,.28,.4,1],u_highlight:.8}}]},un=e({default:()=>dn}),dn={id:`classic_number_plate`,name:`Classic Number Plate`,category:`Heritage`,added:`2026-06-12`,description:`Rounded competition number-plate rectangles repeating over body colour — painted white panels with keyline border, corner mounting rivets, and oversprayed edges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Block Density`,type:`float`,min:4,max:30,default:12},{id:`u_road`,name:`Street Width`,type:`float`,min:.02,max:.2,default:.07},{id:`u_highlight`,name:`Arterial Tint`,type:`float`,min:0,max:1,default:.6},{id:`u_secondary_color`,name:`Blocks`,type:`color`,default:[.9,.88,.84,1]},{id:`u_primary_color`,name:`Streets`,type:`color`,default:[1,1,1,1]},{id:`u_accent_color`,name:`Arterials`,type:`color`,default:[.98,.8,.35,1]},{id:`u_park_color`,name:`Parks`,type:`color`,default:[.7,.85,.65,1]}],variants:[{name:`Paper Atlas`,uniforms:{u_secondary_color:[.9,.88,.84,1],u_primary_color:[1,1,1,1],u_accent_color:[.98,.8,.35,1],u_park_color:[.7,.85,.65,1],u_highlight:.6}},{name:`Night Nav`,uniforms:{u_secondary_color:[.07,.08,.11,1],u_primary_color:[.25,.28,.35,1],u_accent_color:[.2,.7,.95,1],u_park_color:[.08,.14,.1,1],u_highlight:.9}},{name:`Blueprint City`,uniforms:{u_secondary_color:[.08,.2,.42,1],u_primary_color:[.75,.85,.95,1],u_accent_color:[1,1,1,1],u_park_color:[.1,.28,.4,1],u_highlight:.8}}]},gn=e({default:()=>_n}),_n={id:`classic_number_plate`,name:`Classic Number Plate`,category:`Heritage`,added:`2026-06-12`,description:`Rounded competition number-plate rectangles repeating over body colour — painted white panels with keyline border, corner mounting rivets, and oversprayed edges.`,shader:`
     // rounded-rectangle signed distance
     float rrect_hrt8(vec2 p, vec2 b, float r) {
       vec2 q = abs(p) - b + r;
@@ -3213,7 +3320,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grid_scale`,name:`Plates Per Tile`,type:`float`,min:1,max:5,default:2},{id:`u_plate_size`,name:`Plate Size`,type:`float`,min:.5,max:1.2,default:.95},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.07,.23,.14,1]},{id:`u_plate_color`,name:`Plate Colour`,type:`color`,default:[.94,.92,.84,1]}]},fn=e({default:()=>pn}),pn={id:`cnc_toolpath`,name:`CNC Toolpath`,category:`Industrial`,added:`2026-07-07`,description:`Face-milled metal with overlapping circular cutter scallops marching in rows.`,shader:`
+  `,uniforms:[{id:`u_grid_scale`,name:`Plates Per Tile`,type:`float`,min:1,max:5,default:2},{id:`u_plate_size`,name:`Plate Size`,type:`float`,min:.5,max:1.2,default:.95},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.07,.23,.14,1]},{id:`u_plate_color`,name:`Plate Colour`,type:`color`,default:[.94,.92,.84,1]}]},vn=e({default:()=>yn}),yn={id:`cnc_toolpath`,name:`CNC Toolpath`,category:`Industrial`,added:`2026-07-07`,description:`Face-milled metal with overlapping circular cutter scallops marching in rows.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float row = floor(uv.y);
@@ -3237,7 +3344,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += 0.08 * u_shine * sin((uv.x + uv.y) * 0.7);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Pass Width`,type:`float`,min:3,max:30,default:9},{id:`u_rings`,name:`Scallop Fineness`,type:`float`,min:4,max:40,default:16},{id:`u_shine`,name:`Sheen`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Metal`,type:`color`,default:[.68,.69,.71,1]},{id:`u_secondary_color`,name:`Pass Seam`,type:`color`,default:[.4,.41,.43,1]}],variants:[{name:`Milled Alloy`,uniforms:{u_primary_color:[.68,.69,.71,1],u_secondary_color:[.4,.41,.43,1],u_rings:16,u_shine:.5}},{name:`Billet Bronze`,uniforms:{u_primary_color:[.72,.52,.3,1],u_secondary_color:[.45,.3,.16,1],u_rings:20,u_shine:.7}},{name:`Dark Anodize`,uniforms:{u_primary_color:[.2,.21,.24,1],u_secondary_color:[.1,.1,.12,1],u_rings:12,u_shine:.8}}]},mn=e({default:()=>hn}),hn={id:`column_fluting`,name:`Column Fluting`,category:`Architecture`,added:`2026-06-12`,description:`Classical fluted column surface — concave half-round flutes between sharp fillets, raking light shading each groove, drum joints crossing horizontally and centuries of soot settled in the hollows.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pass Width`,type:`float`,min:3,max:30,default:9},{id:`u_rings`,name:`Scallop Fineness`,type:`float`,min:4,max:40,default:16},{id:`u_shine`,name:`Sheen`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Metal`,type:`color`,default:[.68,.69,.71,1]},{id:`u_secondary_color`,name:`Pass Seam`,type:`color`,default:[.4,.41,.43,1]}],variants:[{name:`Milled Alloy`,uniforms:{u_primary_color:[.68,.69,.71,1],u_secondary_color:[.4,.41,.43,1],u_rings:16,u_shine:.5}},{name:`Billet Bronze`,uniforms:{u_primary_color:[.72,.52,.3,1],u_secondary_color:[.45,.3,.16,1],u_rings:20,u_shine:.7}},{name:`Dark Anodize`,uniforms:{u_primary_color:[.2,.21,.24,1],u_secondary_color:[.1,.1,.12,1],u_rings:12,u_shine:.8}}]},bn=e({default:()=>xn}),xn={id:`column_fluting`,name:`Column Fluting`,category:`Architecture`,added:`2026-06-12`,description:`Classical fluted column surface — concave half-round flutes between sharp fillets, raking light shading each groove, drum joints crossing horizontally and centuries of soot settled in the hollows.`,shader:`
     float hash_cfl(vec2 p) {
       return fract(sin(dot(p, vec2(197.3, 331.7))) * 37199.1731);
     }
@@ -3310,7 +3417,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_flutes`,name:`Flutes`,type:`float`,min:4,max:24,default:10},{id:`u_age`,name:`Age`,type:`float`,min:0,max:1,default:.5},{id:`u_stone_color`,name:`Stone`,type:`color`,default:[.82,.79,.72,1]}]},gn=e({default:()=>_n}),_n={id:`comet_tail`,name:`Comet Tail`,category:`Cosmos`,added:`2026-06-11`,description:`A dazzling comet nucleus dragging twin tails — a straight blue ion stream and a curved cream dust fan — through a quiet starfield.`,shader:`
+  `,uniforms:[{id:`u_flutes`,name:`Flutes`,type:`float`,min:4,max:24,default:10},{id:`u_age`,name:`Age`,type:`float`,min:0,max:1,default:.5},{id:`u_stone_color`,name:`Stone`,type:`color`,default:[.82,.79,.72,1]}]},Sn=e({default:()=>Cn}),Cn={id:`comet_tail`,name:`Comet Tail`,category:`Cosmos`,added:`2026-06-11`,description:`A dazzling comet nucleus dragging twin tails — a straight blue ion stream and a curved cream dust fan — through a quiet starfield.`,shader:`
     vec2 rot_cmt(vec2 p, float a) {
       float c = cos(a); float s = sin(a);
       return vec2(c * p.x - s * p.y, s * p.x + c * p.y);
@@ -3378,7 +3485,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_tail_length`,name:`Tail Length`,type:`float`,min:.3,max:2.5,default:1},{id:`u_tail_spread`,name:`Tail Spread`,type:`float`,min:.3,max:2.5,default:1},{id:`u_ion_color`,name:`Ion Tail`,type:`color`,default:[.3,.6,1,1]}]},vn=e({default:()=>yn}),yn={id:`constellation_chart`,name:`Constellation Chart`,category:`Cosmos`,added:`2026-06-11`,description:`A celestial atlas plate — named stars joined by fine asterism lines over an inked coordinate grid and faint ecliptic arc.`,shader:`
+  `,uniforms:[{id:`u_tail_length`,name:`Tail Length`,type:`float`,min:.3,max:2.5,default:1},{id:`u_tail_spread`,name:`Tail Spread`,type:`float`,min:.3,max:2.5,default:1},{id:`u_ion_color`,name:`Ion Tail`,type:`color`,default:[.3,.6,1,1]}]},wn=e({default:()=>Tn}),Tn={id:`constellation_chart`,name:`Constellation Chart`,category:`Cosmos`,added:`2026-06-11`,description:`A celestial atlas plate — named stars joined by fine asterism lines over an inked coordinate grid and faint ecliptic arc.`,shader:`
     // Distance from point p to segment a-b
     float segDist_cch(vec2 p, vec2 a, vec2 b) {
       vec2 pa = p - a;
@@ -3466,7 +3573,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Star Density`,type:`float`,min:3,max:12,default:6},{id:`u_connect`,name:`Line Frequency`,type:`float`,min:0,max:1,default:.45},{id:`u_chart_color`,name:`Chart Ink`,type:`color`,default:[.04,.06,.11,1]},{id:`u_star_color`,name:`Star Colour`,type:`color`,default:[.95,.92,.8,1]}]},bn=e({default:()=>xn}),xn={id:`coral_reef_artisan`,name:`Coral Branch`,category:`Natural`,added:`2026-04-16`,description:`Branching organic calcium structures mimicking underwater coral reef formations.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Star Density`,type:`float`,min:3,max:12,default:6},{id:`u_connect`,name:`Line Frequency`,type:`float`,min:0,max:1,default:.45},{id:`u_chart_color`,name:`Chart Ink`,type:`color`,default:[.04,.06,.11,1]},{id:`u_star_color`,name:`Star Colour`,type:`color`,default:[.95,.92,.8,1]}]},En=e({default:()=>Dn}),Dn={id:`coral_reef_artisan`,name:`Coral Branch`,category:`Natural`,added:`2026-04-16`,description:`Branching organic calcium structures mimicking underwater coral reef formations.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float d = 1.0;
@@ -3478,13 +3585,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, smoothstep(0.2, 0.1, d));
     }
-  `,uniforms:[{id:`u_scale`,name:`Reef Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Polyps`,type:`color`,default:[1,.5,.4,1]},{id:`u_secondary_color`,name:`Ocean Depth`,type:`color`,default:[0,.2,.4,1]}]},Sn=e({default:()=>Cn}),Cn={id:`corduroy_rib_artisan`,name:`Corduroy Rib`,category:`Abstract`,added:`2026-04-15`,description:`Parallel fuzzy ridges of heavy fabric used in durable workwear.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Reef Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Polyps`,type:`color`,default:[1,.5,.4,1]},{id:`u_secondary_color`,name:`Ocean Depth`,type:`color`,default:[0,.2,.4,1]}]},On=e({default:()=>kn}),kn={id:`corduroy_rib_artisan`,name:`Corduroy Rib`,category:`Abstract`,added:`2026-04-15`,description:`Parallel fuzzy ridges of heavy fabric used in durable workwear.`,shader:`
     vec4 generate() {
       float rib = sin(v_uv.x * 100.0 * u_scale);
       float mask = smoothstep(-0.5, 0.5, rib);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Rib Frequency`,type:`float`,min:.1,max:2,default:.8},{id:`u_primary_color`,name:`Rib Ridge`,type:`color`,default:[.4,.3,.2,1]},{id:`u_secondary_color`,name:`Rib Valley`,type:`color`,default:[.15,.1,.05,1]}]},wn=e({default:()=>Tn}),Tn={id:`corroded_aluminum`,name:`Corroded Aluminum`,category:`Industrial`,added:`2026-05-01`,description:`Pitted and oxidized aluminum with dull grey-white aluminum oxide patches over a matte base, with small darker corrosion pits.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Rib Frequency`,type:`float`,min:.1,max:2,default:.8},{id:`u_primary_color`,name:`Rib Ridge`,type:`color`,default:[.4,.3,.2,1]},{id:`u_secondary_color`,name:`Rib Valley`,type:`color`,default:[.15,.1,.05,1]}]},An=e({default:()=>jn}),jn={id:`corroded_aluminum`,name:`Corroded Aluminum`,category:`Industrial`,added:`2026-05-01`,description:`Pitted and oxidized aluminum with dull grey-white aluminum oxide patches over a matte base, with small darker corrosion pits.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 4; i++) {
@@ -3543,13 +3650,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_corrosion`,name:`Corrosion Coverage`,type:`float`,min:0,max:1,default:.6},{id:`u_scale`,name:`Scale`,type:`float`,min:2,max:20,default:8},{id:`u_base_color`,name:`Aluminum Base`,type:`color`,default:[.65,.65,.63,1]}]},En=e({default:()=>Dn}),Dn={id:`corrugated_steel_artisan`,name:`Corrugated Steel`,category:`Industrial`,added:`2026-04-15`,description:`Wavy metal sheet textures used in industrial construction and containers.`,shader:`
+  `,uniforms:[{id:`u_corrosion`,name:`Corrosion Coverage`,type:`float`,min:0,max:1,default:.6},{id:`u_scale`,name:`Scale`,type:`float`,min:2,max:20,default:8},{id:`u_base_color`,name:`Aluminum Base`,type:`color`,default:[.65,.65,.63,1]}]},Mn=e({default:()=>Nn}),Nn={id:`corrugated_steel_artisan`,name:`Corrugated Steel`,category:`Industrial`,added:`2026-04-15`,description:`Wavy metal sheet textures used in industrial construction and containers.`,shader:`
     vec4 generate() {
       float wave = sin(v_uv.x * 30.0 * (1.0 + u_scale));
       float mask = smoothstep(-0.8, 0.8, wave);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Wave Frequency`,type:`float`,min:.1,max:2,default:1},{id:`u_primary_color`,name:`Highlight`,type:`color`,default:[.7,.75,.8,1]},{id:`u_secondary_color`,name:`Recess`,type:`color`,default:[.15,.15,.2,1]}]},On=e({default:()=>kn}),kn={id:`cosmic_microwave`,name:`Cosmic Microwave`,category:`Cosmos`,added:`2026-06-11`,description:`The baby picture of the universe — mottled CMB temperature anisotropies in the classic blue-to-red heat map, speckled with acoustic-peak hot spots.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wave Frequency`,type:`float`,min:.1,max:2,default:1},{id:`u_primary_color`,name:`Highlight`,type:`color`,default:[.7,.75,.8,1]},{id:`u_secondary_color`,name:`Recess`,type:`color`,default:[.15,.15,.2,1]}]},Pn=e({default:()=>Fn}),Fn={id:`cosmic_microwave`,name:`Cosmic Microwave`,category:`Cosmos`,added:`2026-06-11`,description:`The baby picture of the universe — mottled CMB temperature anisotropies in the classic blue-to-red heat map, speckled with acoustic-peak hot spots.`,shader:`
     // Band-limited blobby field: sums of smooth noise at survey-map scales
     float anis_cmb(vec2 uv, float scale) {
       float v = 0.0;
@@ -3608,7 +3715,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_blob_scale`,name:`Anisotropy Scale`,type:`float`,min:2,max:16,default:6},{id:`u_contrast`,name:`Peak Contrast`,type:`float`,min:.5,max:3,default:1.4},{id:`u_dipole`,name:`Dipole Tilt`,type:`float`,min:0,max:1,default:.4}]},An=e({default:()=>jn}),jn={id:`cow_print`,name:`Cow Print`,category:`Organic`,added:`2026-06-11`,description:`Classic Holstein cow hide: irregular organic black blotches scattered over white, with a second smaller blotch layer for natural variety.`,shader:`
+  `,uniforms:[{id:`u_blob_scale`,name:`Anisotropy Scale`,type:`float`,min:2,max:16,default:6},{id:`u_contrast`,name:`Peak Contrast`,type:`float`,min:.5,max:3,default:1.4},{id:`u_dipole`,name:`Dipole Tilt`,type:`float`,min:0,max:1,default:.4}]},In=e({default:()=>Ln}),Ln={id:`cow_print`,name:`Cow Print`,category:`Organic`,added:`2026-06-11`,description:`Classic Holstein cow hide: irregular organic black blotches scattered over white, with a second smaller blotch layer for natural variety.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -3644,7 +3751,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Holstein`,uniforms:{u_color_blotch:[.05,.05,.06,1],u_color_base:[.96,.95,.93,1]}},{name:`Brown Swiss`,uniforms:{u_color_blotch:[.33,.2,.11,1],u_color_base:[.92,.87,.78,1]}},{name:`Pink Moo`,uniforms:{u_color_blotch:[.95,.35,.62,1],u_color_base:[1,.94,.97,1]}},{name:`Inverse`,uniforms:{u_color_blotch:[.96,.95,.93,1],u_color_base:[.05,.05,.06,1]}}],uniforms:[{id:`u_scale`,name:`Blotch Scale`,type:`float`,min:1,max:12,default:3.5},{id:`u_coverage`,name:`Blotch Coverage`,type:`float`,min:0,max:1,default:.45},{id:`u_soft`,name:`Edge Softness`,type:`float`,min:.002,max:.4,default:.05},{id:`u_color_blotch`,name:`Blotch Color`,type:`color`,default:[.05,.05,.06,1]},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.96,.95,.93,1]}]},Mn=e({default:()=>Nn}),Nn={id:`cratered_moon`,name:`Cratered Moon`,category:`Cosmos`,added:`2026-06-11`,description:`A battered lunar regolith plain — overlapping impact craters with sunlit rims and inky floor shadows, dusted with fine grey soil.`,shader:`
+  `,variants:[{name:`Holstein`,uniforms:{u_color_blotch:[.05,.05,.06,1],u_color_base:[.96,.95,.93,1]}},{name:`Brown Swiss`,uniforms:{u_color_blotch:[.33,.2,.11,1],u_color_base:[.92,.87,.78,1]}},{name:`Pink Moo`,uniforms:{u_color_blotch:[.95,.35,.62,1],u_color_base:[1,.94,.97,1]}},{name:`Inverse`,uniforms:{u_color_blotch:[.96,.95,.93,1],u_color_base:[.05,.05,.06,1]}}],uniforms:[{id:`u_scale`,name:`Blotch Scale`,type:`float`,min:1,max:12,default:3.5},{id:`u_coverage`,name:`Blotch Coverage`,type:`float`,min:0,max:1,default:.45},{id:`u_soft`,name:`Edge Softness`,type:`float`,min:.002,max:.4,default:.05},{id:`u_color_blotch`,name:`Blotch Color`,type:`color`,default:[.05,.05,.06,1]},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.96,.95,.93,1]}]},Rn=e({default:()=>zn}),zn={id:`cratered_moon`,name:`Cratered Moon`,category:`Cosmos`,added:`2026-06-11`,description:`A battered lunar regolith plain — overlapping impact craters with sunlit rims and inky floor shadows, dusted with fine grey soil.`,shader:`
     // Crater field at one scale: jittered grid of bowl-shaped depressions.
     // Returns height contribution (negative = bowl, positive = rim).
     float craters_clm(vec2 uv, float density, float seed) {
@@ -3718,7 +3825,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_crater_depth`,name:`Crater Depth`,type:`float`,min:.3,max:2,default:1},{id:`u_sun_angle`,name:`Sun Angle`,type:`float`,min:0,max:6.28,default:.8},{id:`u_surface_color`,name:`Regolith`,type:`color`,default:[.72,.71,.68,1]}]},Pn=e({default:()=>Fn}),Fn={id:`crochet_granny_squares`,name:`Granny Squares`,category:`Textile`,added:`2026-07-07`,description:`Crocheted granny-square blanket — concentric yarn rounds in clashing colors, joined by a border stitch.`,shader:`
+  `,uniforms:[{id:`u_crater_depth`,name:`Crater Depth`,type:`float`,min:.3,max:2,default:1},{id:`u_sun_angle`,name:`Sun Angle`,type:`float`,min:0,max:6.28,default:.8},{id:`u_surface_color`,name:`Regolith`,type:`color`,default:[.72,.71,.68,1]}]},Bn=e({default:()=>Vn}),Vn={id:`crochet_granny_squares`,name:`Granny Squares`,category:`Textile`,added:`2026-07-07`,description:`Crocheted granny-square blanket — concentric yarn rounds in clashing colors, joined by a border stitch.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -3747,14 +3854,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       yarn *= 1.0 - hole * 0.5;
       return vec4(yarn, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Square Density`,type:`float`,min:2,max:14,default:5},{id:`u_primary_color`,name:`Yarn 1`,type:`color`,default:[.85,.3,.25,1]},{id:`u_secondary_color`,name:`Yarn 2`,type:`color`,default:[.9,.7,.2,1]},{id:`u_pop_color`,name:`Yarn 3`,type:`color`,default:[.25,.55,.5,1]},{id:`u_accent_color`,name:`Yarn 4`,type:`color`,default:[.8,.8,.75,1]},{id:`u_border_color`,name:`Border Yarn`,type:`color`,default:[.12,.12,.14,1]}],variants:[{name:`Cabin Blanket`,uniforms:{u_primary_color:[.85,.3,.25,1],u_secondary_color:[.9,.7,.2,1],u_pop_color:[.25,.55,.5,1],u_accent_color:[.8,.8,.75,1],u_border_color:[.12,.12,.14,1]}},{name:`Pastel Nursery`,uniforms:{u_primary_color:[.95,.75,.8,1],u_secondary_color:[.75,.85,.95,1],u_pop_color:[.8,.92,.8,1],u_accent_color:[.98,.95,.85,1],u_border_color:[.95,.95,.95,1]}},{name:`Van Interior 74`,uniforms:{u_primary_color:[.65,.35,.12,1],u_secondary_color:[.85,.6,.2,1],u_pop_color:[.45,.45,.2,1],u_accent_color:[.55,.25,.1,1],u_border_color:[.2,.12,.06,1]}}]},In=e({default:()=>Ln}),Ln={id:`crocodile_hide_artisan`,name:`Crocodile Hide`,category:`Natural`,added:`2026-04-15`,description:`Large rectangular blocky scales with organic gap jitter found in reptilian leather.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Square Density`,type:`float`,min:2,max:14,default:5},{id:`u_primary_color`,name:`Yarn 1`,type:`color`,default:[.85,.3,.25,1]},{id:`u_secondary_color`,name:`Yarn 2`,type:`color`,default:[.9,.7,.2,1]},{id:`u_pop_color`,name:`Yarn 3`,type:`color`,default:[.25,.55,.5,1]},{id:`u_accent_color`,name:`Yarn 4`,type:`color`,default:[.8,.8,.75,1]},{id:`u_border_color`,name:`Border Yarn`,type:`color`,default:[.12,.12,.14,1]}],variants:[{name:`Cabin Blanket`,uniforms:{u_primary_color:[.85,.3,.25,1],u_secondary_color:[.9,.7,.2,1],u_pop_color:[.25,.55,.5,1],u_accent_color:[.8,.8,.75,1],u_border_color:[.12,.12,.14,1]}},{name:`Pastel Nursery`,uniforms:{u_primary_color:[.95,.75,.8,1],u_secondary_color:[.75,.85,.95,1],u_pop_color:[.8,.92,.8,1],u_accent_color:[.98,.95,.85,1],u_border_color:[.95,.95,.95,1]}},{name:`Van Interior 74`,uniforms:{u_primary_color:[.65,.35,.12,1],u_secondary_color:[.85,.6,.2,1],u_pop_color:[.45,.45,.2,1],u_accent_color:[.55,.25,.1,1],u_border_color:[.2,.12,.06,1]}}]},Hn=e({default:()=>Un}),Un={id:`crocodile_hide_artisan`,name:`Crocodile Hide`,category:`Natural`,added:`2026-04-15`,description:`Large rectangular blocky scales with organic gap jitter found in reptilian leather.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
       float mask = step(0.1, gv.x) * step(gv.x, 0.9) * step(0.1, gv.y) * step(gv.y, 0.9);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Zoom`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Leather Top`,type:`color`,default:[.15,.1,.05,1]},{id:`u_secondary_color`,name:`Scale Gap`,type:`color`,default:[.05,.03,.01,1]}]},Rn=e({default:()=>zn}),zn={id:`crt_phosphor_mask_artisan`,name:`CRT Phosphor Mask`,category:`Technology`,added:`2026-05-13`,description:`Macro view of an old tube monitor featuring RGB sub-pixels and scanlines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Zoom`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Leather Top`,type:`color`,default:[.15,.1,.05,1]},{id:`u_secondary_color`,name:`Scale Gap`,type:`color`,default:[.05,.03,.01,1]}]},Wn=e({default:()=>Gn}),Gn={id:`crt_phosphor_mask_artisan`,name:`CRT Phosphor Mask`,category:`Technology`,added:`2026-05-13`,description:`Macro view of an old tube monitor featuring RGB sub-pixels and scanlines.`,shader:`
     vec4 generate() {
         vec2 uv = v_uv * u_scale;
         
@@ -3783,7 +3890,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         // Add ambient reflection
         return screen + u_ambient_glare * 0.1;
     }
-  `,uniforms:[{id:`u_scale`,name:`Grille Scale`,type:`float`,min:10,max:200,default:80},{id:`u_brightness`,name:`Phosphor Brightness`,type:`float`,min:.5,max:3,default:1.5},{id:`u_ambient_glare`,name:`Screen Glass`,type:`color`,default:[.05,.05,.05,1]},{id:`u_phase`,name:`Signal Phase`,type:`float`,min:0,max:100,default:0}]},Bn=e({default:()=>Vn}),Vn={id:`cumulus_clouds`,name:`Cumulus Clouds`,category:`Natural`,added:`2026-07-07`,description:`Fair-weather cumulus — bright cauliflower tops, shaded flat bases, deep blue sky.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grille Scale`,type:`float`,min:10,max:200,default:80},{id:`u_brightness`,name:`Phosphor Brightness`,type:`float`,min:.5,max:3,default:1.5},{id:`u_ambient_glare`,name:`Screen Glass`,type:`color`,default:[.05,.05,.05,1]},{id:`u_phase`,name:`Signal Phase`,type:`float`,min:0,max:100,default:0}]},Kn=e({default:()=>qn}),qn={id:`cumulus_clouds`,name:`Cumulus Clouds`,category:`Natural`,added:`2026-07-07`,description:`Fair-weather cumulus — bright cauliflower tops, shaded flat bases, deep blue sky.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // sky gradient, paler at the horizon
@@ -3805,7 +3912,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, cloudC, max(body, (wispy - body) * 0.5));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Cloud Scale`,type:`float`,min:1,max:8,default:3},{id:`u_cover`,name:`Clear Sky`,type:`float`,min:.2,max:.75,default:.5},{id:`u_shading`,name:`Base Shading`,type:`float`,min:0,max:1,default:.7},{id:`u_primary_color`,name:`Cloud`,type:`color`,default:[.98,.98,.97,1]},{id:`u_secondary_color`,name:`Sky Zenith`,type:`color`,default:[.2,.45,.85,1]},{id:`u_accent_color`,name:`Horizon`,type:`color`,default:[.65,.8,.95,1]}],variants:[{name:`Fair Weather`,uniforms:{u_primary_color:[.98,.98,.97,1],u_secondary_color:[.2,.45,.85,1],u_accent_color:[.65,.8,.95,1],u_cover:.5}},{name:`Golden Hour`,uniforms:{u_primary_color:[1,.85,.7,1],u_secondary_color:[.35,.3,.55,1],u_accent_color:[.95,.6,.4,1],u_cover:.45}},{name:`Storm Building`,uniforms:{u_primary_color:[.8,.8,.82,1],u_secondary_color:[.25,.3,.38,1],u_accent_color:[.5,.52,.55,1],u_cover:.32,u_shading:1}}]},Hn=e({default:()=>Un}),Un={id:`cyber_grid_pro`,name:`Cyber Grid`,category:`Technology`,added:`2026-04-15`,description:`Pro-grade data-matrix style grid with secondary interference lines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cloud Scale`,type:`float`,min:1,max:8,default:3},{id:`u_cover`,name:`Clear Sky`,type:`float`,min:.2,max:.75,default:.5},{id:`u_shading`,name:`Base Shading`,type:`float`,min:0,max:1,default:.7},{id:`u_primary_color`,name:`Cloud`,type:`color`,default:[.98,.98,.97,1]},{id:`u_secondary_color`,name:`Sky Zenith`,type:`color`,default:[.2,.45,.85,1]},{id:`u_accent_color`,name:`Horizon`,type:`color`,default:[.65,.8,.95,1]}],variants:[{name:`Fair Weather`,uniforms:{u_primary_color:[.98,.98,.97,1],u_secondary_color:[.2,.45,.85,1],u_accent_color:[.65,.8,.95,1],u_cover:.5}},{name:`Golden Hour`,uniforms:{u_primary_color:[1,.85,.7,1],u_secondary_color:[.35,.3,.55,1],u_accent_color:[.95,.6,.4,1],u_cover:.45}},{name:`Storm Building`,uniforms:{u_primary_color:[.8,.8,.82,1],u_secondary_color:[.25,.3,.38,1],u_accent_color:[.5,.52,.55,1],u_cover:.32,u_shading:1}}]},Jn=e({default:()=>Yn}),Yn={id:`cyber_grid_pro`,name:`Cyber Grid`,category:`Technology`,added:`2026-04-15`,description:`Pro-grade data-matrix style grid with secondary interference lines.`,shader:`
     vec4 generate() {
       vec2 g = fract(v_uv * u_scale);
       float grid = step(0.95, max(g.x, g.y));
@@ -3819,13 +3926,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, clamp(mask, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Grid Resolution`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Grid Glow`,type:`color`,default:[0,.6,1,1]},{id:`u_secondary_color`,name:`Base Void`,type:`color`,default:[.02,.02,.05,1]}]},Wn=e({default:()=>Gn}),Gn={id:`cyber_leather_artisan`,name:`Cyber Leather`,category:`Technology`,added:`2026-04-16`,description:`Synthetic high-performance leather with integrated glowing micro-circuitry pores.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grid Resolution`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Grid Glow`,type:`color`,default:[0,.6,1,1]},{id:`u_secondary_color`,name:`Base Void`,type:`color`,default:[.02,.02,.05,1]}]},Xn=e({default:()=>Zn}),Zn={id:`cyber_leather_artisan`,name:`Cyber Leather`,category:`Technology`,added:`2026-04-16`,description:`Synthetic high-performance leather with integrated glowing micro-circuitry pores.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * 100.0;
       float mask = step(0.9, hash(floor(uv)));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Circuit Glow`,type:`color`,default:[1,0,.5,1]},{id:`u_secondary_color`,name:`Synthetic Skin`,type:`color`,default:[.05,.05,.06,1]}]},Kn=e({default:()=>qn}),qn={id:`cyber_twill_artisan`,name:`Cyber Twill`,category:`Technology`,added:`2026-04-16`,description:`Advanced glowing-edge carbon fiber weave for high-performance cybernetic components.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Circuit Glow`,type:`color`,default:[1,0,.5,1]},{id:`u_secondary_color`,name:`Synthetic Skin`,type:`color`,default:[.05,.05,.06,1]}]},Qn=e({default:()=>$n}),$n={id:`cyber_twill_artisan`,name:`Cyber Twill`,category:`Technology`,added:`2026-04-16`,description:`Advanced glowing-edge carbon fiber weave for high-performance cybernetic components.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -3833,13 +3940,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.48, 0.5, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Weave Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Glow Edge`,type:`color`,default:[0,1,.8,1]},{id:`u_secondary_color`,name:`Carbon Body`,type:`color`,default:[.05,.05,.05,1]}]},Jn=e({default:()=>Yn}),Yn={id:`cyber_wiring_artisan`,name:`Cyber Bundle`,category:`Technology`,added:`2026-04-16`,description:`Dense, tangled bundles of high-speed digital wiring and fiber-optic strands.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Weave Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Glow Edge`,type:`color`,default:[0,1,.8,1]},{id:`u_secondary_color`,name:`Carbon Body`,type:`color`,default:[.05,.05,.05,1]}]},er=e({default:()=>tr}),tr={id:`cyber_wiring_artisan`,name:`Cyber Bundle`,category:`Technology`,added:`2026-04-16`,description:`Dense, tangled bundles of high-speed digital wiring and fiber-optic strands.`,shader:`
     vec4 generate() {
       float y = floor(v_uv.y * u_scale + sin(v_uv.x * 5.0));
       float n = hash(vec2(y, y));
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Wire Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Wire Signal`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Insulation`,type:`color`,default:[.1,.1,.1,1]}]},Xn=e({default:()=>Zn}),Zn={id:`damask_lace_artisan`,name:`Damask Lace`,category:`Abstract`,added:`2026-04-16`,description:`Complex organic floral symmetry and decorative lace patterns.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wire Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Wire Signal`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Insulation`,type:`color`,default:[.1,.1,.1,1]}]},nr=e({default:()=>rr}),rr={id:`damask_lace_artisan`,name:`Damask Lace`,category:`Abstract`,added:`2026-04-16`,description:`Complex organic floral symmetry and decorative lace patterns.`,shader:`
     vec4 generate() {
       vec2 uv = abs(v_uv - 0.5) * 2.0;
       float d = 0.0;
@@ -3850,21 +3957,21 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.5, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Lace High`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Sheer Base`,type:`color`,default:[.1,.1,.1,1]}]},Qn=e({default:()=>$n}),$n={id:`damask_silk_artisan`,name:`Damask Silk`,category:`Abstract`,added:`2026-04-15`,description:`Floral symmetrical weave with high-end fabric sheen found in luxury upholstery.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Lace High`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Sheer Base`,type:`color`,default:[.1,.1,.1,1]}]},ir=e({default:()=>ar}),ar={id:`damask_silk_artisan`,name:`Damask Silk`,category:`Abstract`,added:`2026-04-15`,description:`Floral symmetrical weave with high-end fabric sheen found in luxury upholstery.`,shader:`
     vec4 generate() {
       vec2 uv = abs(v_uv - 0.5) * u_scale;
       float d = length(uv - sin(uv.x * 5.0) * 0.1);
       float mask = smoothstep(0.4, 0.35, fract(d * 2.0));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Silk Pattern`,type:`color`,default:[.8,.5,.2,1]},{id:`u_secondary_color`,name:`Base Satin`,type:`color`,default:[.4,.2,.1,1]}]},er=e({default:()=>tr}),tr={id:`data_matrix_artisan`,name:`Data Matrix`,category:`Technology`,added:`2026-04-16`,description:`Stacked digital data blocks mimicking high-density computer storage and visualization.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Silk Pattern`,type:`color`,default:[.8,.5,.2,1]},{id:`u_secondary_color`,name:`Base Satin`,type:`color`,default:[.4,.2,.1,1]}]},or=e({default:()=>sr}),sr={id:`data_matrix_artisan`,name:`Data Matrix`,category:`Technology`,added:`2026-04-16`,description:`Stacked digital data blocks mimicking high-density computer storage and visualization.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
       float mask = step(0.5, hash(i_uv));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Data Density`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Active Bit`,type:`color`,default:[0,1,.5,1]},{id:`u_secondary_color`,name:`Zero Bit`,type:`color`,default:[0,.1,.05,1]}]},nr=e({default:()=>rr}),rr={id:`dazzle_camo`,name:`Dazzle Camo`,category:`Geometric`,added:`2026-06-11`,description:`WWI battleship razzle-dazzle: bold irregular geometric zones, each filled with hard-edged two-tone stripes at its own clashing angle and frequency, plus occasional accent zones.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Data Density`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Active Bit`,type:`color`,default:[0,1,.5,1]},{id:`u_secondary_color`,name:`Zero Bit`,type:`color`,default:[0,.1,.05,1]}]},cr=e({default:()=>lr}),lr={id:`dazzle_camo`,name:`Dazzle Camo`,category:`Geometric`,added:`2026-06-11`,description:`WWI battleship razzle-dazzle: bold irregular geometric zones, each filled with hard-edged two-tone stripes at its own clashing angle and frequency, plus occasional accent zones.`,shader:`
 
     vec4 generate() {
       vec2 baseUv = v_uv;
@@ -3902,7 +4009,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 color = mix(u_color_a, ink, stripe);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Classic B&W`,uniforms:{u_color_a:[.95,.95,.94,1],u_color_b:[.06,.06,.07,1],u_color_accent:[.3,.32,.36,1]}},{name:`Navy`,uniforms:{u_color_a:[.78,.83,.88,1],u_color_b:[.07,.13,.26,1],u_color_accent:[.32,.45,.62,1]}},{name:`Magenta Pop`,uniforms:{u_color_a:[.97,.96,.97,1],u_color_b:[.1,.08,.12,1],u_color_accent:[.92,.1,.55,1]}},{name:`Ghost Grey`,uniforms:{u_color_a:[.82,.83,.85,1],u_color_b:[.55,.57,.61,1],u_color_accent:[.38,.4,.45,1]}}],uniforms:[{id:`u_zone_scale`,name:`Zone Scale`,type:`float`,min:1.5,max:10,default:4},{id:`u_stripe_freq`,name:`Stripe Frequency`,type:`float`,min:5,max:60,default:18},{id:`u_color_a`,name:`Stripe Light`,type:`color`,default:[.95,.95,.94,1]},{id:`u_color_b`,name:`Stripe Dark`,type:`color`,default:[.06,.06,.07,1]},{id:`u_color_accent`,name:`Accent`,type:`color`,default:[.3,.32,.36,1]}]},ir=e({default:()=>ar}),ar={id:`deep_field_galaxies`,name:`Deep Field Galaxies`,category:`Cosmos`,added:`2026-07-07`,description:`A telescope deep field — hundreds of faint ellipticals, spirals, and edge-on streaks.`,shader:`
+  `,variants:[{name:`Classic B&W`,uniforms:{u_color_a:[.95,.95,.94,1],u_color_b:[.06,.06,.07,1],u_color_accent:[.3,.32,.36,1]}},{name:`Navy`,uniforms:{u_color_a:[.78,.83,.88,1],u_color_b:[.07,.13,.26,1],u_color_accent:[.32,.45,.62,1]}},{name:`Magenta Pop`,uniforms:{u_color_a:[.97,.96,.97,1],u_color_b:[.1,.08,.12,1],u_color_accent:[.92,.1,.55,1]}},{name:`Ghost Grey`,uniforms:{u_color_a:[.82,.83,.85,1],u_color_b:[.55,.57,.61,1],u_color_accent:[.38,.4,.45,1]}}],uniforms:[{id:`u_zone_scale`,name:`Zone Scale`,type:`float`,min:1.5,max:10,default:4},{id:`u_stripe_freq`,name:`Stripe Frequency`,type:`float`,min:5,max:60,default:18},{id:`u_color_a`,name:`Stripe Light`,type:`color`,default:[.95,.95,.94,1]},{id:`u_color_b`,name:`Stripe Dark`,type:`color`,default:[.06,.06,.07,1]},{id:`u_color_accent`,name:`Accent`,type:`color`,default:[.3,.32,.36,1]}]},ur=e({default:()=>dr}),dr={id:`deep_field_galaxies`,name:`Deep Field Galaxies`,category:`Cosmos`,added:`2026-07-07`,description:`A telescope deep field — hundreds of faint ellipticals, spirals, and edge-on streaks.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -3933,7 +4040,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += step(0.997, s) * vec3(0.9);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Field Density`,type:`float`,min:4,max:30,default:12},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[.01,.01,.03,1]},{id:`u_primary_color`,name:`Young Galaxies`,type:`color`,default:[.55,.7,1,1]},{id:`u_accent_color`,name:`Old Galaxies`,type:`color`,default:[1,.75,.5,1]}],variants:[{name:`Hubble Deep`,uniforms:{u_secondary_color:[.01,.01,.03,1],u_primary_color:[.55,.7,1,1],u_accent_color:[1,.75,.5,1]}},{name:`Infrared Webb`,uniforms:{u_secondary_color:[.02,.01,.02,1],u_primary_color:[.9,.5,.2,1],u_accent_color:[.95,.2,.3,1]}},{name:`Violet Survey`,uniforms:{u_secondary_color:[.02,0,.04,1],u_primary_color:[.6,.3,.95,1],u_accent_color:[.3,.8,.9,1]}}]},or=e({default:()=>sr}),sr={id:`deep_trench_strata`,name:`Deep Trench Strata`,category:`Ocean`,added:`2026-06-11`,description:`A trench wall in cross-section — banded sediment strata sheared by vertical faults, with pale ash layers and crumbling edges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Field Density`,type:`float`,min:4,max:30,default:12},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[.01,.01,.03,1]},{id:`u_primary_color`,name:`Young Galaxies`,type:`color`,default:[.55,.7,1,1]},{id:`u_accent_color`,name:`Old Galaxies`,type:`color`,default:[1,.75,.5,1]}],variants:[{name:`Hubble Deep`,uniforms:{u_secondary_color:[.01,.01,.03,1],u_primary_color:[.55,.7,1,1],u_accent_color:[1,.75,.5,1]}},{name:`Infrared Webb`,uniforms:{u_secondary_color:[.02,.01,.02,1],u_primary_color:[.9,.5,.2,1],u_accent_color:[.95,.2,.3,1]}},{name:`Violet Survey`,uniforms:{u_secondary_color:[.02,0,.04,1],u_primary_color:[.6,.3,.95,1],u_accent_color:[.3,.8,.9,1]}}]},fr=e({default:()=>pr}),pr={id:`deep_trench_strata`,name:`Deep Trench Strata`,category:`Ocean`,added:`2026-06-11`,description:`A trench wall in cross-section — banded sediment strata sheared by vertical faults, with pale ash layers and crumbling edges.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -4000,7 +4107,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_layers`,name:`Layer Count`,type:`float`,min:4,max:24,default:12},{id:`u_fault`,name:`Fault Offset`,type:`float`,min:0,max:.5,default:.18},{id:`u_warp`,name:`Bed Warping`,type:`float`,min:0,max:.4,default:.12},{id:`u_sediment_color`,name:`Sediment Tone`,type:`color`,default:[.52,.43,.32,1]}]},cr=e({default:()=>lr}),lr={id:`demon_scales_artisan`,name:`Demon Scales`,category:`Natural`,added:`2026-04-15`,description:`Overlapping pointed organic scales with depth found in mythical beast armor.`,shader:`
+  `,uniforms:[{id:`u_layers`,name:`Layer Count`,type:`float`,min:4,max:24,default:12},{id:`u_fault`,name:`Fault Offset`,type:`float`,min:0,max:.5,default:.18},{id:`u_warp`,name:`Bed Warping`,type:`float`,min:0,max:.4,default:.12},{id:`u_sediment_color`,name:`Sediment Tone`,type:`color`,default:[.52,.43,.32,1]}]},mr=e({default:()=>hr}),hr={id:`demon_scales_artisan`,name:`Demon Scales`,category:`Natural`,added:`2026-04-15`,description:`Overlapping pointed organic scales with depth found in mythical beast armor.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -4009,7 +4116,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.38, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Size`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Scale Top`,type:`color`,default:[.3,0,0,1]},{id:`u_secondary_color`,name:`Under Scale`,type:`color`,default:[.1,0,0,1]}]},ur=e({default:()=>dr}),dr={id:`denim_weave_artisan`,name:`Denim Fabric`,category:`Abstract`,added:`2026-04-15`,description:`Iconic indigo-stained twill weave with micro-directional thread noise.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Size`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Scale Top`,type:`color`,default:[.3,0,0,1]},{id:`u_secondary_color`,name:`Under Scale`,type:`color`,default:[.1,0,0,1]}]},gr=e({default:()=>_r}),_r={id:`denim_weave_artisan`,name:`Denim Fabric`,category:`Abstract`,added:`2026-04-15`,description:`Iconic indigo-stained twill weave with micro-directional thread noise.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float twill = sin((uv.x + uv.y) * 20.0);
@@ -4017,13 +4124,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.0, twill + noise);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Twill Zoom`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Fade Blue`,type:`color`,default:[.3,.4,.6,1]},{id:`u_secondary_color`,name:`Indigo Deep`,type:`color`,default:[.1,.15,.3,1]}]},fr=e({default:()=>pr}),pr={id:`desert_dunes_artisan`,name:`Desert Dunes`,category:`Natural`,added:`2026-04-16`,description:`Wavy ripple-sand patterns mimicking windswept desert landscapes.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Twill Zoom`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Fade Blue`,type:`color`,default:[.3,.4,.6,1]},{id:`u_secondary_color`,name:`Indigo Deep`,type:`color`,default:[.1,.15,.3,1]}]},vr=e({default:()=>yr}),yr={id:`desert_dunes_artisan`,name:`Desert Dunes`,category:`Natural`,added:`2026-04-16`,description:`Wavy ripple-sand patterns mimicking windswept desert landscapes.`,shader:`
     vec4 generate() {
       float ripple = sin(v_uv.x * u_scale + sin(v_uv.y * 10.0));
       float mask = smoothstep(-0.5, 0.5, ripple);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Dune Frequency`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Sunlit Sand`,type:`color`,default:[.9,.7,.4,1]},{id:`u_secondary_color`,name:`Dune Shadow`,type:`color`,default:[.7,.5,.3,1]}]},mr=e({default:()=>hr}),hr={id:`desert_rose`,name:`Desert Rose`,category:`Geology`,added:`2026-06-12`,description:`Intergrown bladed gypsum rosettes — sandy crystal petals radiating from clustered centres, edges catching the light, sand-blasted matrix between.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Dune Frequency`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Sunlit Sand`,type:`color`,default:[.9,.7,.4,1]},{id:`u_secondary_color`,name:`Dune Shadow`,type:`color`,default:[.7,.5,.3,1]}]},br=e({default:()=>xr}),xr={id:`desert_rose`,name:`Desert Rose`,category:`Geology`,added:`2026-06-12`,description:`Intergrown bladed gypsum rosettes — sandy crystal petals radiating from clustered centres, edges catching the light, sand-blasted matrix between.`,shader:`
     vec2 hash2_dro(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -4106,7 +4213,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rosette_scale`,name:`Rosette Scale`,type:`float`,min:1.5,max:10,default:4},{id:`u_blade_count`,name:`Blade Count`,type:`float`,min:4,max:16,default:9},{id:`u_edge_glint`,name:`Edge Glint`,type:`float`,min:0,max:2,default:1},{id:`u_sand_color`,name:`Sand Color`,type:`color`,default:[.78,.62,.45,1]}]},gr=e({default:()=>_r}),_r={id:`diamond_plate_pro`,name:`Diamond Plate`,category:`Industrial`,added:`2026-04-15`,description:`Classic anti-slip safety metal floor texture.`,shader:`
+  `,uniforms:[{id:`u_rosette_scale`,name:`Rosette Scale`,type:`float`,min:1.5,max:10,default:4},{id:`u_blade_count`,name:`Blade Count`,type:`float`,min:4,max:16,default:9},{id:`u_edge_glint`,name:`Edge Glint`,type:`float`,min:0,max:2,default:1},{id:`u_sand_color`,name:`Sand Color`,type:`color`,default:[.78,.62,.45,1]}]},Sr=e({default:()=>Cr}),Cr={id:`diamond_plate_pro`,name:`Diamond Plate`,category:`Industrial`,added:`2026-04-15`,description:`Classic anti-slip safety metal floor texture.`,shader:`
     float diamond(vec2 p) {
       p = abs(p);
       return max(p.x * 2.5, p.y);
@@ -4127,7 +4234,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb += highlight;
       return color;
     }
-  `,uniforms:[{id:`u_scale`,name:`Plate Scale`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Diamond Face`,type:`color`,default:[.7,.7,.72,1]},{id:`u_secondary_color`,name:`Plate Base`,type:`color`,default:[.4,.4,.42,1]}]},vr=e({default:()=>yr}),yr={id:`diamond_quilt_artisan`,name:`Diamond Quilt`,category:`Abstract`,added:`2026-04-15`,description:`Stitched padded fabric effect with soft surface shading for luxury upholstery.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Plate Scale`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Diamond Face`,type:`color`,default:[.7,.7,.72,1]},{id:`u_secondary_color`,name:`Plate Base`,type:`color`,default:[.4,.4,.42,1]}]},wr=e({default:()=>Tr}),Tr={id:`diamond_quilt_artisan`,name:`Diamond Quilt`,category:`Abstract`,added:`2026-04-15`,description:`Stitched padded fabric effect with soft surface shading for luxury upholstery.`,shader:`
     vec4 generate() {
       mat2 m = mat2(0.707, -0.707, 0.707, 0.707);
       vec2 uv = m * v_uv * u_scale;
@@ -4136,7 +4243,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.5, 0.0, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Stitch Size`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Padding`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Stitch Deep`,type:`color`,default:[.5,.5,.6,1]}]},br=e({default:()=>xr}),xr={id:`diamond_stitch_v2_artisan`,name:`Pro Diamond Stitch`,category:`Racing`,added:`2026-04-16`,description:`Advanced padded upholstery with individual cross-stitching detail found in luxury GT cockpits.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Stitch Size`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Padding`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Stitch Deep`,type:`color`,default:[.5,.5,.6,1]}]},Er=e({default:()=>Dr}),Dr={id:`diamond_stitch_v2_artisan`,name:`Pro Diamond Stitch`,category:`Racing`,added:`2026-04-16`,description:`Advanced padded upholstery with individual cross-stitching detail found in luxury GT cockpits.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -4144,7 +4251,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.48, 0.5, d);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Diamond Size`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Padding`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Stitch Line`,type:`color`,default:[.4,0,0,1]}]},Sr=e({default:()=>Cr}),Cr={id:`diatom_shells_artisan`,name:`Diatom Shells`,category:`Natural`,added:`2026-04-15`,description:`Intricate microscopic silicate shells found in marine plankton formations.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Diamond Size`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Padding`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Stitch Line`,type:`color`,default:[.4,0,0,1]}]},Or=e({default:()=>kr}),kr={id:`diatom_shells_artisan`,name:`Diatom Shells`,category:`Natural`,added:`2026-04-15`,description:`Intricate microscopic silicate shells found in marine plankton formations.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float d = length(uv);
@@ -4152,13 +4259,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = sin(d * 10.0 + sin(angle * 8.0));
       return mix(u_secondary_color, u_primary_color, smoothstep(-0.5, 0.5, mask));
     }
-  `,uniforms:[{id:`u_scale`,name:`Shell Scale`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Silicate`,type:`color`,default:[.8,.9,1,1]},{id:`u_secondary_color`,name:`Marine Deep`,type:`color`,default:[0,.1,.2,1]}]},wr=e({default:()=>Tr}),Tr={id:`diffraction_grating_artisan`,name:`Diffraction Grating`,category:`Abstract`,added:`2026-04-15`,description:`Rainbow-like spectral interference bands mimicking light diffraction on surfaces.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shell Scale`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Silicate`,type:`color`,default:[.8,.9,1,1]},{id:`u_secondary_color`,name:`Marine Deep`,type:`color`,default:[0,.1,.2,1]}]},Ar=e({default:()=>jr}),jr={id:`diffraction_grating_artisan`,name:`Diffraction Grating`,category:`Abstract`,added:`2026-04-15`,description:`Rainbow-like spectral interference bands mimicking light diffraction on surfaces.`,shader:`
     vec4 generate() {
       float d = sin(v_uv.x * 500.0 + v_uv.y * 50.0);
       vec3 rainbow = vec3(0.5) + 0.5 * cos(vec3(0,2,4) + d * 3.14);
       return vec4(rainbow, 1.0);
     }
-  `,uniforms:[]},Er=e({default:()=>Dr}),Dr={id:`digi_camo_urban`,name:`Urban Digi Camo`,category:`Racing`,added:`2026-04-15`,description:`High-contrast city digital camouflage.`,shader:`
+  `,uniforms:[]},Mr=e({default:()=>Nr}),Nr={id:`digi_camo_urban`,name:`Urban Digi Camo`,category:`Racing`,added:`2026-04-15`,description:`High-contrast city digital camouflage.`,shader:`
     vec4 generate() {
       vec2 uv = floor(v_uv * u_scale);
       float n = hash(uv);
@@ -4168,12 +4275,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       else if (n > 0.2) color = u_color_3;
       return color;
     }
-  `,variants:[{name:`Urban (Default)`,uniforms:{u_color_base:[.5,.5,.5,1],u_color_1:[.1,.1,.1,1],u_color_2:[.3,.3,.3,1],u_color_3:[.7,.7,.7,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.08,.08,.09,1],u_color_1:[0,0,0,1],u_color_2:[.04,.04,.05,1],u_color_3:[.12,.12,.14,1]}}],uniforms:[{id:`u_scale`,name:`Detail`,type:`float`,min:10,max:100,default:50},{id:`u_color_base`,name:`Base`,type:`color`,default:[.5,.5,.5,1]},{id:`u_color_1`,name:`Dark`,type:`color`,default:[.1,.1,.1,1]},{id:`u_color_2`,name:`Mid`,type:`color`,default:[.3,.3,.3,1]},{id:`u_color_3`,name:`Light`,type:`color`,default:[.7,.7,.7,1]}]},Or=e({default:()=>kr}),kr={id:`digital_camo_v2_artisan`,name:`Ghost Camo`,category:`Racing`,added:`2026-04-16`,description:`Advanced multi-scale digital camouflage with low-visibility spectral patterns.`,shader:`
+  `,variants:[{name:`Urban (Default)`,uniforms:{u_color_base:[.5,.5,.5,1],u_color_1:[.1,.1,.1,1],u_color_2:[.3,.3,.3,1],u_color_3:[.7,.7,.7,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.08,.08,.09,1],u_color_1:[0,0,0,1],u_color_2:[.04,.04,.05,1],u_color_3:[.12,.12,.14,1]}}],uniforms:[{id:`u_scale`,name:`Detail`,type:`float`,min:10,max:100,default:50},{id:`u_color_base`,name:`Base`,type:`color`,default:[.5,.5,.5,1]},{id:`u_color_1`,name:`Dark`,type:`color`,default:[.1,.1,.1,1]},{id:`u_color_2`,name:`Mid`,type:`color`,default:[.3,.3,.3,1]},{id:`u_color_3`,name:`Light`,type:`color`,default:[.7,.7,.7,1]}]},Pr=e({default:()=>Fr}),Fr={id:`digital_camo_v2_artisan`,name:`Ghost Camo`,category:`Racing`,added:`2026-04-16`,description:`Advanced multi-scale digital camouflage with low-visibility spectral patterns.`,shader:`
     vec4 generate() {
       float n = hash(floor(v_uv * 10.0)) + hash(floor(v_uv * 40.0)) * 0.5;
       return mix(u_secondary_color, u_primary_color, n / 1.5);
     }
-  `,variants:[{name:`Ghost (Default)`,uniforms:{u_primary_color:[.3,.3,.35,1],u_secondary_color:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_primary_color:[.08,.08,.09,1],u_secondary_color:[0,0,0,1]}}],uniforms:[{id:`u_primary_color`,name:`Camo High`,type:`color`,default:[.3,.3,.35,1]},{id:`u_secondary_color`,name:`Camo Deep`,type:`color`,default:[.1,.1,.12,1]}]},Ar=e({default:()=>jr}),jr={id:`digital_glitch_pro`,name:`Digital Glitch`,category:`Abstract`,added:`2026-04-15`,description:`Static pixel shift and signal interference simulation.`,shader:`
+  `,variants:[{name:`Ghost (Default)`,uniforms:{u_primary_color:[.3,.3,.35,1],u_secondary_color:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_primary_color:[.08,.08,.09,1],u_secondary_color:[0,0,0,1]}}],uniforms:[{id:`u_primary_color`,name:`Camo High`,type:`color`,default:[.3,.3,.35,1]},{id:`u_secondary_color`,name:`Camo Deep`,type:`color`,default:[.1,.1,.12,1]}]},Ir=e({default:()=>Lr}),Lr={id:`digital_glitch_pro`,name:`Digital Glitch`,category:`Abstract`,added:`2026-04-15`,description:`Static pixel shift and signal interference simulation.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
@@ -4184,7 +4291,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.9, hash(floor(x * 10.0) + y));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Glitch Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Signal`,type:`color`,default:[0,1,.3,1]},{id:`u_secondary_color`,name:`Noise`,type:`color`,default:[.05,.05,.08,1]}]},Mr=e({default:()=>Nr}),Nr={id:`disco_ball`,name:`Disco Ball`,category:`Retro`,added:`2026-06-11`,description:`Mirror-tile skin of a spinning glitter ball — silvered facets each angled at a different light, coloured spots washing across them and four-point flares spiking off the hottest.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Glitch Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Signal`,type:`color`,default:[0,1,.3,1]},{id:`u_secondary_color`,name:`Noise`,type:`color`,default:[.05,.05,.08,1]}]},Rr=e({default:()=>zr}),zr={id:`disco_ball`,name:`Disco Ball`,category:`Retro`,added:`2026-06-11`,description:`Mirror-tile skin of a spinning glitter ball — silvered facets each angled at a different light, coloured spots washing across them and four-point flares spiking off the hottest.`,shader:`
     vec4 generate() {
       float facets = u_facets;
       vec2 uv = v_uv * facets;
@@ -4246,7 +4353,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_facets`,name:`Facet Count`,type:`float`,min:8,max:48,default:18},{id:`u_sparkle`,name:`Flare Intensity`,type:`float`,min:0,max:2,default:1},{id:`u_light_color`,name:`Spot Light`,type:`color`,default:[1,.4,.8,1]}]},Pr=e({default:()=>Fr}),Fr={id:`dna_helix`,name:`DNA Helix`,category:`Organic`,added:`2026-07-07`,description:`Double helix columns — two crossing strands joined by base-pair rungs.`,shader:`
+  `,uniforms:[{id:`u_facets`,name:`Facet Count`,type:`float`,min:8,max:48,default:18},{id:`u_sparkle`,name:`Flare Intensity`,type:`float`,min:0,max:2,default:1},{id:`u_light_color`,name:`Spot Light`,type:`color`,default:[1,.4,.8,1]}]},Br=e({default:()=>Vr}),Vr={id:`dna_helix`,name:`DNA Helix`,category:`Organic`,added:`2026-07-07`,description:`Double helix columns — two crossing strands joined by base-pair rungs.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float col_ = floor(uv.x);
@@ -4277,7 +4384,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb, frnt);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Helix Density`,type:`float`,min:2,max:12,default:4},{id:`u_twist`,name:`Twist Rate`,type:`float`,min:2,max:12,default:6},{id:`u_strand`,name:`Strand Weight`,type:`float`,min:.02,max:.12,default:.05},{id:`u_primary_color`,name:`Backbone`,type:`color`,default:[.85,.87,.9,1]},{id:`u_accent_color`,name:`Base Pair A-T`,type:`color`,default:[.2,.7,.85,1]},{id:`u_pop_color`,name:`Base Pair G-C`,type:`color`,default:[.95,.6,.2,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.05,.08,.14,1]}],variants:[{name:`Genome Lab`,uniforms:{u_primary_color:[.85,.87,.9,1],u_accent_color:[.2,.7,.85,1],u_pop_color:[.95,.6,.2,1],u_secondary_color:[.05,.08,.14,1]}},{name:`X-Ray Film`,uniforms:{u_primary_color:[.2,.22,.25,1],u_accent_color:[.45,.45,.48,1],u_pop_color:[.6,.6,.62,1],u_secondary_color:[.88,.87,.84,1]}},{name:`Neon Bio`,uniforms:{u_primary_color:[.3,.95,.6,1],u_accent_color:[.9,.3,.7,1],u_pop_color:[.95,.9,.2,1],u_secondary_color:[.04,.03,.08,1]}}]},Ir=e({default:()=>Lr}),Lr={id:`donegal_tweed`,name:`Donegal Tweed`,category:`Textile`,added:`2026-06-12`,description:`Irish Donegal tweed: a 2/2 woollen twill in heathered earth tones, salted with the trademark bright neps — little knots of red, gold, blue and white spun into the yarn.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Helix Density`,type:`float`,min:2,max:12,default:4},{id:`u_twist`,name:`Twist Rate`,type:`float`,min:2,max:12,default:6},{id:`u_strand`,name:`Strand Weight`,type:`float`,min:.02,max:.12,default:.05},{id:`u_primary_color`,name:`Backbone`,type:`color`,default:[.85,.87,.9,1]},{id:`u_accent_color`,name:`Base Pair A-T`,type:`color`,default:[.2,.7,.85,1]},{id:`u_pop_color`,name:`Base Pair G-C`,type:`color`,default:[.95,.6,.2,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.05,.08,.14,1]}],variants:[{name:`Genome Lab`,uniforms:{u_primary_color:[.85,.87,.9,1],u_accent_color:[.2,.7,.85,1],u_pop_color:[.95,.6,.2,1],u_secondary_color:[.05,.08,.14,1]}},{name:`X-Ray Film`,uniforms:{u_primary_color:[.2,.22,.25,1],u_accent_color:[.45,.45,.48,1],u_pop_color:[.6,.6,.62,1],u_secondary_color:[.88,.87,.84,1]}},{name:`Neon Bio`,uniforms:{u_primary_color:[.3,.95,.6,1],u_accent_color:[.9,.3,.7,1],u_pop_color:[.95,.9,.2,1],u_secondary_color:[.04,.03,.08,1]}}]},Hr=e({default:()=>Ur}),Ur={id:`donegal_tweed`,name:`Donegal Tweed`,category:`Textile`,added:`2026-06-12`,description:`Irish Donegal tweed: a 2/2 woollen twill in heathered earth tones, salted with the trademark bright neps — little knots of red, gold, blue and white spun into the yarn.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -4350,14 +4457,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_thread_freq`,name:`Thread Count`,type:`float`,min:40,max:160,default:90},{id:`u_fleck_density`,name:`Nep Density`,type:`float`,min:0,max:1,default:.6},{id:`u_wool_color`,name:`Wool Color`,type:`color`,default:[.45,.4,.33,1]}]},Rr=e({default:()=>zr}),zr={id:`door_panel_fabric_artisan`,name:`Panel Fabric`,category:`Racing`,added:`2026-04-16`,description:`Coarse interior textile weave found in lightweight door cards and racing interiors.`,shader:`
+  `,uniforms:[{id:`u_thread_freq`,name:`Thread Count`,type:`float`,min:40,max:160,default:90},{id:`u_fleck_density`,name:`Nep Density`,type:`float`,min:0,max:1,default:.6},{id:`u_wool_color`,name:`Wool Color`,type:`color`,default:[.45,.4,.33,1]}]},Wr=e({default:()=>Gr}),Gr={id:`door_panel_fabric_artisan`,name:`Panel Fabric`,category:`Racing`,added:`2026-04-16`,description:`Coarse interior textile weave found in lightweight door cards and racing interiors.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float lines = sin(uv.x * 2.0) * sin(uv.y * 2.0);
       float mask = smoothstep(-0.2, 0.2, lines);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:50,max:300,default:150},{id:`u_primary_color`,name:`Fiber Grain`,type:`color`,default:[.3,.3,.35,1]},{id:`u_secondary_color`,name:`Fabric Base`,type:`color`,default:[.15,.15,.2,1]}]},Br=e({default:()=>Vr}),Vr={id:`dragon_plate_artisan`,name:`Dragon Plate`,category:`Natural`,added:`2026-04-15`,description:`Thick, overlapping pointed armor-like scales with depth found in mythical creature hide.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:50,max:300,default:150},{id:`u_primary_color`,name:`Fiber Grain`,type:`color`,default:[.3,.3,.35,1]},{id:`u_secondary_color`,name:`Fabric Base`,type:`color`,default:[.15,.15,.2,1]}]},Kr=e({default:()=>qr}),qr={id:`dragon_plate_artisan`,name:`Dragon Plate`,category:`Natural`,added:`2026-04-15`,description:`Thick, overlapping pointed armor-like scales with depth found in mythical creature hide.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -4366,7 +4473,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.5, 0.48, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Plate Size`,type:`float`,min:5,max:25,default:12},{id:`u_primary_color`,name:`Plate Top`,type:`color`,default:[.3,0,.1,1]},{id:`u_secondary_color`,name:`Under Rim`,type:`color`,default:[.1,0,0,1]}]},Hr=e({default:()=>Ur}),Ur={id:`dragonfly_wing`,name:`Dragonfly Wing`,category:`Natural`,added:`2026-07-07`,description:`Translucent wing membrane — fine vein cells inside bold structural veins, with a soft iridescent sheen.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Plate Size`,type:`float`,min:5,max:25,default:12},{id:`u_primary_color`,name:`Plate Top`,type:`color`,default:[.3,0,.1,1]},{id:`u_secondary_color`,name:`Under Rim`,type:`color`,default:[.1,0,0,1]}]},Jr=e({default:()=>Yr}),Yr={id:`dragonfly_wing`,name:`Dragonfly Wing`,category:`Natural`,added:`2026-07-07`,description:`Translucent wing membrane — fine vein cells inside bold structural veins, with a soft iridescent sheen.`,shader:`
     float voroEdge(vec2 uv) {
       vec2 cell = floor(uv);
       float d1 = 8.0; float d2 = 8.0;
@@ -4400,7 +4507,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, u_primary_color.rgb * 0.6, stig * 0.5);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Density`,type:`float`,min:2,max:16,default:6},{id:`u_iridescence`,name:`Iridescence`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Veins`,type:`color`,default:[.15,.12,.08,1]},{id:`u_secondary_color`,name:`Membrane`,type:`color`,default:[.85,.88,.9,1]},{id:`u_accent_color`,name:`Sheen`,type:`color`,default:[.7,.85,1,1]}],variants:[{name:`Clear Wing`,uniforms:{u_primary_color:[.15,.12,.08,1],u_secondary_color:[.85,.88,.9,1],u_accent_color:[.7,.85,1,1],u_iridescence:.5}},{name:`Amber Darter`,uniforms:{u_primary_color:[.3,.15,.05,1],u_secondary_color:[.92,.8,.55,1],u_accent_color:[1,.65,.3,1],u_iridescence:.65}},{name:`Neon Damsel`,uniforms:{u_primary_color:[.05,.08,.12,1],u_secondary_color:[.1,.2,.3,1],u_accent_color:[.2,.95,.85,1],u_iridescence:.9}}]},Wr=e({default:()=>Gr}),Gr={id:`dry_stone_wall`,name:`Dry Stone Wall`,category:`Architecture`,added:`2026-07-07`,description:`Hand-stacked fieldstone courses — irregular stones, deep shadow joints, moss in the gaps.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Density`,type:`float`,min:2,max:16,default:6},{id:`u_iridescence`,name:`Iridescence`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Veins`,type:`color`,default:[.15,.12,.08,1]},{id:`u_secondary_color`,name:`Membrane`,type:`color`,default:[.85,.88,.9,1]},{id:`u_accent_color`,name:`Sheen`,type:`color`,default:[.7,.85,1,1]}],variants:[{name:`Clear Wing`,uniforms:{u_primary_color:[.15,.12,.08,1],u_secondary_color:[.85,.88,.9,1],u_accent_color:[.7,.85,1,1],u_iridescence:.5}},{name:`Amber Darter`,uniforms:{u_primary_color:[.3,.15,.05,1],u_secondary_color:[.92,.8,.55,1],u_accent_color:[1,.65,.3,1],u_iridescence:.65}},{name:`Neon Damsel`,uniforms:{u_primary_color:[.05,.08,.12,1],u_secondary_color:[.1,.2,.3,1],u_accent_color:[.2,.95,.85,1],u_iridescence:.9}}]},Xr=e({default:()=>Zr}),Zr={id:`dry_stone_wall`,name:`Dry Stone Wall`,category:`Architecture`,added:`2026-07-07`,description:`Hand-stacked fieldstone courses — irregular stones, deep shadow joints, moss in the gaps.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // courses of varying height
@@ -4431,7 +4538,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 c = mix(joint, rock, face);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Stone Density`,type:`float`,min:2,max:16,default:6},{id:`u_moss`,name:`Moss`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Stone`,type:`color`,default:[.6,.57,.52,1]},{id:`u_accent_color`,name:`Odd Stone`,type:`color`,default:[.5,.42,.36,1]},{id:`u_secondary_color`,name:`Joint Shadow`,type:`color`,default:[.1,.09,.08,1]}],variants:[{name:`Yorkshire Dales`,uniforms:{u_primary_color:[.6,.57,.52,1],u_accent_color:[.5,.42,.36,1],u_secondary_color:[.1,.09,.08,1],u_moss:.5}},{name:`Granite Coast`,uniforms:{u_primary_color:[.55,.56,.58,1],u_accent_color:[.65,.6,.55,1],u_secondary_color:[.12,.12,.13,1],u_moss:.2}},{name:`Red Sandstone`,uniforms:{u_primary_color:[.62,.4,.28,1],u_accent_color:[.7,.52,.35,1],u_secondary_color:[.14,.08,.05,1],u_moss:.35}}]},Kr=e({default:()=>qr}),qr={id:`eclipse_corona`,name:`Eclipse Corona`,category:`Cosmos`,added:`2026-06-11`,description:`Totality — a jet-black lunar disc ringed by a blazing chromosphere and wispy pearl-white coronal streamers raking into the dark.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Stone Density`,type:`float`,min:2,max:16,default:6},{id:`u_moss`,name:`Moss`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Stone`,type:`color`,default:[.6,.57,.52,1]},{id:`u_accent_color`,name:`Odd Stone`,type:`color`,default:[.5,.42,.36,1]},{id:`u_secondary_color`,name:`Joint Shadow`,type:`color`,default:[.1,.09,.08,1]}],variants:[{name:`Yorkshire Dales`,uniforms:{u_primary_color:[.6,.57,.52,1],u_accent_color:[.5,.42,.36,1],u_secondary_color:[.1,.09,.08,1],u_moss:.5}},{name:`Granite Coast`,uniforms:{u_primary_color:[.55,.56,.58,1],u_accent_color:[.65,.6,.55,1],u_secondary_color:[.12,.12,.13,1],u_moss:.2}},{name:`Red Sandstone`,uniforms:{u_primary_color:[.62,.4,.28,1],u_accent_color:[.7,.52,.35,1],u_secondary_color:[.14,.08,.05,1],u_moss:.35}}]},Qr=e({default:()=>$r}),$r={id:`eclipse_corona`,name:`Eclipse Corona`,category:`Cosmos`,added:`2026-06-11`,description:`Totality — a jet-black lunar disc ringed by a blazing chromosphere and wispy pearl-white coronal streamers raking into the dark.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv) - 0.5;
       float r = length(uv) * 2.0;
@@ -4496,7 +4603,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_disc_size`,name:`Disc Size`,type:`float`,min:.15,max:.55,default:.32},{id:`u_corona_reach`,name:`Corona Reach`,type:`float`,min:.3,max:2.5,default:1},{id:`u_streamers`,name:`Streamer Bias`,type:`float`,min:0,max:1,default:.7},{id:`u_diamond`,name:`Diamond Ring`,type:`float`,min:0,max:2,default:.8}]},Jr=e({default:()=>Yr}),Yr={id:`eight_bit_clouds`,name:`8-Bit Clouds`,category:`Retro`,added:`2026-06-11`,description:`Side-scroller sky straight off a 1985 cartridge — chunky white clouds with navy outlines and powder-blue undersides drifting over banded NES blue.`,shader:`
+  `,uniforms:[{id:`u_disc_size`,name:`Disc Size`,type:`float`,min:.15,max:.55,default:.32},{id:`u_corona_reach`,name:`Corona Reach`,type:`float`,min:.3,max:2.5,default:1},{id:`u_streamers`,name:`Streamer Bias`,type:`float`,min:0,max:1,default:.7},{id:`u_diamond`,name:`Diamond Ring`,type:`float`,min:0,max:2,default:.8}]},ei=e({default:()=>ti}),ti={id:`eight_bit_clouds`,name:`8-Bit Clouds`,category:`Retro`,added:`2026-06-11`,description:`Side-scroller sky straight off a 1985 cartridge — chunky white clouds with navy outlines and powder-blue undersides drifting over banded NES blue.`,shader:`
     float cloudfield_ebc(vec2 p) {
       return noise(p * 1.5) * 0.60 + noise(p * 3.0 + 4.7) * 0.30 + noise(p * 6.0 + 9.3) * 0.10;
     }
@@ -4547,7 +4654,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_pixels`,name:`Pixel Grid`,type:`float`,min:24,max:96,default:48},{id:`u_cover`,name:`Cloud Cover`,type:`float`,min:.1,max:1,default:.55},{id:`u_sky_color`,name:`Sky Blue`,type:`color`,default:[.36,.58,.98,1]}]},Xr=e({default:()=>Zr}),Zr={id:`energy_shield_artisan`,name:`Phase Shield`,category:`Abstract`,added:`2026-04-16`,description:`Hexagonal-linked energy barrier pattern with high-frequency interference patterns.`,shader:`
+  `,uniforms:[{id:`u_pixels`,name:`Pixel Grid`,type:`float`,min:24,max:96,default:48},{id:`u_cover`,name:`Cloud Cover`,type:`float`,min:.1,max:1,default:.55},{id:`u_sky_color`,name:`Sky Blue`,type:`color`,default:[.36,.58,.98,1]}]},ni=e({default:()=>ri}),ri={id:`energy_shield_artisan`,name:`Phase Shield`,category:`Abstract`,added:`2026-04-16`,description:`Hexagonal-linked energy barrier pattern with high-frequency interference patterns.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -4556,7 +4663,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.48, 0.5, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Shield Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Ion Glow`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Hardlight Base`,type:`color`,default:[0,.1,.2,1]}]},Qr=e({default:()=>$r}),$r={id:`engine_turned_guilloche`,name:`Engine Turning`,category:`Industrial`,added:`2026-07-07`,description:`Overlapping abraded swirl discs — the jeweled dashboard finish of vintage racers and warbirds.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shield Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Ion Glow`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Hardlight Base`,type:`color`,default:[0,.1,.2,1]}]},ii=e({default:()=>ai}),ai={id:`engine_turned_guilloche`,name:`Engine Turning`,category:`Industrial`,added:`2026-07-07`,description:`Overlapping abraded swirl discs — the jeweled dashboard finish of vintage racers and warbirds.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // staggered rows of swirl centers, later rows overlap earlier ones
@@ -4579,20 +4686,20 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(u_secondary_color.rgb, col.rgb, smoothstep(0.78, 0.72, r));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Disc Density`,type:`float`,min:3,max:24,default:8},{id:`u_grain`,name:`Swirl Fineness`,type:`float`,min:4,max:30,default:12},{id:`u_shine`,name:`Sheen`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Metal`,type:`color`,default:[.75,.76,.78,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.5,.5,.52,1]}],variants:[{name:`Spirit of St Louis`,uniforms:{u_primary_color:[.75,.76,.78,1],u_secondary_color:[.5,.5,.52,1],u_grain:12,u_shine:.6}},{name:`Brass Dash`,uniforms:{u_primary_color:[.8,.62,.3,1],u_secondary_color:[.55,.4,.18,1],u_grain:14,u_shine:.75}},{name:`Smoked Turn`,uniforms:{u_primary_color:[.32,.33,.36,1],u_secondary_color:[.18,.18,.2,1],u_grain:10,u_shine:.9}}]},ei=e({default:()=>ti}),ti={id:`etched_brass_artisan`,name:`Etched Brass`,category:`Industrial`,added:`2026-04-16`,description:`Victorian-style chemical etching and ornate brass panel patterns.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Disc Density`,type:`float`,min:3,max:24,default:8},{id:`u_grain`,name:`Swirl Fineness`,type:`float`,min:4,max:30,default:12},{id:`u_shine`,name:`Sheen`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Metal`,type:`color`,default:[.75,.76,.78,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.5,.5,.52,1]}],variants:[{name:`Spirit of St Louis`,uniforms:{u_primary_color:[.75,.76,.78,1],u_secondary_color:[.5,.5,.52,1],u_grain:12,u_shine:.6}},{name:`Brass Dash`,uniforms:{u_primary_color:[.8,.62,.3,1],u_secondary_color:[.55,.4,.18,1],u_grain:14,u_shine:.75}},{name:`Smoked Turn`,uniforms:{u_primary_color:[.32,.33,.36,1],u_secondary_color:[.18,.18,.2,1],u_grain:10,u_shine:.9}}]},oi=e({default:()=>si}),si={id:`etched_brass_artisan`,name:`Etched Brass`,category:`Industrial`,added:`2026-04-16`,description:`Victorian-style chemical etching and ornate brass panel patterns.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * 10.0;
       float lines = sin(uv.x) * sin(uv.y) + sin(uv.x * 2.0) * cos(uv.y * 2.0);
       float mask = step(0.5, lines);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Brass High`,type:`color`,default:[.8,.6,.2,1]},{id:`u_secondary_color`,name:`Etched Deep`,type:`color`,default:[.4,.3,.1,1]}]},ni=e({default:()=>ri}),ri={id:`exhaust_heat_artisan`,name:`Exhaust Bluing`,category:`Industrial`,added:`2026-04-16`,description:`Wavy prismatic heat seasoning found on high-temperature titanium and steel exhaust systems.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Brass High`,type:`color`,default:[.8,.6,.2,1]},{id:`u_secondary_color`,name:`Etched Deep`,type:`color`,default:[.4,.3,.1,1]}]},ci=e({default:()=>li}),li={id:`exhaust_heat_artisan`,name:`Exhaust Bluing`,category:`Industrial`,added:`2026-04-16`,description:`Wavy prismatic heat seasoning found on high-temperature titanium and steel exhaust systems.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 5.0);
       vec3 col = 0.5 + 0.5 * cos(3.14159 * (n + vec3(0, 0.2, 0.4)));
       return vec4(col, 1.0);
     }
-  `,uniforms:[]},ii=e({default:()=>ai}),ai={id:`expanded_grating_pro`,name:`Expanded Metal`,category:`Industrial`,added:`2026-04-15`,description:`Expanded-metal walkway grating — staggered diamond apertures with twisted, light-catching strands.`,shader:`
+  `,uniforms:[]},ui=e({default:()=>di}),di={id:`expanded_grating_pro`,name:`Expanded Metal`,category:`Industrial`,added:`2026-04-15`,description:`Expanded-metal walkway grating — staggered diamond apertures with twisted, light-catching strands.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // expanded metal is a staggered bond: offset alternate rows half a cell
@@ -4613,7 +4720,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 col = mix(ap, rib, hole);
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:5,max:50,default:14},{id:`u_primary_color`,name:`Steel Rib`,type:`color`,default:[.55,.56,.6,1]},{id:`u_secondary_color`,name:`Aperture`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Walkway`,uniforms:{u_primary_color:[.55,.56,.6,1],u_secondary_color:[.04,.04,.05,1],u_scale:14}},{name:`Rusted Catwalk`,uniforms:{u_primary_color:[.5,.32,.2,1],u_secondary_color:[.06,.03,.02,1],u_scale:12}},{name:`Anodized Grille`,uniforms:{u_primary_color:[.2,.22,.28,1],u_secondary_color:[.02,.02,.03,1],u_scale:24}}]},oi=e({default:()=>si}),si={id:`exposed_aggregate`,name:`Exposed Aggregate`,category:`Natural`,added:`2026-05-01`,description:`Exposed aggregate concrete with embedded smooth pebbles in warm stone colors set in a dark cement matrix.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:5,max:50,default:14},{id:`u_primary_color`,name:`Steel Rib`,type:`color`,default:[.55,.56,.6,1]},{id:`u_secondary_color`,name:`Aperture`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Walkway`,uniforms:{u_primary_color:[.55,.56,.6,1],u_secondary_color:[.04,.04,.05,1],u_scale:14}},{name:`Rusted Catwalk`,uniforms:{u_primary_color:[.5,.32,.2,1],u_secondary_color:[.06,.03,.02,1],u_scale:12}},{name:`Anodized Grille`,uniforms:{u_primary_color:[.2,.22,.28,1],u_secondary_color:[.02,.02,.03,1],u_scale:24}}]},fi=e({default:()=>pi}),pi={id:`exposed_aggregate`,name:`Exposed Aggregate`,category:`Natural`,added:`2026-05-01`,description:`Exposed aggregate concrete with embedded smooth pebbles in warm stone colors set in a dark cement matrix.`,shader:`
     // --- helpers BEFORE generate() ---
 
     vec2 voronoi_rand_ea(vec2 p) {
@@ -4722,7 +4829,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_stone_size`,name:`Aggregate Density`,type:`float`,min:2,max:20,default:8},{id:`u_cement_color`,name:`Cement Color`,type:`color`,default:[.25,.24,.23,1]},{id:`u_grout_width`,name:`Cement Gap Width`,type:`float`,min:.02,max:.15,default:.06}]},ci=e({default:()=>li}),li={id:`fair_isle_knit`,name:`Fair Isle Knit`,category:`Textile`,added:`2026-06-12`,description:`Stranded Fair Isle knitting: banded rows of diamond, cross and zigzag motifs built stitch-by-stitch from visible knit Vs in heathered Shetland wool.`,shader:`
+  `,uniforms:[{id:`u_stone_size`,name:`Aggregate Density`,type:`float`,min:2,max:20,default:8},{id:`u_cement_color`,name:`Cement Color`,type:`color`,default:[.25,.24,.23,1]},{id:`u_grout_width`,name:`Cement Gap Width`,type:`float`,min:.02,max:.15,default:.06}]},mi=e({default:()=>hi}),hi={id:`fair_isle_knit`,name:`Fair Isle Knit`,category:`Textile`,added:`2026-06-12`,description:`Stranded Fair Isle knitting: banded rows of diamond, cross and zigzag motifs built stitch-by-stitch from visible knit Vs in heathered Shetland wool.`,shader:`
     float tri_fik(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -4804,7 +4911,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_stitches`,name:`Stitches Across`,type:`float`,min:12,max:60,default:28},{id:`u_ground_color`,name:`Ground Wool`,type:`color`,default:[.85,.8,.7,1]},{id:`u_motif_color`,name:`Motif Wool`,type:`color`,default:[.45,.16,.14,1]}]},ui=e({default:()=>di}),di={id:`fern_fronds`,name:`Fern Fronds`,category:`Natural`,added:`2026-07-07`,description:`Arched fern stems with combed leaflets tapering to the tip, layered over forest shade.`,shader:`
+  `,uniforms:[{id:`u_stitches`,name:`Stitches Across`,type:`float`,min:12,max:60,default:28},{id:`u_ground_color`,name:`Ground Wool`,type:`color`,default:[.85,.8,.7,1]},{id:`u_motif_color`,name:`Motif Wool`,type:`color`,default:[.45,.16,.14,1]}]},gi=e({default:()=>_i}),_i={id:`fern_fronds`,name:`Fern Fronds`,category:`Natural`,added:`2026-07-07`,description:`Arched fern stems with combed leaflets tapering to the tip, layered over forest shade.`,shader:`
     // distance shading for one frond within a cell, p in -0.5..0.5
     float frond(vec2 p, float seed) {
       // arch the stem: x follows a parabola of y
@@ -4837,20 +4944,20 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Frond Density`,type:`float`,min:2,max:12,default:5},{id:`u_primary_color`,name:`Frond Green`,type:`color`,default:[.2,.45,.22,1]},{id:`u_accent_color`,name:`New Growth`,type:`color`,default:[.45,.65,.3,1]},{id:`u_secondary_color`,name:`Forest Shade`,type:`color`,default:[.06,.1,.07,1]}],variants:[{name:`Understory`,uniforms:{u_primary_color:[.2,.45,.22,1],u_accent_color:[.45,.65,.3,1],u_secondary_color:[.06,.1,.07,1]}},{name:`Autumn Bracken`,uniforms:{u_primary_color:[.6,.4,.15,1],u_accent_color:[.75,.55,.25,1],u_secondary_color:[.14,.09,.05,1]}},{name:`Botanical Print`,uniforms:{u_primary_color:[.15,.25,.3,1],u_accent_color:[.3,.45,.5,1],u_secondary_color:[.93,.9,.84,1]}}]},fi=e({default:()=>pi}),pi={id:`fiber_optic_bundle_artisan`,name:`Fiber Bundle`,category:`Technology`,added:`2026-04-16`,description:`Glowing bundles of light-conducting strands found in high-speed data transmission systems.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Frond Density`,type:`float`,min:2,max:12,default:5},{id:`u_primary_color`,name:`Frond Green`,type:`color`,default:[.2,.45,.22,1]},{id:`u_accent_color`,name:`New Growth`,type:`color`,default:[.45,.65,.3,1]},{id:`u_secondary_color`,name:`Forest Shade`,type:`color`,default:[.06,.1,.07,1]}],variants:[{name:`Understory`,uniforms:{u_primary_color:[.2,.45,.22,1],u_accent_color:[.45,.65,.3,1],u_secondary_color:[.06,.1,.07,1]}},{name:`Autumn Bracken`,uniforms:{u_primary_color:[.6,.4,.15,1],u_accent_color:[.75,.55,.25,1],u_secondary_color:[.14,.09,.05,1]}},{name:`Botanical Print`,uniforms:{u_primary_color:[.15,.25,.3,1],u_accent_color:[.3,.45,.5,1],u_secondary_color:[.93,.9,.84,1]}}]},vi=e({default:()=>yi}),yi={id:`fiber_optic_bundle_artisan`,name:`Fiber Bundle`,category:`Technology`,added:`2026-04-16`,description:`Glowing bundles of light-conducting strands found in high-speed data transmission systems.`,shader:`
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
       float n = hash(vec2(y, y));
       float strand = step(0.1, fract(v_uv.x * 5.0 + n));
       return mix(u_secondary_color, u_primary_color, strand);
     }
-  `,uniforms:[{id:`u_scale`,name:`Strand Density`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Optic Glow`,type:`color`,default:[.2,1,1,1]},{id:`u_secondary_color`,name:`Dark Cladding`,type:`color`,default:[0,.05,.1,1]}]},mi=e({default:()=>hi}),hi={id:`fingerprint_swirls_artisan`,name:`Fingerprint Swirls`,category:`Natural`,added:`2026-04-15`,description:`Swirling organic ridge patterns mimicking human dermatoglyphics.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Strand Density`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Optic Glow`,type:`color`,default:[.2,1,1,1]},{id:`u_secondary_color`,name:`Dark Cladding`,type:`color`,default:[0,.05,.1,1]}]},bi=e({default:()=>xi}),xi={id:`fingerprint_swirls_artisan`,name:`Fingerprint Swirls`,category:`Natural`,added:`2026-04-15`,description:`Swirling organic ridge patterns mimicking human dermatoglyphics.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * u_scale + noise(v_uv * 5.0) * 2.0);
       float mask = sin(n * 20.0);
       return mix(u_secondary_color, u_primary_color, smoothstep(-0.5, 0.5, mask));
     }
-  `,uniforms:[{id:`u_scale`,name:`Ridge Detail`,type:`float`,min:2,max:15,default:5},{id:`u_primary_color`,name:`Ridge`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Valley`,type:`color`,default:[.95,.9,.85,1]}]},gi=e({default:()=>_i}),_i={id:`finish_line_fade`,name:`Finish Line Fade`,category:`Heritage`,added:`2026-06-12`,description:`Chequered flag dissolving upward into a halftone scatter — solid squares break into shrinking print dots, with screen-angle rotation and ink bleed on the last survivors.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Ridge Detail`,type:`float`,min:2,max:15,default:5},{id:`u_primary_color`,name:`Ridge`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Valley`,type:`color`,default:[.95,.9,.85,1]}]},Si=e({default:()=>Ci}),Ci={id:`finish_line_fade`,name:`Finish Line Fade`,category:`Heritage`,added:`2026-06-12`,description:`Chequered flag dissolving upward into a halftone scatter — solid squares break into shrinking print dots, with screen-angle rotation and ink bleed on the last survivors.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -4919,7 +5026,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_checker_count`,name:`Chequer Count`,type:`float`,min:4,max:20,default:9},{id:`u_fade_span`,name:`Fade Span`,type:`float`,min:.3,max:1,default:.75},{id:`u_ink_color`,name:`Chequer Ink`,type:`color`,default:[.08,.08,.1,1]},{id:`u_base_color`,name:`Body Colour`,type:`color`,default:[.92,.9,.85,1]}]},vi=e({default:()=>yi}),yi={id:`fire_opal`,name:`Fire Opal`,category:`Geology`,added:`2026-06-12`,description:`Milky opal body with play-of-color — irregular patches flashing saturated spectral hues out of a warm translucent matrix.`,shader:`
+  `,uniforms:[{id:`u_checker_count`,name:`Chequer Count`,type:`float`,min:4,max:20,default:9},{id:`u_fade_span`,name:`Fade Span`,type:`float`,min:.3,max:1,default:.75},{id:`u_ink_color`,name:`Chequer Ink`,type:`color`,default:[.08,.08,.1,1]},{id:`u_base_color`,name:`Body Colour`,type:`color`,default:[.92,.9,.85,1]}]},wi=e({default:()=>Ti}),Ti={id:`fire_opal`,name:`Fire Opal`,category:`Geology`,added:`2026-06-12`,description:`Milky opal body with play-of-color — irregular patches flashing saturated spectral hues out of a warm translucent matrix.`,shader:`
     vec2 hash2_fop(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -4990,7 +5097,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_patch_scale`,name:`Patch Scale`,type:`float`,min:2,max:20,default:7},{id:`u_fire_intensity`,name:`Fire Intensity`,type:`float`,min:0,max:1.5,default:.9},{id:`u_fire_coverage`,name:`Fire Coverage`,type:`float`,min:.1,max:1,default:.55},{id:`u_body_color`,name:`Body Color`,type:`color`,default:[.96,.78,.62,1]}]},bi=e({default:()=>xi}),xi={id:`fish_scales_artisan`,name:`Fish Scales`,category:`Natural`,added:`2026-04-15`,description:`Round, thin overlapping semi-circles found in aquatic life and reflective armor.`,shader:`
+  `,uniforms:[{id:`u_patch_scale`,name:`Patch Scale`,type:`float`,min:2,max:20,default:7},{id:`u_fire_intensity`,name:`Fire Intensity`,type:`float`,min:0,max:1.5,default:.9},{id:`u_fire_coverage`,name:`Fire Coverage`,type:`float`,min:.1,max:1,default:.55},{id:`u_body_color`,name:`Body Color`,type:`color`,default:[.96,.78,.62,1]}]},Ei=e({default:()=>Di}),Di={id:`fish_scales_artisan`,name:`Fish Scales`,category:`Natural`,added:`2026-04-15`,description:`Round, thin overlapping semi-circles found in aquatic life and reflective armor.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -4999,7 +5106,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.5, 0.45, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Scale Body`,type:`color`,default:[.4,.6,.7,.8]},{id:`u_secondary_color`,name:`Joint Shadow`,type:`color`,default:[.1,.2,.3,1]}]},Si=e({default:()=>Ci}),Ci={id:`fishing_net`,name:`Fishing Net`,category:`Ocean`,added:`2026-07-07`,description:`Knotted rope netting sagging in diamond meshes, with corks bobbing on the top lines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Scale Body`,type:`color`,default:[.4,.6,.7,.8]},{id:`u_secondary_color`,name:`Joint Shadow`,type:`color`,default:[.1,.2,.3,1]}]},Oi=e({default:()=>ki}),ki={id:`fishing_net`,name:`Fishing Net`,category:`Ocean`,added:`2026-07-07`,description:`Knotted rope netting sagging in diamond meshes, with corks bobbing on the top lines.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // sag the net: vertical droop between anchor points
@@ -5030,7 +5137,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_accent_color.rgb * (0.8 + 0.4 * fc.y), cork * u_corks);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:2,max:20,default:7},{id:`u_rope`,name:`Rope Weight`,type:`float`,min:.02,max:.12,default:.05},{id:`u_sag`,name:`Sag`,type:`float`,min:0,max:1,default:.5},{id:`u_corks`,name:`Cork Floats`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Rope`,type:`color`,default:[.78,.68,.5,1]},{id:`u_accent_color`,name:`Corks`,type:`color`,default:[.8,.35,.15,1]},{id:`u_secondary_color`,name:`Water`,type:`color`,default:[.06,.2,.28,1]}],variants:[{name:`Harbor Net`,uniforms:{u_primary_color:[.78,.68,.5,1],u_accent_color:[.8,.35,.15,1],u_secondary_color:[.06,.2,.28,1],u_corks:.6}},{name:`Deep Trawl`,uniforms:{u_primary_color:[.3,.5,.4,1],u_accent_color:[.9,.75,.2,1],u_secondary_color:[.02,.08,.14,1],u_corks:.3}},{name:`Ghost Net`,uniforms:{u_primary_color:[.7,.75,.78,1],u_accent_color:[.5,.55,.6,1],u_secondary_color:[.1,.12,.16,1],u_corks:0}}]},wi=e({default:()=>Ti}),Ti={id:`flecktarn_camo`,name:`Flecktarn Camo`,category:`Organic`,added:`2026-05-12`,description:`A complex pattern consisting of small, densely packed spots and dots that create a disruptive, noisy texture.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Mesh Density`,type:`float`,min:2,max:20,default:7},{id:`u_rope`,name:`Rope Weight`,type:`float`,min:.02,max:.12,default:.05},{id:`u_sag`,name:`Sag`,type:`float`,min:0,max:1,default:.5},{id:`u_corks`,name:`Cork Floats`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Rope`,type:`color`,default:[.78,.68,.5,1]},{id:`u_accent_color`,name:`Corks`,type:`color`,default:[.8,.35,.15,1]},{id:`u_secondary_color`,name:`Water`,type:`color`,default:[.06,.2,.28,1]}],variants:[{name:`Harbor Net`,uniforms:{u_primary_color:[.78,.68,.5,1],u_accent_color:[.8,.35,.15,1],u_secondary_color:[.06,.2,.28,1],u_corks:.6}},{name:`Deep Trawl`,uniforms:{u_primary_color:[.3,.5,.4,1],u_accent_color:[.9,.75,.2,1],u_secondary_color:[.02,.08,.14,1],u_corks:.3}},{name:`Ghost Net`,uniforms:{u_primary_color:[.7,.75,.78,1],u_accent_color:[.5,.55,.6,1],u_secondary_color:[.1,.12,.16,1],u_corks:0}}]},Ai=e({default:()=>ji}),ji={id:`flecktarn_camo`,name:`Flecktarn Camo`,category:`Organic`,added:`2026-05-12`,description:`A complex pattern consisting of small, densely packed spots and dots that create a disruptive, noisy texture.`,shader:`
     
     // Cellular noise for dots
     vec2 random2( vec2 p ) {
@@ -5070,7 +5177,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Flecktarn (Woodland)`,uniforms:{u_color_base:[.35,.4,.25,1],u_color_1:[.25,.3,.2,1],u_color_2:[.45,.35,.25,1],u_color_3:[.25,.15,.1,1],u_color_4:[.1,.1,.1,1]}},{name:`Tropentarn (Desert)`,uniforms:{u_color_base:[.75,.65,.5,1],u_color_1:[.65,.55,.4,1],u_color_2:[.45,.5,.35,1],u_color_3:[.35,.25,.15,1],u_color_4:[.15,.15,.15,1]}},{name:`Urban Mottled`,uniforms:{u_color_base:[.6,.6,.65,1],u_color_1:[.4,.4,.45,1],u_color_2:[.3,.3,.35,1],u_color_3:[.2,.2,.25,1],u_color_4:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.12,.12,.12,1],u_color_2:[.08,.08,.08,1],u_color_3:[.05,.05,.05,1],u_color_4:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Spot Scale`,type:`float`,min:5,max:40,default:15},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.35,.4,.25,1]},{id:`u_color_1`,name:`Blob Color`,type:`color`,default:[.25,.3,.2,1]},{id:`u_color_2`,name:`Spot 1`,type:`color`,default:[.45,.35,.25,1]},{id:`u_color_3`,name:`Spot 2`,type:`color`,default:[.25,.15,.1,1]},{id:`u_color_4`,name:`Spot 3`,type:`color`,default:[.1,.1,.1,1]}]},Ei=e({default:()=>Di}),Di={id:`flow_field_streams`,name:`Flow Field Streams`,category:`Abstract`,added:`2026-07-07`,description:`Generative streamlines — thousands of fine strands combed along an invisible flow field.`,shader:`
+  `,variants:[{name:`Flecktarn (Woodland)`,uniforms:{u_color_base:[.35,.4,.25,1],u_color_1:[.25,.3,.2,1],u_color_2:[.45,.35,.25,1],u_color_3:[.25,.15,.1,1],u_color_4:[.1,.1,.1,1]}},{name:`Tropentarn (Desert)`,uniforms:{u_color_base:[.75,.65,.5,1],u_color_1:[.65,.55,.4,1],u_color_2:[.45,.5,.35,1],u_color_3:[.35,.25,.15,1],u_color_4:[.15,.15,.15,1]}},{name:`Urban Mottled`,uniforms:{u_color_base:[.6,.6,.65,1],u_color_1:[.4,.4,.45,1],u_color_2:[.3,.3,.35,1],u_color_3:[.2,.2,.25,1],u_color_4:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.12,.12,.12,1],u_color_2:[.08,.08,.08,1],u_color_3:[.05,.05,.05,1],u_color_4:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Spot Scale`,type:`float`,min:5,max:40,default:15},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.35,.4,.25,1]},{id:`u_color_1`,name:`Blob Color`,type:`color`,default:[.25,.3,.2,1]},{id:`u_color_2`,name:`Spot 1`,type:`color`,default:[.45,.35,.25,1]},{id:`u_color_3`,name:`Spot 2`,type:`color`,default:[.25,.15,.1,1]},{id:`u_color_4`,name:`Spot 3`,type:`color`,default:[.1,.1,.1,1]}]},Mi=e({default:()=>Ni}),Ni={id:`flow_field_streams`,name:`Flow Field Streams`,category:`Abstract`,added:`2026-07-07`,description:`Generative streamlines — thousands of fine strands combed along an invisible flow field.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // domain-warp the coordinates twice for a flowing look
@@ -5088,7 +5195,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c += u_accent_color.rgb * smoothstep(0.92, 1.0, strands) * 0.35;
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Field Scale`,type:`float`,min:1,max:10,default:3.5},{id:`u_warp`,name:`Flow Strength`,type:`float`,min:.5,max:5,default:2.2},{id:`u_lines`,name:`Strand Count`,type:`float`,min:2,max:20,default:8},{id:`u_secondary_color`,name:`Deep`,type:`color`,default:[.05,.06,.12,1]},{id:`u_primary_color`,name:`Streams`,type:`color`,default:[.25,.55,.75,1]},{id:`u_accent_color`,name:`Crest`,type:`color`,default:[.85,.9,.95,1]}],variants:[{name:`Ocean Current`,uniforms:{u_secondary_color:[.05,.06,.12,1],u_primary_color:[.25,.55,.75,1],u_accent_color:[.85,.9,.95,1],u_warp:2.2}},{name:`Magma Flow`,uniforms:{u_secondary_color:[.1,.03,.02,1],u_primary_color:[.8,.3,.08,1],u_accent_color:[1,.85,.4,1],u_warp:3}},{name:`Ink Wash`,uniforms:{u_secondary_color:[.92,.91,.88,1],u_primary_color:[.35,.37,.42,1],u_accent_color:[.12,.12,.15,1],u_warp:1.6}}]},Oi=e({default:()=>ki}),ki={id:`flower_of_life`,name:`Flower of Life`,category:`Geometric`,added:`2026-07-07`,description:`Overlapping circle lattice on a triangular grid — the sacred geometry rosette field.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Field Scale`,type:`float`,min:1,max:10,default:3.5},{id:`u_warp`,name:`Flow Strength`,type:`float`,min:.5,max:5,default:2.2},{id:`u_lines`,name:`Strand Count`,type:`float`,min:2,max:20,default:8},{id:`u_secondary_color`,name:`Deep`,type:`color`,default:[.05,.06,.12,1]},{id:`u_primary_color`,name:`Streams`,type:`color`,default:[.25,.55,.75,1]},{id:`u_accent_color`,name:`Crest`,type:`color`,default:[.85,.9,.95,1]}],variants:[{name:`Ocean Current`,uniforms:{u_secondary_color:[.05,.06,.12,1],u_primary_color:[.25,.55,.75,1],u_accent_color:[.85,.9,.95,1],u_warp:2.2}},{name:`Magma Flow`,uniforms:{u_secondary_color:[.1,.03,.02,1],u_primary_color:[.8,.3,.08,1],u_accent_color:[1,.85,.4,1],u_warp:3}},{name:`Ink Wash`,uniforms:{u_secondary_color:[.92,.91,.88,1],u_primary_color:[.35,.37,.42,1],u_accent_color:[.12,.12,.15,1],u_warp:1.6}}]},Pi=e({default:()=>Fi}),Fi={id:`flower_of_life`,name:`Flower of Life`,category:`Geometric`,added:`2026-07-07`,description:`Overlapping circle lattice on a triangular grid — the sacred geometry rosette field.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // triangular lattice of circle centers
@@ -5114,7 +5221,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb *= 0.94 + 0.06 * sin(d * 6.0);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Circle Density`,type:`float`,min:2,max:16,default:6},{id:`u_line`,name:`Line Weight`,type:`float`,min:.01,max:.1,default:.03},{id:`u_glow`,name:`Glow`,type:`float`,min:0,max:1,default:.3},{id:`u_primary_color`,name:`Lines`,type:`color`,default:[.85,.75,.45,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.1,.16,1]}],variants:[{name:`Temple Gold`,uniforms:{u_primary_color:[.85,.75,.45,1],u_secondary_color:[.12,.1,.16,1],u_glow:.3}},{name:`Chalk Mandala`,uniforms:{u_primary_color:[.92,.92,.9,1],u_secondary_color:[.2,.22,.25,1],u_glow:0}},{name:`Aurora Grid`,uniforms:{u_primary_color:[.3,.9,.75,1],u_secondary_color:[.04,.07,.1,1],u_glow:.8}}]},Ai=e({default:()=>ji}),ji={id:`fluid_marbling_pro`,name:`Fluid Marbling`,category:`Abstract`,added:`2026-04-15`,description:`Organic static liquid flow with colorful mineral-like marbling.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Circle Density`,type:`float`,min:2,max:16,default:6},{id:`u_line`,name:`Line Weight`,type:`float`,min:.01,max:.1,default:.03},{id:`u_glow`,name:`Glow`,type:`float`,min:0,max:1,default:.3},{id:`u_primary_color`,name:`Lines`,type:`color`,default:[.85,.75,.45,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.1,.16,1]}],variants:[{name:`Temple Gold`,uniforms:{u_primary_color:[.85,.75,.45,1],u_secondary_color:[.12,.1,.16,1],u_glow:.3}},{name:`Chalk Mandala`,uniforms:{u_primary_color:[.92,.92,.9,1],u_secondary_color:[.2,.22,.25,1],u_glow:0}},{name:`Aurora Grid`,uniforms:{u_primary_color:[.3,.9,.75,1],u_secondary_color:[.04,.07,.1,1],u_glow:.8}}]},Ii=e({default:()=>Li}),Li={id:`fluid_marbling_pro`,name:`Fluid Marbling`,category:`Abstract`,added:`2026-04-15`,description:`Organic static liquid flow with colorful mineral-like marbling.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // Removed time from noise offsets
@@ -5123,7 +5230,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.3, 0.7, n * 0.5 + n2 * 0.5);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Flow Scale`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Mineral A`,type:`color`,default:[.4,.1,.8,1]},{id:`u_secondary_color`,name:`Mineral B`,type:`color`,default:[.1,.4,.5,1]}]},Mi=e({default:()=>Ni}),Ni={id:`fluorite_zoning`,name:`Fluorite Zoning`,category:`Geology`,added:`2026-06-12`,description:`Translucent fluorite crystals with square growth zoning — nested purple and green color zones following cubic crystal faces.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flow Scale`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Mineral A`,type:`color`,default:[.4,.1,.8,1]},{id:`u_secondary_color`,name:`Mineral B`,type:`color`,default:[.1,.4,.5,1]}]},Ri=e({default:()=>zi}),zi={id:`fluorite_zoning`,name:`Fluorite Zoning`,category:`Geology`,added:`2026-06-12`,description:`Translucent fluorite crystals with square growth zoning — nested purple and green color zones following cubic crystal faces.`,shader:`
     vec2 hash2_flz(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -5202,7 +5309,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_crystal_scale`,name:`Crystal Scale`,type:`float`,min:1.5,max:10,default:3.5},{id:`u_zone_density`,name:`Zone Density`,type:`float`,min:4,max:30,default:12},{id:`u_purple_color`,name:`Purple Zone`,type:`color`,default:[.48,.22,.62,1]},{id:`u_green_color`,name:`Green Zone`,type:`color`,default:[.25,.65,.45,1]}]},Pi=e({default:()=>Fi}),Fi={id:`folded_damascus_steel_artisan`,name:`Folded Damascus Steel`,category:`Industrial`,added:`2026-05-13`,description:`Swirling, wavy folded steel patterns with high-contrast acid bath etching.`,shader:`
+  `,uniforms:[{id:`u_crystal_scale`,name:`Crystal Scale`,type:`float`,min:1.5,max:10,default:3.5},{id:`u_zone_density`,name:`Zone Density`,type:`float`,min:4,max:30,default:12},{id:`u_purple_color`,name:`Purple Zone`,type:`color`,default:[.48,.22,.62,1]},{id:`u_green_color`,name:`Green Zone`,type:`color`,default:[.25,.65,.45,1]}]},Bi=e({default:()=>Vi}),Vi={id:`folded_damascus_steel_artisan`,name:`Folded Damascus Steel`,category:`Industrial`,added:`2026-05-13`,description:`Swirling, wavy folded steel patterns with high-contrast acid bath etching.`,shader:`
     float fbm(vec2 p) {
       float f = 0.0;
       f += 0.5000 * noise(p); p *= 2.02;
@@ -5231,7 +5338,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return mix(darkLayer, lightLayer, etch);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Scale`,type:`float`,min:1,max:10,default:3},{id:`u_fold_density`,name:`Fold Density`,type:`float`,min:5,max:30,default:15},{id:`u_dark_steel`,name:`Etched Layer`,type:`color`,default:[.15,.15,.16,1]},{id:`u_light_steel`,name:`Polished Layer`,type:`color`,default:[.6,.6,.65,1]}]},Ii=e({default:()=>Li}),Li={id:`forest_litter_artisan`,name:`Forest Litter`,category:`Natural`,added:`2026-04-15`,description:`Dense organic debris and varying leaf shapes found on a forest floor.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Scale`,type:`float`,min:1,max:10,default:3},{id:`u_fold_density`,name:`Fold Density`,type:`float`,min:5,max:30,default:15},{id:`u_dark_steel`,name:`Etched Layer`,type:`color`,default:[.15,.15,.16,1]},{id:`u_light_steel`,name:`Polished Layer`,type:`color`,default:[.6,.6,.65,1]}]},Hi=e({default:()=>Ui}),Ui={id:`forest_litter_artisan`,name:`Forest Litter`,category:`Natural`,added:`2026-04-15`,description:`Dense organic debris and varying leaf shapes found on a forest floor.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv));
@@ -5239,7 +5346,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.1, d * (0.8 + n * 0.5));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Debris Density`,type:`float`,min:2,max:20,default:12},{id:`u_primary_color`,name:`Leaf Dust`,type:`color`,default:[.4,.3,.1,1]},{id:`u_secondary_color`,name:`Soil`,type:`color`,default:[.1,.08,.05,1]}]},Ri=e({default:()=>zi}),zi={id:`forged_carbon`,name:`Forged Carbon`,category:`Organic`,added:`2026-04-15`,description:`Randomized carbon shred pattern used in hypercars.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Debris Density`,type:`float`,min:2,max:20,default:12},{id:`u_primary_color`,name:`Leaf Dust`,type:`color`,default:[.4,.3,.1,1]},{id:`u_secondary_color`,name:`Soil`,type:`color`,default:[.1,.08,.05,1]}]},Wi=e({default:()=>Gi}),Gi={id:`forged_carbon`,name:`Forged Carbon`,category:`Organic`,added:`2026-04-15`,description:`Randomized carbon shred pattern used in hypercars.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     float fbm(vec2 p) {
       float f = 0.0;
@@ -5265,13 +5372,54 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Flake Size`,type:`float`,min:1,max:20,default:8},{id:`u_primary_color`,name:`High Carbon`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Base Carbon`,type:`color`,default:[.05,.05,.05,1]}]},Bi=e({default:()=>Vi}),Vi={id:`frost_crystals_artisan`,name:`Frost Crystals`,category:`Natural`,added:`2026-04-15`,description:`Crystalline window-ice patterns and frost blooms found in extreme cold.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flake Size`,type:`float`,min:1,max:20,default:8},{id:`u_primary_color`,name:`High Carbon`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Base Carbon`,type:`color`,default:[.05,.05,.05,1]}]},Ki=e({default:()=>qi}),qi={id:`fracture_velocity`,name:`Fracture Velocity`,category:`Abstract`,added:`2026-07-09`,description:`Shattered panel shards stretched along the direction of travel, with crack-glow radiating from a single point of impact — hot orange nearby, cold hairlines far away.`,shader:`
+    vec2 fvpt(vec2 id) { return vec2(hash(id), hash(id + 7.3)); }
+
+    vec4 generate() {
+      vec2 uv = fract(v_uv);
+      // anisotropic metric: fewer cells across x stretches shards along travel
+      vec2 p = vec2(uv.x * u_cells * u_stretch, uv.y * u_cells);
+      vec2 ip = floor(p);
+      vec2 fp = fract(p);
+
+      float d1 = 8.0;
+      float d2 = 8.0;
+      vec2 cid = vec2(0.0);
+      for (int j = -2; j <= 2; j++) {
+        for (int i = -2; i <= 2; i++) {
+          vec2 o = vec2(float(i), float(j));
+          vec2 pt = o + fvpt(ip + o) - fp;
+          float d = length(pt);
+          if (d < d1) { d2 = d1; d1 = d; cid = ip + o; }
+          else if (d < d2) { d2 = d; }
+        }
+      }
+
+      float edge = pow(clamp(1.0 - (d2 - d1) / 0.09, 0.0, 1.0), 1.5);
+
+      // flat shard shading lit from the upper-left
+      vec2 cuv = (cid + 0.5) / vec2(u_cells * u_stretch, u_cells);
+      float light = cuv.x * 0.55 + (1.0 - cuv.y) * 0.45;
+      float t = 0.28 + 0.22 * hash(cid + 3.3) + 0.30 * light;
+      vec3 col = mix(vec3(0.063, 0.067, 0.082), vec3(0.275, 0.294, 0.33), t);
+
+      // impact point: crack glow decays with distance
+      float dist = distance(uv, vec2(0.72, 0.26));
+      float heat = exp(-dist / 0.30);
+      float glow = edge * (0.12 + 0.88 * heat) * u_glow;
+      col += glow * vec3(0.92, 0.36, 0.08);
+      // cold hairline keeps far cracks legible
+      col += edge * (1.0 - heat) * 0.10;
+
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_cells`,name:`Shard Count`,type:`float`,min:4,max:16,default:8},{id:`u_stretch`,name:`Shard Stretch`,type:`float`,min:.4,max:1,default:.62},{id:`u_glow`,name:`Impact Glow`,type:`float`,min:0,max:2,default:1}]},Ji=e({default:()=>Yi}),Yi={id:`frost_crystals_artisan`,name:`Frost Crystals`,category:`Natural`,added:`2026-04-15`,description:`Crystalline window-ice patterns and frost blooms found in extreme cold.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * 10.0);
       float crystal = step(0.9, hash(v_uv * 20.0 + n));
       return mix(u_secondary_color, u_primary_color, crystal);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Frost`,type:`color`,default:[.9,.95,1,1]},{id:`u_secondary_color`,name:`Glass`,type:`color`,default:[.1,.2,.3,1]}]},Hi=e({default:()=>Ui}),Ui={id:`frozen_lake_artisan`,name:`Ice Fractures`,category:`Natural`,added:`2026-04-16`,description:`Angular ice cracks and crystalline fractures found in frozen lake and arctic simulation environments.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Frost`,type:`color`,default:[.9,.95,1,1]},{id:`u_secondary_color`,name:`Glass`,type:`color`,default:[.1,.2,.3,1]}]},Xi=e({default:()=>Zi}),Zi={id:`frozen_lake_artisan`,name:`Ice Fractures`,category:`Natural`,added:`2026-04-16`,description:`Angular ice cracks and crystalline fractures found in frozen lake and arctic simulation environments.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -5289,7 +5437,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.02, 0.0, abs(m_dist - 0.1));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Ice Shard`,type:`color`,default:[.8,.9,1,1]},{id:`u_secondary_color`,name:`Deep Lake`,type:`color`,default:[0,.1,.2,1]}]},Wi=e({default:()=>Gi}),Gi={id:`fusion_panel_artisan`,name:`Fusion Plating`,category:`Technology`,added:`2026-04-16`,description:`Complex geometric panel lines and "greebles" found on high-energy reactor housings.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Ice Shard`,type:`color`,default:[.8,.9,1,1]},{id:`u_secondary_color`,name:`Deep Lake`,type:`color`,default:[0,.1,.2,1]}]},Qi=e({default:()=>$i}),$i={id:`fusion_panel_artisan`,name:`Fusion Plating`,category:`Technology`,added:`2026-04-16`,description:`Complex geometric panel lines and "greebles" found on high-energy reactor housings.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
@@ -5298,7 +5446,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float n = hash(i_uv);
       return mix(u_secondary_color, u_primary_color, mask * n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Panel Detail`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Alloy Surface`,type:`color`,default:[.12,.12,.15,1]},{id:`u_secondary_color`,name:`Panel Joint`,type:`color`,default:[0,0,0,1]}]},Ki=e({default:()=>qi}),qi={id:`galaxy_spiral`,name:`Galaxy Spiral`,category:`Cosmos`,added:`2026-06-11`,description:`A grand-design spiral galaxy with logarithmic arms laced by dark dust lanes, a blazing golden core, and thousands of pinpoint stars.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Panel Detail`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Alloy Surface`,type:`color`,default:[.12,.12,.15,1]},{id:`u_secondary_color`,name:`Panel Joint`,type:`color`,default:[0,0,0,1]}]},ea=e({default:()=>ta}),ta={id:`galaxy_spiral`,name:`Galaxy Spiral`,category:`Cosmos`,added:`2026-06-11`,description:`A grand-design spiral galaxy with logarithmic arms laced by dark dust lanes, a blazing golden core, and thousands of pinpoint stars.`,shader:`
     // 2D rotation helper (unique suffix to avoid prelude collisions)
     vec2 rot_gsp(vec2 p, float a) {
       float c = cos(a); float s = sin(a);
@@ -5381,7 +5529,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_arm_count`,name:`Spiral Arms`,type:`float`,min:1,max:6,default:2},{id:`u_arm_wind`,name:`Arm Tightness`,type:`float`,min:1.5,max:7,default:3.6},{id:`u_core_color`,name:`Core Glow`,type:`color`,default:[1,.82,.55,1]},{id:`u_disc_color`,name:`Disc Tint`,type:`color`,default:[.3,.34,.55,1]}]},Ji=e({default:()=>Yi}),Yi={id:`galvanized_steel_artisan`,name:`Galvanized Steel`,category:`Industrial`,added:`2026-04-15`,description:`Spangled crystalline industrial coating found in heavy-duty utility equipment.`,shader:`
+  `,uniforms:[{id:`u_arm_count`,name:`Spiral Arms`,type:`float`,min:1,max:6,default:2},{id:`u_arm_wind`,name:`Arm Tightness`,type:`float`,min:1.5,max:7,default:3.6},{id:`u_core_color`,name:`Core Glow`,type:`color`,default:[1,.82,.55,1]},{id:`u_disc_color`,name:`Disc Tint`,type:`color`,default:[.3,.34,.55,1]}]},na=e({default:()=>ra}),ra={id:`galvanized_steel_artisan`,name:`Galvanized Steel`,category:`Industrial`,added:`2026-04-15`,description:`Spangled crystalline industrial coating found in heavy-duty utility equipment.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -5402,7 +5550,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, m_point.x);
     }
-  `,uniforms:[{id:`u_scale`,name:`Spangle Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Zinc High`,type:`color`,default:[.9,.9,.92,1]},{id:`u_secondary_color`,name:`Zinc Deep`,type:`color`,default:[.5,.5,.55,1]}]},Xi=e({default:()=>Zi}),Zi={id:`gas_giant_bands`,name:`Gas Giant Bands`,category:`Cosmos`,added:`2026-06-11`,description:`Jovian cloud belts and zones shearing past each other in turbulent cream and rust, with a swirling great storm oval.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Spangle Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Zinc High`,type:`color`,default:[.9,.9,.92,1]},{id:`u_secondary_color`,name:`Zinc Deep`,type:`color`,default:[.5,.5,.55,1]}]},ia=e({default:()=>aa}),aa={id:`gas_giant_bands`,name:`Gas Giant Bands`,category:`Cosmos`,added:`2026-06-11`,description:`Jovian cloud belts and zones shearing past each other in turbulent cream and rust, with a swirling great storm oval.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -5461,14 +5609,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_band_count`,name:`Belt Count`,type:`float`,min:1,max:8,default:3},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:.2,max:3,default:1.2},{id:`u_storm_size`,name:`Storm Size`,type:`float`,min:.05,max:.3,default:.14},{id:`u_zone_color`,name:`Zone Cream`,type:`color`,default:[.91,.84,.7,1]}]},Qi=e({default:()=>$i}),$i={id:`gauge_cluster_artisan`,name:`Gauge Finish`,category:`Racing`,added:`2026-04-16`,description:`Concentric circular brushed finish found on high-end analog gauge clusters and trim panels.`,shader:`
+  `,uniforms:[{id:`u_band_count`,name:`Belt Count`,type:`float`,min:1,max:8,default:3},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:.2,max:3,default:1.2},{id:`u_storm_size`,name:`Storm Size`,type:`float`,min:.05,max:.3,default:.14},{id:`u_zone_color`,name:`Zone Cream`,type:`color`,default:[.91,.84,.7,1]}]},oa=e({default:()=>sa}),sa={id:`gauge_cluster_artisan`,name:`Gauge Finish`,category:`Racing`,added:`2026-04-16`,description:`Concentric circular brushed finish found on high-end analog gauge clusters and trim panels.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5);
       float rings = sin(d * 1000.0);
       float mask = smoothstep(-0.5, 0.5, rings);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Brushed Rim`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Brushed Deep`,type:`color`,default:[.5,.5,.55,1]}]},ea=e({default:()=>ta}),ta={id:`gear_train`,name:`Gear Train`,category:`Industrial`,added:`2026-07-07`,description:`Meshed toothed gears of varying sizes — clockwork machinery packed edge to edge.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Brushed Rim`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Brushed Deep`,type:`color`,default:[.5,.5,.55,1]}]},ca=e({default:()=>la}),la={id:`gear_train`,name:`Gear Train`,category:`Industrial`,added:`2026-07-07`,description:`Meshed toothed gears of varying sizes — clockwork machinery packed edge to edge.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -5493,7 +5641,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += body * 0.12 * smoothstep(0.03, 0.0, abs(r - (teeth - 0.03)));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Gear Density`,type:`float`,min:2,max:14,default:5},{id:`u_primary_color`,name:`Gear Metal`,type:`color`,default:[.62,.6,.58,1]},{id:`u_secondary_color`,name:`Backplate`,type:`color`,default:[.13,.12,.11,1]},{id:`u_accent_color`,name:`Hub`,type:`color`,default:[.75,.55,.2,1]}],variants:[{name:`Steel Works`,uniforms:{u_primary_color:[.62,.6,.58,1],u_secondary_color:[.13,.12,.11,1],u_accent_color:[.75,.55,.2,1]}},{name:`Brass Clock`,uniforms:{u_primary_color:[.78,.6,.28,1],u_secondary_color:[.2,.14,.08,1],u_accent_color:[.5,.32,.14,1]}},{name:`Gunmetal`,uniforms:{u_primary_color:[.3,.32,.36,1],u_secondary_color:[.07,.07,.09,1],u_accent_color:[.85,.3,.1,1]}}]},na=e({default:()=>ra}),ra={id:`geode_slice`,name:`Geode Slice`,category:`Geology`,added:`2026-06-12`,description:`Cross-section of a geode — wavy agate rim bands wrapping a sparkling crystal druzy cavity, set in dark host rock.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Gear Density`,type:`float`,min:2,max:14,default:5},{id:`u_primary_color`,name:`Gear Metal`,type:`color`,default:[.62,.6,.58,1]},{id:`u_secondary_color`,name:`Backplate`,type:`color`,default:[.13,.12,.11,1]},{id:`u_accent_color`,name:`Hub`,type:`color`,default:[.75,.55,.2,1]}],variants:[{name:`Steel Works`,uniforms:{u_primary_color:[.62,.6,.58,1],u_secondary_color:[.13,.12,.11,1],u_accent_color:[.75,.55,.2,1]}},{name:`Brass Clock`,uniforms:{u_primary_color:[.78,.6,.28,1],u_secondary_color:[.2,.14,.08,1],u_accent_color:[.5,.32,.14,1]}},{name:`Gunmetal`,uniforms:{u_primary_color:[.3,.32,.36,1],u_secondary_color:[.07,.07,.09,1],u_accent_color:[.85,.3,.1,1]}}]},ua=e({default:()=>da}),da={id:`geode_slice`,name:`Geode Slice`,category:`Geology`,added:`2026-06-12`,description:`Cross-section of a geode — wavy agate rim bands wrapping a sparkling crystal druzy cavity, set in dark host rock.`,shader:`
     vec2 hash2_geo(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -5585,7 +5733,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_cavity_size`,name:`Cavity Size`,type:`float`,min:.2,max:1.4,default:.8},{id:`u_band_density`,name:`Rim Bands`,type:`float`,min:3,max:24,default:9},{id:`u_crystal_scale`,name:`Crystal Size`,type:`float`,min:.4,max:3,default:1},{id:`u_band_color`,name:`Agate Color`,type:`color`,default:[.55,.35,.55,1]}]},ia=e({default:()=>aa}),aa={id:`geodesic_dome`,name:`Geodesic Dome`,category:`Architecture`,added:`2026-07-07`,description:`Triangulated strut lattice with hub nodes — Buckminster Fuller structure against the sky.`,shader:`
+  `,uniforms:[{id:`u_cavity_size`,name:`Cavity Size`,type:`float`,min:.2,max:1.4,default:.8},{id:`u_band_density`,name:`Rim Bands`,type:`float`,min:3,max:24,default:9},{id:`u_crystal_scale`,name:`Crystal Size`,type:`float`,min:.4,max:3,default:1},{id:`u_band_color`,name:`Agate Color`,type:`color`,default:[.55,.35,.55,1]}]},fa=e({default:()=>pa}),pa={id:`geodesic_dome`,name:`Geodesic Dome`,category:`Architecture`,added:`2026-07-07`,description:`Triangulated strut lattice with hub nodes — Buckminster Fuller structure against the sky.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // three strut directions at 60 degrees
@@ -5611,7 +5759,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb * 1.15, hub);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Strut Density`,type:`float`,min:2,max:20,default:7},{id:`u_strut`,name:`Strut Weight`,type:`float`,min:.02,max:.15,default:.055},{id:`u_glass`,name:`Panel Variation`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Struts`,type:`color`,default:[.85,.86,.88,1]},{id:`u_secondary_color`,name:`Panels`,type:`color`,default:[.25,.45,.65,1]},{id:`u_accent_color`,name:`Panel Tint`,type:`color`,default:[.5,.7,.85,1]}],variants:[{name:`Expo 67`,uniforms:{u_primary_color:[.85,.86,.88,1],u_secondary_color:[.25,.45,.65,1],u_accent_color:[.5,.7,.85,1],u_glass:.5}},{name:`Desert Dome`,uniforms:{u_primary_color:[.35,.3,.25,1],u_secondary_color:[.88,.78,.6,1],u_accent_color:[.95,.88,.72,1],u_glass:.4}},{name:`Night Biosphere`,uniforms:{u_primary_color:[.2,.22,.26,1],u_secondary_color:[.05,.08,.14,1],u_accent_color:[.9,.7,.3,1],u_glass:.8}}]},oa=e({default:()=>sa}),sa={id:`geometric_camo_ops`,name:`Geometric Camo (Ops)`,category:`Geometric`,added:`2026-05-12`,description:`A modern, sharp geometric splinter camouflage designed for high-performance racing liveries with vibrant accent capabilities.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Strut Density`,type:`float`,min:2,max:20,default:7},{id:`u_strut`,name:`Strut Weight`,type:`float`,min:.02,max:.15,default:.055},{id:`u_glass`,name:`Panel Variation`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Struts`,type:`color`,default:[.85,.86,.88,1]},{id:`u_secondary_color`,name:`Panels`,type:`color`,default:[.25,.45,.65,1]},{id:`u_accent_color`,name:`Panel Tint`,type:`color`,default:[.5,.7,.85,1]}],variants:[{name:`Expo 67`,uniforms:{u_primary_color:[.85,.86,.88,1],u_secondary_color:[.25,.45,.65,1],u_accent_color:[.5,.7,.85,1],u_glass:.5}},{name:`Desert Dome`,uniforms:{u_primary_color:[.35,.3,.25,1],u_secondary_color:[.88,.78,.6,1],u_accent_color:[.95,.88,.72,1],u_glass:.4}},{name:`Night Biosphere`,uniforms:{u_primary_color:[.2,.22,.26,1],u_secondary_color:[.05,.08,.14,1],u_accent_color:[.9,.7,.3,1],u_glass:.8}}]},ma=e({default:()=>ha}),ha={id:`geometric_camo_ops`,name:`Geometric Camo (Ops)`,category:`Geometric`,added:`2026-05-12`,description:`A modern, sharp geometric splinter camouflage designed for high-performance racing liveries with vibrant accent capabilities.`,shader:`
     
     vec4 generate() {
         vec2 uv = v_uv * u_scale;
@@ -5638,7 +5786,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return col;
     }
-  `,variants:[{name:`Woodland (Ops)`,uniforms:{u_color_base:[.22,.27,.2,1],u_color_1:[.15,.16,.15,1],u_color_2:[.05,.05,.05,1],u_color_3:[.35,.35,.35,1],u_color_accent:[.35,.28,.18,1]}},{name:`Desert Recon`,uniforms:{u_color_base:[.76,.69,.5,1],u_color_1:[.55,.47,.33,1],u_color_2:[.25,.28,.2,1],u_color_3:[.1,.1,.1,1],u_color_accent:[.6,.4,.1,1]}},{name:`Urban Stealth`,uniforms:{u_color_base:[.9,.9,.92,1],u_color_1:[.6,.6,.65,1],u_color_2:[.15,.15,.18,1],u_color_3:[.3,.3,.35,1],u_color_accent:[.25,.28,.35,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.08,.08,.09,1],u_color_1:[.03,.03,.04,1],u_color_2:[0,0,0,1],u_color_3:[.15,.15,.16,1],u_color_accent:[.05,.05,.06,1]}}],uniforms:[{id:`u_scale`,name:`Camo Scale`,type:`float`,min:1,max:50,default:12},{id:`u_color_base`,name:`Base Green`,type:`color`,default:[.22,.27,.2,1]},{id:`u_color_1`,name:`Dark Grey`,type:`color`,default:[.15,.16,.15,1]},{id:`u_color_2`,name:`Black`,type:`color`,default:[.05,.05,.05,1]},{id:`u_color_3`,name:`Light Grey`,type:`color`,default:[.35,.35,.35,1]},{id:`u_color_accent`,name:`Accent Line`,type:`color`,default:[.35,.28,.18,1]},{id:`u_accent_amount`,name:`Accent Amount`,type:`float`,min:0,max:1,default:.5}]},ca=e({default:()=>la}),la={id:`geometric_fracture_artisan`,name:`Shatter Shard`,category:`Abstract`,added:`2026-04-16`,description:`Sharp angular procedural shards and crystalline fractures mimicking high-speed impact surfaces.`,shader:`
+  `,variants:[{name:`Woodland (Ops)`,uniforms:{u_color_base:[.22,.27,.2,1],u_color_1:[.15,.16,.15,1],u_color_2:[.05,.05,.05,1],u_color_3:[.35,.35,.35,1],u_color_accent:[.35,.28,.18,1]}},{name:`Desert Recon`,uniforms:{u_color_base:[.76,.69,.5,1],u_color_1:[.55,.47,.33,1],u_color_2:[.25,.28,.2,1],u_color_3:[.1,.1,.1,1],u_color_accent:[.6,.4,.1,1]}},{name:`Urban Stealth`,uniforms:{u_color_base:[.9,.9,.92,1],u_color_1:[.6,.6,.65,1],u_color_2:[.15,.15,.18,1],u_color_3:[.3,.3,.35,1],u_color_accent:[.25,.28,.35,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.08,.08,.09,1],u_color_1:[.03,.03,.04,1],u_color_2:[0,0,0,1],u_color_3:[.15,.15,.16,1],u_color_accent:[.05,.05,.06,1]}}],uniforms:[{id:`u_scale`,name:`Camo Scale`,type:`float`,min:1,max:50,default:12},{id:`u_color_base`,name:`Base Green`,type:`color`,default:[.22,.27,.2,1]},{id:`u_color_1`,name:`Dark Grey`,type:`color`,default:[.15,.16,.15,1]},{id:`u_color_2`,name:`Black`,type:`color`,default:[.05,.05,.05,1]},{id:`u_color_3`,name:`Light Grey`,type:`color`,default:[.35,.35,.35,1]},{id:`u_color_accent`,name:`Accent Line`,type:`color`,default:[.35,.28,.18,1]},{id:`u_accent_amount`,name:`Accent Amount`,type:`float`,min:0,max:1,default:.5}]},ga=e({default:()=>_a}),_a={id:`geometric_fracture_artisan`,name:`Shatter Shard`,category:`Abstract`,added:`2026-04-16`,description:`Sharp angular procedural shards and crystalline fractures mimicking high-speed impact surfaces.`,shader:`
     vec2 rand(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -5655,7 +5803,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, step(0.1, m_dist));
     }
-  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Fracture Edge`,type:`color`,default:[.9,.9,1,1]},{id:`u_secondary_color`,name:`Fracture Void`,type:`color`,default:[.1,.1,.2,1]}]},ua=e({default:()=>da}),da={id:`giraffe_patches`,name:`Giraffe Patches`,category:`Natural`,added:`2026-07-07`,description:`Angular tan patches split by wide cream channels — reticulated giraffe hide.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Fracture Edge`,type:`color`,default:[.9,.9,1,1]},{id:`u_secondary_color`,name:`Fracture Void`,type:`color`,default:[.1,.1,.2,1]}]},va=e({default:()=>ya}),ya={id:`giraffe_patches`,name:`Giraffe Patches`,category:`Natural`,added:`2026-07-07`,description:`Angular tan patches split by wide cream channels — reticulated giraffe hide.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // voronoi: distance to nearest and second-nearest feature point
@@ -5682,7 +5830,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb *= 0.96 + 0.04 * snoise(uv * 12.0);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Patch Density`,type:`float`,min:2,max:16,default:6},{id:`u_gap`,name:`Channel Width`,type:`float`,min:.02,max:.4,default:.14},{id:`u_primary_color`,name:`Patch`,type:`color`,default:[.62,.4,.2,1]},{id:`u_secondary_color`,name:`Channel`,type:`color`,default:[.92,.86,.72,1]}],variants:[{name:`Reticulated`,uniforms:{u_primary_color:[.62,.4,.2,1],u_secondary_color:[.92,.86,.72,1],u_gap:.14}},{name:`Masai Dark`,uniforms:{u_primary_color:[.4,.24,.12,1],u_secondary_color:[.85,.76,.6,1],u_gap:.2}},{name:`Ghost Fashion`,uniforms:{u_primary_color:[.25,.25,.28,1],u_secondary_color:[.9,.9,.92,1],u_gap:.1}}]},fa=e({default:()=>pa}),pa={id:`girih_stars`,name:`Girih Stars`,category:`Geometric`,added:`2026-07-07`,description:`Eight-pointed star and cross tessellation with strapwork outlines — Persian girih tiling.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Patch Density`,type:`float`,min:2,max:16,default:6},{id:`u_gap`,name:`Channel Width`,type:`float`,min:.02,max:.4,default:.14},{id:`u_primary_color`,name:`Patch`,type:`color`,default:[.62,.4,.2,1]},{id:`u_secondary_color`,name:`Channel`,type:`color`,default:[.92,.86,.72,1]}],variants:[{name:`Reticulated`,uniforms:{u_primary_color:[.62,.4,.2,1],u_secondary_color:[.92,.86,.72,1],u_gap:.14}},{name:`Masai Dark`,uniforms:{u_primary_color:[.4,.24,.12,1],u_secondary_color:[.85,.76,.6,1],u_gap:.2}},{name:`Ghost Fashion`,uniforms:{u_primary_color:[.25,.25,.28,1],u_secondary_color:[.9,.9,.92,1],u_gap:.1}}]},ba=e({default:()=>xa}),xa={id:`girih_stars`,name:`Girih Stars`,category:`Geometric`,added:`2026-07-07`,description:`Eight-pointed star and cross tessellation with strapwork outlines — Persian girih tiling.`,shader:`
     // signed distance to an 8-pointed star (two rotated squares)
     float star8(vec2 p, float r) {
       vec2 a = abs(p);
@@ -5715,14 +5863,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, u_strap_color.rgb, outline);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Tile Density`,type:`float`,min:2,max:16,default:6},{id:`u_line`,name:`Strap Weight`,type:`float`,min:.006,max:.05,default:.018},{id:`u_primary_color`,name:`Star A`,type:`color`,default:[.16,.4,.55,1]},{id:`u_accent_color`,name:`Star B`,type:`color`,default:[.5,.2,.3,1]},{id:`u_secondary_color`,name:`Cross Field`,type:`color`,default:[.88,.82,.68,1]},{id:`u_strap_color`,name:`Strapwork`,type:`color`,default:[.3,.22,.1,1]}],variants:[{name:`Isfahan`,uniforms:{u_primary_color:[.16,.4,.55,1],u_accent_color:[.5,.2,.3,1],u_secondary_color:[.88,.82,.68,1],u_strap_color:[.3,.22,.1,1]}},{name:`Lapis and Gold`,uniforms:{u_primary_color:[.12,.2,.5,1],u_accent_color:[.2,.32,.65,1],u_secondary_color:[.14,.14,.2,1],u_strap_color:[.85,.7,.35,1]}},{name:`Alabaster`,uniforms:{u_primary_color:[.9,.88,.84,1],u_accent_color:[.8,.78,.72,1],u_secondary_color:[.95,.94,.9,1],u_strap_color:[.55,.52,.46,1]}}]},ma=e({default:()=>ha}),ha={id:`glacier_ice_artisan`,name:`Glacier Ice`,category:`Natural`,added:`2026-04-15`,description:`Crackled crystalline planes with directional depth found in Arctic ice formations.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tile Density`,type:`float`,min:2,max:16,default:6},{id:`u_line`,name:`Strap Weight`,type:`float`,min:.006,max:.05,default:.018},{id:`u_primary_color`,name:`Star A`,type:`color`,default:[.16,.4,.55,1]},{id:`u_accent_color`,name:`Star B`,type:`color`,default:[.5,.2,.3,1]},{id:`u_secondary_color`,name:`Cross Field`,type:`color`,default:[.88,.82,.68,1]},{id:`u_strap_color`,name:`Strapwork`,type:`color`,default:[.3,.22,.1,1]}],variants:[{name:`Isfahan`,uniforms:{u_primary_color:[.16,.4,.55,1],u_accent_color:[.5,.2,.3,1],u_secondary_color:[.88,.82,.68,1],u_strap_color:[.3,.22,.1,1]}},{name:`Lapis and Gold`,uniforms:{u_primary_color:[.12,.2,.5,1],u_accent_color:[.2,.32,.65,1],u_secondary_color:[.14,.14,.2,1],u_strap_color:[.85,.7,.35,1]}},{name:`Alabaster`,uniforms:{u_primary_color:[.9,.88,.84,1],u_accent_color:[.8,.78,.72,1],u_secondary_color:[.95,.94,.9,1],u_strap_color:[.55,.52,.46,1]}}]},Sa=e({default:()=>Ca}),Ca={id:`glacier_ice_artisan`,name:`Glacier Ice`,category:`Natural`,added:`2026-04-15`,description:`Crackled crystalline planes with directional depth found in Arctic ice formations.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv));
       float crack = step(0.9, hash(v_uv * 10.0));
       return mix(u_secondary_color, u_primary_color, (n + crack) * 0.5);
     }
-  `,uniforms:[{id:`u_scale`,name:`Shelf Scale`,type:`float`,min:1,max:20,default:5},{id:`u_primary_color`,name:`Clean Ice`,type:`color`,default:[.9,.95,1,.8]},{id:`u_secondary_color`,name:`Deep Freeze`,type:`color`,default:[.1,.3,.5,1]}]},ga=e({default:()=>_a}),_a={id:`glass_shards_artisan`,name:`Glass Shards`,category:`Abstract`,added:`2026-04-15`,description:`Sharp, non-animated geometric fragmentation mimicking shattered glass.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shelf Scale`,type:`float`,min:1,max:20,default:5},{id:`u_primary_color`,name:`Clean Ice`,type:`color`,default:[.9,.95,1,.8]},{id:`u_secondary_color`,name:`Deep Freeze`,type:`color`,default:[.1,.3,.5,1]}]},wa=e({default:()=>Ta}),Ta={id:`glass_shards_artisan`,name:`Glass Shards`,category:`Abstract`,added:`2026-04-15`,description:`Sharp, non-animated geometric fragmentation mimicking shattered glass.`,shader:`
     vec2 random2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -5739,7 +5887,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, m_dist);
     }
-  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Glass Highlight`,type:`color`,default:[.8,.9,1,.5]},{id:`u_secondary_color`,name:`Shard Depth`,type:`color`,default:[.1,.2,.4,.8]}]},va=e({default:()=>ya}),ya={id:`glitch_interference_artisan`,name:`Signal Glitch`,category:`Abstract`,added:`2026-04-16`,description:`Chaotic horizontal interference and data-stream glitch patterns.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shard Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Glass Highlight`,type:`color`,default:[.8,.9,1,.5]},{id:`u_secondary_color`,name:`Shard Depth`,type:`color`,default:[.1,.2,.4,.8]}]},Ea=e({default:()=>Da}),Da={id:`glitch_interference_artisan`,name:`Signal Glitch`,category:`Abstract`,added:`2026-04-16`,description:`Chaotic horizontal interference and data-stream glitch patterns.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * 100.0);
@@ -5747,14 +5895,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.5, fract(x * 2.0));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Signal Peak`,type:`color`,default:[0,1,0,1]},{id:`u_secondary_color`,name:`Static Floor`,type:`color`,default:[0,.05,0,1]}]},ba=e({default:()=>xa}),xa={id:`glitch_text_logic_artisan`,name:`Logic Glitch`,category:`Abstract`,added:`2026-04-16`,description:`Abstract blocks of logic-like symbols and corrupted data stream visualizations.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Signal Peak`,type:`color`,default:[0,1,0,1]},{id:`u_secondary_color`,name:`Static Floor`,type:`color`,default:[0,.05,0,1]}]},Oa=e({default:()=>ka}),ka={id:`glitch_text_logic_artisan`,name:`Logic Glitch`,category:`Abstract`,added:`2026-04-16`,description:`Abstract blocks of logic-like symbols and corrupted data stream visualizations.`,shader:`
     vec4 generate() {
       vec2 uv = floor(v_uv * 40.0);
       float n = hash(uv);
       float mask = step(0.7, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Bit Glow`,type:`color`,default:[0,1,.8,1]},{id:`u_secondary_color`,name:`Buffer Black`,type:`color`,default:[0,.01,0,1]}]},Sa=e({default:()=>Ca}),Ca={id:`glitter_chips`,name:`Glitter Chips`,category:`Abstract`,added:`2026-07-08`,description:`Dense craft-glitter chips — tiny angular flakes with per-chip brightness and blown-white glints.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Bit Glow`,type:`color`,default:[0,1,.8,1]},{id:`u_secondary_color`,name:`Buffer Black`,type:`color`,default:[0,.01,0,1]}]},Aa=e({default:()=>ja}),ja={id:`glitter_chips`,name:`Glitter Chips`,category:`Abstract`,added:`2026-07-08`,description:`Dense craft-glitter chips — tiny angular flakes with per-chip brightness and blown-white glints.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // ground peeks between chips
@@ -5784,20 +5932,20 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:30,max:220,default:100},{id:`u_coverage`,name:`Coverage`,type:`float`,min:.3,max:1,default:.85},{id:`u_mix`,name:`Accent Chips`,type:`float`,min:0,max:1,default:.3},{id:`u_primary_color`,name:`Chips`,type:`color`,default:[.85,.68,.28,1]},{id:`u_accent_color`,name:`Accent Chips`,type:`color`,default:[.95,.85,.55,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.09,.07,.04,1]}],variants:[{name:`Gold Rush`,uniforms:{u_primary_color:[.85,.68,.28,1],u_accent_color:[.95,.85,.55,1],u_secondary_color:[.09,.07,.04,1],u_coverage:.85,u_mix:.3}},{name:`Midnight Teal`,uniforms:{u_primary_color:[.1,.55,.6,1],u_accent_color:[.4,.9,.85,1],u_secondary_color:[.03,.05,.07,1],u_coverage:.75,u_mix:.4}},{name:`Unicorn Craft`,uniforms:{u_primary_color:[.9,.4,.75,1],u_accent_color:[.45,.75,.95,1],u_secondary_color:[.93,.9,.94,1],u_coverage:.7,u_mix:.5}}]},wa=e({default:()=>Ta}),Ta={id:`gold_leaf_artisan`,name:`Gold Leaf`,category:`Abstract`,added:`2026-04-15`,description:`Irregular metallic foil noise and gold leaf textures for premium accents.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:30,max:220,default:100},{id:`u_coverage`,name:`Coverage`,type:`float`,min:.3,max:1,default:.85},{id:`u_mix`,name:`Accent Chips`,type:`float`,min:0,max:1,default:.3},{id:`u_primary_color`,name:`Chips`,type:`color`,default:[.85,.68,.28,1]},{id:`u_accent_color`,name:`Accent Chips`,type:`color`,default:[.95,.85,.55,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.09,.07,.04,1]}],variants:[{name:`Gold Rush`,uniforms:{u_primary_color:[.85,.68,.28,1],u_accent_color:[.95,.85,.55,1],u_secondary_color:[.09,.07,.04,1],u_coverage:.85,u_mix:.3}},{name:`Midnight Teal`,uniforms:{u_primary_color:[.1,.55,.6,1],u_accent_color:[.4,.9,.85,1],u_secondary_color:[.03,.05,.07,1],u_coverage:.75,u_mix:.4}},{name:`Unicorn Craft`,uniforms:{u_primary_color:[.9,.4,.75,1],u_accent_color:[.45,.75,.95,1],u_secondary_color:[.93,.9,.94,1],u_coverage:.7,u_mix:.5}}]},Ma=e({default:()=>Na}),Na={id:`gold_leaf_artisan`,name:`Gold Leaf`,category:`Abstract`,added:`2026-04-15`,description:`Irregular metallic foil noise and gold leaf textures for premium accents.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * 100.0) * hash(v_uv * 10.0);
       float mask = smoothstep(0.1, 0.3, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Gilded`,type:`color`,default:[1,.8,.3,1]},{id:`u_secondary_color`,name:`Underneath`,type:`color`,default:[.2,.1,0,1]}]},Ea=e({default:()=>Da}),Da={id:`gold_leaf_flake_artisan`,name:`Gold Flake`,category:`Abstract`,added:`2026-04-16`,description:`Thin, irregular metallic foil fragments and gold leaf flakes mimicking luxurious textured finishes.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Gilded`,type:`color`,default:[1,.8,.3,1]},{id:`u_secondary_color`,name:`Underneath`,type:`color`,default:[.2,.1,0,1]}]},Pa=e({default:()=>Fa}),Fa={id:`gold_leaf_flake_artisan`,name:`Gold Flake`,category:`Abstract`,added:`2026-04-16`,description:`Thin, irregular metallic foil fragments and gold leaf flakes mimicking luxurious textured finishes.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
       float mask = step(0.95, hash(i_uv));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Flake Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Gold Leaf`,type:`color`,default:[1,.8,.2,1]},{id:`u_secondary_color`,name:`Base Resin`,type:`color`,default:[.1,.1,.1,1]}]},Oa=e({default:()=>ka}),ka={id:`gold_ore_vein`,name:`Gold Ore Vein`,category:`Geology`,added:`2026-07-07`,description:`Branching gold veins glittering through dark host rock — high-grade ore face.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flake Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Gold Leaf`,type:`color`,default:[1,.8,.2,1]},{id:`u_secondary_color`,name:`Base Resin`,type:`color`,default:[.1,.1,.1,1]}]},Ia=e({default:()=>La}),La={id:`gold_ore_vein`,name:`Gold Ore Vein`,category:`Geology`,added:`2026-07-07`,description:`Branching gold veins glittering through dark host rock — high-grade ore face.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // host rock
@@ -5822,14 +5970,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += u_primary_color.rgb * fleck * 0.5;
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Vein Scale`,type:`float`,min:1,max:10,default:4},{id:`u_width`,name:`Vein Width`,type:`float`,min:.02,max:.3,default:.1},{id:`u_glitter`,name:`Glitter`,type:`float`,min:0,max:1.5,default:.8},{id:`u_primary_color`,name:`Gold`,type:`color`,default:[.85,.65,.2,1]},{id:`u_accent_color`,name:`Quartz Halo`,type:`color`,default:[.75,.72,.68,1]},{id:`u_secondary_color`,name:`Host Rock`,type:`color`,default:[.14,.13,.14,1]}],variants:[{name:`Mother Lode`,uniforms:{u_primary_color:[.85,.65,.2,1],u_accent_color:[.75,.72,.68,1],u_secondary_color:[.14,.13,.14,1],u_glitter:.8}},{name:`Silver Lode`,uniforms:{u_primary_color:[.8,.82,.85,1],u_accent_color:[.55,.55,.58,1],u_secondary_color:[.1,.1,.12,1],u_glitter:1}},{name:`Copper Strike`,uniforms:{u_primary_color:[.8,.45,.25,1],u_accent_color:[.4,.55,.5,1],u_secondary_color:[.16,.14,.12,1],u_glitter:.6}}]},Aa=e({default:()=>ja}),ja={id:`gothic_filigree_artisan`,name:`Gothic Filigree`,category:`Abstract`,added:`2026-04-15`,description:`Intricate iron-like symmetrical swirls and ornate architectural blackwork.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Vein Scale`,type:`float`,min:1,max:10,default:4},{id:`u_width`,name:`Vein Width`,type:`float`,min:.02,max:.3,default:.1},{id:`u_glitter`,name:`Glitter`,type:`float`,min:0,max:1.5,default:.8},{id:`u_primary_color`,name:`Gold`,type:`color`,default:[.85,.65,.2,1]},{id:`u_accent_color`,name:`Quartz Halo`,type:`color`,default:[.75,.72,.68,1]},{id:`u_secondary_color`,name:`Host Rock`,type:`color`,default:[.14,.13,.14,1]}],variants:[{name:`Mother Lode`,uniforms:{u_primary_color:[.85,.65,.2,1],u_accent_color:[.75,.72,.68,1],u_secondary_color:[.14,.13,.14,1],u_glitter:.8}},{name:`Silver Lode`,uniforms:{u_primary_color:[.8,.82,.85,1],u_accent_color:[.55,.55,.58,1],u_secondary_color:[.1,.1,.12,1],u_glitter:1}},{name:`Copper Strike`,uniforms:{u_primary_color:[.8,.45,.25,1],u_accent_color:[.4,.55,.5,1],u_secondary_color:[.16,.14,.12,1],u_glitter:.6}}]},Ra=e({default:()=>za}),za={id:`gothic_filigree_artisan`,name:`Gothic Filigree`,category:`Abstract`,added:`2026-04-15`,description:`Intricate iron-like symmetrical swirls and ornate architectural blackwork.`,shader:`
     vec4 generate() {
       vec2 uv = abs(v_uv - 0.5) * u_scale;
       float d = sin(uv.x * 10.0 + sin(uv.y * 10.0));
       float mask = smoothstep(0.1, 0.0, abs(d - 0.5));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Detail Zoom`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Iron`,type:`color`,default:[.1,.1,.15,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.9,.85,.8,1]}]},Ma=e({default:()=>Na}),Na={id:`grain_gradient`,name:`Grain Gradient`,category:`Abstract`,added:`2026-07-07`,description:`Soft color-field blobs dissolved in film grain — the modern grainy-gradient aesthetic.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Detail Zoom`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Iron`,type:`color`,default:[.1,.1,.15,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.9,.85,.8,1]}]},Ba=e({default:()=>Va}),Va={id:`grain_gradient`,name:`Grain Gradient`,category:`Abstract`,added:`2026-07-07`,description:`Soft color-field blobs dissolved in film grain — the modern grainy-gradient aesthetic.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // two soft blob fields blend three colors
@@ -5845,7 +5993,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, floor(c * 14.0 + g) / 14.0, u_posterize);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Blob Scale`,type:`float`,min:.5,max:6,default:2},{id:`u_grain`,name:`Grain`,type:`float`,min:0,max:.5,default:.18},{id:`u_posterize`,name:`Posterize`,type:`float`,min:0,max:1,default:.2},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[.95,.45,.3,1]},{id:`u_accent_color`,name:`Color B`,type:`color`,default:[.5,.3,.7,1]},{id:`u_secondary_color`,name:`Color C`,type:`color`,default:[.12,.14,.3,1]}],variants:[{name:`Dusk Poster`,uniforms:{u_primary_color:[.95,.45,.3,1],u_accent_color:[.5,.3,.7,1],u_secondary_color:[.12,.14,.3,1],u_grain:.18}},{name:`Meadow Mist`,uniforms:{u_primary_color:[.75,.85,.6,1],u_accent_color:[.4,.65,.6,1],u_secondary_color:[.9,.92,.88,1],u_grain:.12}},{name:`Charcoal Ember`,uniforms:{u_primary_color:[.85,.35,.15,1],u_accent_color:[.4,.15,.2,1],u_secondary_color:[.08,.08,.1,1],u_grain:.3}}]},Pa=e({default:()=>Fa}),Fa={id:`granite_speckle_natural`,name:`Granite Speckle`,category:`Natural`,added:`2026-05-01`,description:`Classic grey granite with randomly scattered feldspar, quartz, biotite mica, and hornblende mineral grains.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Blob Scale`,type:`float`,min:.5,max:6,default:2},{id:`u_grain`,name:`Grain`,type:`float`,min:0,max:.5,default:.18},{id:`u_posterize`,name:`Posterize`,type:`float`,min:0,max:1,default:.2},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[.95,.45,.3,1]},{id:`u_accent_color`,name:`Color B`,type:`color`,default:[.5,.3,.7,1]},{id:`u_secondary_color`,name:`Color C`,type:`color`,default:[.12,.14,.3,1]}],variants:[{name:`Dusk Poster`,uniforms:{u_primary_color:[.95,.45,.3,1],u_accent_color:[.5,.3,.7,1],u_secondary_color:[.12,.14,.3,1],u_grain:.18}},{name:`Meadow Mist`,uniforms:{u_primary_color:[.75,.85,.6,1],u_accent_color:[.4,.65,.6,1],u_secondary_color:[.9,.92,.88,1],u_grain:.12}},{name:`Charcoal Ember`,uniforms:{u_primary_color:[.85,.35,.15,1],u_accent_color:[.4,.15,.2,1],u_secondary_color:[.08,.08,.1,1],u_grain:.3}}]},Ha=e({default:()=>Ua}),Ua={id:`granite_speckle_natural`,name:`Granite Speckle`,category:`Natural`,added:`2026-05-01`,description:`Classic grey granite with randomly scattered feldspar, quartz, biotite mica, and hornblende mineral grains.`,shader:`
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float hash12(float p) { return fract(sin(p * 311.7) * 43758.5453); }
 
@@ -5911,7 +6059,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:2,max:20,default:8},{id:`u_light_mineral`,name:`Light Mineral`,type:`color`,default:[.9,.88,.85,1]},{id:`u_dark_mineral`,name:`Dark Mineral`,type:`color`,default:[.08,.08,.09,1]}]},Ia=e({default:()=>La}),La={id:`graphene_nanotubes_artisan`,name:`Graphene Nanotubes`,category:`Industrial`,added:`2026-05-13`,description:`Hexagonal carbon lattices at a molecular scale with metallic glowing points.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:2,max:20,default:8},{id:`u_light_mineral`,name:`Light Mineral`,type:`color`,default:[.9,.88,.85,1]},{id:`u_dark_mineral`,name:`Dark Mineral`,type:`color`,default:[.08,.08,.09,1]}]},Wa=e({default:()=>Ga}),Ga={id:`graphene_nanotubes_artisan`,name:`Graphene Nanotubes`,category:`Industrial`,added:`2026-05-13`,description:`Hexagonal carbon lattices at a molecular scale with metallic glowing points.`,shader:`
     // Hexagonal grid function
     float hexDist(vec2 p) {
       p = abs(p);
@@ -5942,7 +6090,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 baseColor = mix(u_bg_color, u_line_color, hex.x);
       return mix(baseColor, u_glow_color, hex.y);
     }
-  `,uniforms:[{id:`u_scale`,name:`Lattice Scale`,type:`float`,min:2,max:40,default:15},{id:`u_bg_color`,name:`Background`,type:`color`,default:[.05,.05,.05,1]},{id:`u_line_color`,name:`Bond Lines`,type:`color`,default:[.3,.3,.35,1]},{id:`u_glow_color`,name:`Node Glow`,type:`color`,default:[0,.8,1,1]}]},Ra=e({default:()=>za}),za={id:`gravel_trap_artisan`,name:`Gravel Trap`,category:`Racing`,added:`2026-04-15`,description:`Irregular sharp cellular noise mimicking track-side runoff gravel.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Lattice Scale`,type:`float`,min:2,max:40,default:15},{id:`u_bg_color`,name:`Background`,type:`color`,default:[.05,.05,.05,1]},{id:`u_line_color`,name:`Bond Lines`,type:`color`,default:[.3,.3,.35,1]},{id:`u_glow_color`,name:`Node Glow`,type:`color`,default:[0,.8,1,1]}]},Ka=e({default:()=>qa}),qa={id:`gravel_trap_artisan`,name:`Gravel Trap`,category:`Racing`,added:`2026-04-15`,description:`Irregular sharp cellular noise mimicking track-side runoff gravel.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -5950,14 +6098,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.3, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Stone Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Gravel`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Dust`,type:`color`,default:[.3,.3,.32,1]}]},Ba=e({default:()=>Va}),Va={id:`greek_key_artisan`,name:`Greek Key`,category:`Abstract`,added:`2026-04-15`,description:`Classic ancient geometric meander border patterns found in historic architecture.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Stone Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Gravel`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Dust`,type:`color`,default:[.3,.3,.32,1]}]},Ja=e({default:()=>Ya}),Ya={id:`greek_key_artisan`,name:`Greek Key`,category:`Abstract`,added:`2026-04-15`,description:`Classic ancient geometric meander border patterns found in historic architecture.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv * u_scale);
       float mask = step(0.1, uv.x) * step(uv.x, 0.9) * step(0.1, uv.y) * step(uv.y, 0.9);
       mask -= step(0.3, uv.x) * step(uv.x, 0.7) * step(0.3, uv.y) * step(uv.y, 0.7);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Key Rows`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Meander`,type:`color`,default:[.8,.7,.3,1]},{id:`u_secondary_color`,name:`Plinth`,type:`color`,default:[.1,.1,.1,1]}]},Ha=e({default:()=>Ua}),Ua={id:`gumball_roundel`,name:`Gumball Roundel`,category:`Heritage`,added:`2026-06-12`,description:`Big competition number circles on body colour — white gumballs with painted ring, blocky digit bars inside, decal silvering and curled-edge shadow.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Key Rows`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Meander`,type:`color`,default:[.8,.7,.3,1]},{id:`u_secondary_color`,name:`Plinth`,type:`color`,default:[.1,.1,.1,1]}]},Xa=e({default:()=>Za}),Za={id:`gumball_roundel`,name:`Gumball Roundel`,category:`Heritage`,added:`2026-06-12`,description:`Big competition number circles on body colour — white gumballs with painted ring, blocky digit bars inside, decal silvering and curled-edge shadow.`,shader:`
     vec4 generate() {
       // offset grid: every other row shifts half a cell so roundels stagger
       vec2 guv = v_uv * u_grid_scale;
@@ -6018,7 +6166,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grid_scale`,name:`Roundels Per Tile`,type:`float`,min:1,max:6,default:2},{id:`u_roundel_size`,name:`Roundel Size`,type:`float`,min:.3,max:.9,default:.68},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.72,.11,.12,1]},{id:`u_ring_color`,name:`Ring Colour`,type:`color`,default:[.12,.14,.35,1]}]},Wa=e({default:()=>Ga}),Ga={id:`half_timber_tudor`,name:`Half-Timber Tudor`,category:`Architecture`,added:`2026-06-12`,description:`Tudor half-timbering — adze-hewn oak posts, rails and diagonal braces stained near-black, infill panels of whitewashed wattle-and-daub bulging softly between them.`,shader:`
+  `,uniforms:[{id:`u_grid_scale`,name:`Roundels Per Tile`,type:`float`,min:1,max:6,default:2},{id:`u_roundel_size`,name:`Roundel Size`,type:`float`,min:.3,max:.9,default:.68},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.72,.11,.12,1]},{id:`u_ring_color`,name:`Ring Colour`,type:`color`,default:[.12,.14,.35,1]}]},Qa=e({default:()=>$a}),$a={id:`half_timber_tudor`,name:`Half-Timber Tudor`,category:`Architecture`,added:`2026-06-12`,description:`Tudor half-timbering — adze-hewn oak posts, rails and diagonal braces stained near-black, infill panels of whitewashed wattle-and-daub bulging softly between them.`,shader:`
     float hash_htt(vec2 p) {
       return fract(sin(dot(p, vec2(229.1, 167.7))) * 38117.9341);
     }
@@ -6098,7 +6246,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_bays`,name:`Bays`,type:`float`,min:2,max:10,default:4},{id:`u_timber_width`,name:`Timber Width`,type:`float`,min:.04,max:.16,default:.09},{id:`u_timber_color`,name:`Oak Stain`,type:`color`,default:[.16,.11,.08,1]},{id:`u_plaster_color`,name:`Limewash`,type:`color`,default:[.9,.87,.79,1]}]},Ka=e({default:()=>qa}),qa={id:`halftone_dots_artisan`,name:`CMYK Halftone`,category:`Abstract`,added:`2026-04-16`,description:`Professional offset color dots and halftone patterns used in high-end graphic design.`,shader:`
+  `,uniforms:[{id:`u_bays`,name:`Bays`,type:`float`,min:2,max:10,default:4},{id:`u_timber_width`,name:`Timber Width`,type:`float`,min:.04,max:.16,default:.09},{id:`u_timber_color`,name:`Oak Stain`,type:`color`,default:[.16,.11,.08,1]},{id:`u_plaster_color`,name:`Limewash`,type:`color`,default:[.9,.87,.79,1]}]},eo=e({default:()=>to}),to={id:`halftone_dots_artisan`,name:`CMYK Halftone`,category:`Abstract`,added:`2026-04-16`,description:`Professional offset color dots and halftone patterns used in high-end graphic design.`,shader:`
     vec4 generate() {
       float a = u_angle * 0.01745329;
       vec2 p = v_uv - 0.5;
@@ -6114,7 +6262,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(r + s, r - s, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[0,1,1,1],u_secondary_color:[1,1,1,1],u_dot_size:.4,u_angle:0,u_fade:0}},{name:`Comic Pop`,uniforms:{u_primary_color:[.95,.1,.5,1],u_secondary_color:[1,.92,.3,1],u_dot_size:.35,u_angle:45,u_fade:.5}},{name:`Newsprint`,uniforms:{u_primary_color:[.08,.08,.08,1],u_secondary_color:[.94,.92,.87,1],u_dot_size:.3,u_angle:22,u_fade:0}},{name:`Neon Fade`,uniforms:{u_primary_color:[.1,1,.5,1],u_secondary_color:[.02,.02,.05,1],u_dot_size:.42,u_angle:30,u_fade:.8}}],uniforms:[{id:`u_scale`,name:`Dot Density`,type:`float`,min:10,max:100,default:50},{id:`u_dot_size`,name:`Dot Size`,type:`float`,min:.05,max:.7,default:.4},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.3,default:.01},{id:`u_angle`,name:`Screen Angle`,type:`float`,min:0,max:90,default:0},{id:`u_fade`,name:`Tonal Fade`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Ink Dot`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[1,1,1,1]}]},Ja=e({default:()=>Ya}),Ya={id:`halftone_pop_artisan`,name:`Halftone Pop-Art`,category:`Abstract`,added:`2026-04-15`,description:`Classic CMYK-style dot matrix textures found in pop-art and comic books.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[0,1,1,1],u_secondary_color:[1,1,1,1],u_dot_size:.4,u_angle:0,u_fade:0}},{name:`Comic Pop`,uniforms:{u_primary_color:[.95,.1,.5,1],u_secondary_color:[1,.92,.3,1],u_dot_size:.35,u_angle:45,u_fade:.5}},{name:`Newsprint`,uniforms:{u_primary_color:[.08,.08,.08,1],u_secondary_color:[.94,.92,.87,1],u_dot_size:.3,u_angle:22,u_fade:0}},{name:`Neon Fade`,uniforms:{u_primary_color:[.1,1,.5,1],u_secondary_color:[.02,.02,.05,1],u_dot_size:.42,u_angle:30,u_fade:.8}}],uniforms:[{id:`u_scale`,name:`Dot Density`,type:`float`,min:10,max:100,default:50},{id:`u_dot_size`,name:`Dot Size`,type:`float`,min:.05,max:.7,default:.4},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.3,default:.01},{id:`u_angle`,name:`Screen Angle`,type:`float`,min:0,max:90,default:0},{id:`u_fade`,name:`Tonal Fade`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Ink Dot`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[1,1,1,1]}]},no=e({default:()=>ro}),ro={id:`halftone_pop_artisan`,name:`Halftone Pop-Art`,category:`Abstract`,added:`2026-04-15`,description:`Classic CMYK-style dot matrix textures found in pop-art and comic books.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -6125,7 +6273,34 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Dot Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Dot Color`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Paper Base`,type:`color`,default:[1,1,.95,1]}]},Xa=e({default:()=>Za}),Za={id:`hammered_copper_artisan`,name:`Hammered Copper`,category:`Industrial`,added:`2026-04-15`,description:`Indented, concave specular surfaces found in artisanal hammered metalwork.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Dot Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Dot Color`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Paper Base`,type:`color`,default:[1,1,.95,1]}]},io=e({default:()=>ao}),ao={id:`halftone_surge`,name:`Halftone Surge`,category:`Retro`,added:`2026-07-09`,description:`A rotated halftone dot sweep surging across the diagonal, with a single red accent stripe cutting through the field — print-shop energy at racing scale.`,shader:`
+    vec4 generate() {
+      vec2 uv = v_uv;
+      float c = cos(0.2618);
+      float s = sin(0.2618);                        // 15-degree screen angle
+      vec2 ruv = mat2(c, -s, s, c) * (uv - 0.5) + 0.5;
+      vec2 p = ruv * u_scale;
+      vec2 id = floor(p);
+      vec2 f = fract(p) - 0.5;
+
+      // cell centre back in un-rotated space drives the gradient
+      vec2 cuv = (id + 0.5) / u_scale;
+      vec2 guv = mat2(c, s, -s, c) * (cuv - 0.5) + 0.5;
+      float g = (guv.x + guv.y) * 0.5;
+      float v = 1.0 - g + sin(g * 6.2831853 * 1.5) * 0.10 + (noise(id * 0.13) - 0.5) * 0.22;
+      v = clamp(v, 0.0, 1.0);
+
+      float rad = u_size * pow(v, 1.35);
+      float dotm = smoothstep(rad, rad - 0.06, length(f));
+
+      float band = guv.x - guv.y;                   // accent stripe coordinate
+      vec3 ink = (band > u_stripe && band < u_stripe + 0.16)
+        ? vec3(0.91, 0.165, 0.235)
+        : vec3(0.925, 0.925, 0.91);
+      vec3 col = mix(vec3(0.047, 0.047, 0.055), ink, dotm);
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_scale`,name:`Dot Density`,type:`float`,min:20,max:80,default:44},{id:`u_size`,name:`Max Dot Size`,type:`float`,min:.3,max:.9,default:.62},{id:`u_stripe`,name:`Stripe Position`,type:`float`,min:-.5,max:.5,default:.18}]},oo=e({default:()=>so}),so={id:`hammered_copper_artisan`,name:`Hammered Copper`,category:`Industrial`,added:`2026-04-15`,description:`Indented, concave specular surfaces found in artisanal hammered metalwork.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -6142,7 +6317,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, 1.0 - m_dist);
     }
-  `,uniforms:[{id:`u_scale`,name:`Dents`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rim Shine`,type:`color`,default:[.9,.6,.4,1]},{id:`u_secondary_color`,name:`Copper Deep`,type:`color`,default:[.4,.2,.1,1]}]},Qa=e({default:()=>$a}),$a={id:`hand_pinstripe`,name:`Hand Pinstripe`,category:`Heritage`,added:`2026-06-12`,description:`Flowing symmetric pinstriper linework — mirrored sweeps, teardrop returns and crossover flourishes pulled by brush in one-shot enamel over deep lacquer.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Dents`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rim Shine`,type:`color`,default:[.9,.6,.4,1]},{id:`u_secondary_color`,name:`Copper Deep`,type:`color`,default:[.4,.2,.1,1]}]},co=e({default:()=>lo}),lo={id:`hand_pinstripe`,name:`Hand Pinstripe`,category:`Heritage`,added:`2026-06-12`,description:`Flowing symmetric pinstriper linework — mirrored sweeps, teardrop returns and crossover flourishes pulled by brush in one-shot enamel over deep lacquer.`,shader:`
     // distance from y to a flowing stroke path, with hand wobble baked in
     float stroke_hrt4(vec2 p, float yc, float wob) {
       return abs(p.y - yc + wob);
@@ -6210,7 +6385,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_line_weight`,name:`Line Weight`,type:`float`,min:.004,max:.03,default:.011},{id:`u_flourish`,name:`Flourish`,type:`float`,min:.3,max:1.6,default:1},{id:`u_body_color`,name:`Lacquer Colour`,type:`color`,default:[.13,.04,.07,1]},{id:`u_stripe_color`,name:`Stripe Colour`,type:`color`,default:[.94,.9,.78,1]}]},eo=e({default:()=>to}),to={id:`harlequin_diamond`,name:`Harlequin Diamond`,category:`Geometric`,added:`2026-04-15`,description:`Classic high-contrast diagonal diamond pattern.`,shader:`
+  `,uniforms:[{id:`u_line_weight`,name:`Line Weight`,type:`float`,min:.004,max:.03,default:.011},{id:`u_flourish`,name:`Flourish`,type:`float`,min:.3,max:1.6,default:1},{id:`u_body_color`,name:`Lacquer Colour`,type:`color`,default:[.13,.04,.07,1]},{id:`u_stripe_color`,name:`Stripe Colour`,type:`color`,default:[.94,.9,.78,1]}]},uo=e({default:()=>fo}),fo={id:`harlequin_diamond`,name:`Harlequin Diamond`,category:`Geometric`,added:`2026-04-15`,description:`Classic high-contrast diagonal diamond pattern.`,shader:`
     vec4 generate() {
       float a = u_angle * 0.01745329;
       mat2 rot = mat2(cos(a), -sin(a), sin(a), cos(a));
@@ -6235,7 +6410,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (u_is_spec > 0.5) return vec4(0.0, 0.0, 0.0, 1.0);
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,.1,.1,1],u_secondary_color:[.1,.1,.1,1],u_accent_color:[.95,.85,.4,1],u_angle:45,u_aspect:1,u_outline:0}},{name:`Jester`,uniforms:{u_primary_color:[.5,.12,.6,1],u_secondary_color:[.08,.08,.1,1],u_accent_color:[.95,.78,.2,1],u_angle:45,u_aspect:1.4,u_outline:.9}},{name:`Carnival`,uniforms:{u_primary_color:[.85,.1,.15,1],u_secondary_color:[.95,.92,.85,1],u_accent_color:[.95,.85,.4,1],u_angle:45,u_aspect:1,u_outline:0}},{name:`Ivory Lattice`,uniforms:{u_primary_color:[.92,.9,.85,1],u_secondary_color:[.85,.82,.75,1],u_accent_color:[.4,.3,.2,1],u_angle:45,u_aspect:1.8,u_outline:1}}],uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:50,default:12},{id:`u_angle`,name:`Rotation`,type:`float`,min:0,max:90,default:45},{id:`u_aspect`,name:`Diamond Stretch`,type:`float`,min:.4,max:2.5,default:1},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.008},{id:`u_outline`,name:`Outline Strength`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[1,.1,.1,1]},{id:`u_secondary_color`,name:`Color B`,type:`color`,default:[.1,.1,.1,1]},{id:`u_accent_color`,name:`Outline`,type:`color`,default:[.95,.85,.4,1]}]},no=e({default:()=>ro}),ro={id:`hazard_chevrons`,name:`Hazard Chevrons`,category:`Heritage`,added:`2026-06-12`,description:`Bold angled warning chevrons — safety yellow and night black marching diagonally, with reflective-tape sheen bands, scuffed wear-through and stencilled edge bleed.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,.1,.1,1],u_secondary_color:[.1,.1,.1,1],u_accent_color:[.95,.85,.4,1],u_angle:45,u_aspect:1,u_outline:0}},{name:`Jester`,uniforms:{u_primary_color:[.5,.12,.6,1],u_secondary_color:[.08,.08,.1,1],u_accent_color:[.95,.78,.2,1],u_angle:45,u_aspect:1.4,u_outline:.9}},{name:`Carnival`,uniforms:{u_primary_color:[.85,.1,.15,1],u_secondary_color:[.95,.92,.85,1],u_accent_color:[.95,.85,.4,1],u_angle:45,u_aspect:1,u_outline:0}},{name:`Ivory Lattice`,uniforms:{u_primary_color:[.92,.9,.85,1],u_secondary_color:[.85,.82,.75,1],u_accent_color:[.4,.3,.2,1],u_angle:45,u_aspect:1.8,u_outline:1}}],uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:50,default:12},{id:`u_angle`,name:`Rotation`,type:`float`,min:0,max:90,default:45},{id:`u_aspect`,name:`Diamond Stretch`,type:`float`,min:.4,max:2.5,default:1},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.008},{id:`u_outline`,name:`Outline Strength`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Color A`,type:`color`,default:[1,.1,.1,1]},{id:`u_secondary_color`,name:`Color B`,type:`color`,default:[.1,.1,.1,1]},{id:`u_accent_color`,name:`Outline`,type:`color`,default:[.95,.85,.4,1]}]},po=e({default:()=>mo}),mo={id:`hazard_chevrons`,name:`Hazard Chevrons`,category:`Heritage`,added:`2026-06-12`,description:`Bold angled warning chevrons — safety yellow and night black marching diagonally, with reflective-tape sheen bands, scuffed wear-through and stencilled edge bleed.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -6296,7 +6471,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_stripe_count`,name:`Chevron Count`,type:`float`,min:2,max:10,default:4},{id:`u_wear`,name:`Scuff Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_warn_color`,name:`Warning Colour`,type:`color`,default:[.93,.76,.1,1]},{id:`u_dark_color`,name:`Contrast Colour`,type:`color`,default:[.1,.1,.11,1]}]},io=e({default:()=>ao}),ao={id:`headliner_mesh_artisan`,name:`Headliner Mesh`,category:`Racing`,added:`2026-04-16`,description:`Breathable ceiling textile with hexagonal micro-pores found in modern automotive interiors.`,shader:`
+  `,uniforms:[{id:`u_stripe_count`,name:`Chevron Count`,type:`float`,min:2,max:10,default:4},{id:`u_wear`,name:`Scuff Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_warn_color`,name:`Warning Colour`,type:`color`,default:[.93,.76,.1,1]},{id:`u_dark_color`,name:`Contrast Colour`,type:`color`,default:[.1,.1,.11,1]}]},ho=e({default:()=>go}),go={id:`headliner_mesh_artisan`,name:`Headliner Mesh`,category:`Racing`,added:`2026-04-16`,description:`Breathable ceiling textile with hexagonal micro-pores found in modern automotive interiors.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -6305,7 +6480,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.38, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pore Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Textile Surface`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Pore Shade`,type:`color`,default:[.05,.05,.1,1]}]},oo=e({default:()=>so}),so={id:`heat_blued_titanium`,name:`Heat-Blued Titanium`,category:`Industrial`,added:`2026-05-13`,description:`Titanium heat-oxidation colour bands — the characteristic silver → straw → gold → purple → blue gradient on exhaust systems and racing hardware.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pore Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Textile Surface`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Pore Shade`,type:`color`,default:[.05,.05,.1,1]}]},_o=e({default:()=>vo}),vo={id:`heat_blued_titanium`,name:`Heat-Blued Titanium`,category:`Industrial`,added:`2026-05-13`,description:`Titanium heat-oxidation colour bands — the characteristic silver → straw → gold → purple → blue gradient on exhaust systems and racing hardware.`,shader:`
     float hash_hbt(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise_hbt(vec2 p) {
       vec2 i = floor(p), f = fract(p);
@@ -6356,7 +6531,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
-  `,uniforms:[{id:`u_heat_bias`,name:`Heat Level`,type:`float`,default:.4,min:0,max:1},{id:`u_spread`,name:`Band Spread`,type:`float`,default:.85,min:.2,max:1.5},{id:`u_direction`,name:`Direction`,type:`float`,default:0,min:0,max:1}]},co=e({default:()=>lo}),lo={id:`heatsink_fins`,name:`Heatsink Fins`,category:`Industrial`,added:`2026-07-07`,description:`Extruded aluminum cooling fins — parallel blades with bright machined tops and deep channels.`,shader:`
+  `,uniforms:[{id:`u_heat_bias`,name:`Heat Level`,type:`float`,default:.4,min:0,max:1},{id:`u_spread`,name:`Band Spread`,type:`float`,default:.85,min:.2,max:1.5},{id:`u_direction`,name:`Direction`,type:`float`,default:0,min:0,max:1}]},yo=e({default:()=>bo}),bo={id:`heatsink_fins`,name:`Heatsink Fins`,category:`Industrial`,added:`2026-07-07`,description:`Extruded aluminum cooling fins — parallel blades with bright machined tops and deep channels.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -6379,7 +6554,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c += smoothstep(0.02, 0.0, abs(fx - finW + 0.01)) * 0.15 * u_shine;
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fin Density`,type:`float`,min:6,max:60,default:22},{id:`u_fin_width`,name:`Fin Width`,type:`float`,min:.2,max:.8,default:.55},{id:`u_shine`,name:`Edge Shine`,type:`float`,min:0,max:1,default:.7},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Aluminum`,type:`color`,default:[.7,.71,.73,1]},{id:`u_secondary_color`,name:`Channel`,type:`color`,default:[.12,.12,.14,1]}],variants:[{name:`Raw Extrusion`,uniforms:{u_primary_color:[.7,.71,.73,1],u_secondary_color:[.12,.12,.14,1],u_rotate:0,u_shine:.7}},{name:`Black Anodized`,uniforms:{u_primary_color:[.15,.15,.17,1],u_secondary_color:[.03,.03,.04,1],u_rotate:0,u_shine:.9}},{name:`Copper Core`,uniforms:{u_primary_color:[.72,.45,.28,1],u_secondary_color:[.2,.1,.06,1],u_rotate:90,u_shine:.8}}]},uo=e({default:()=>fo}),fo={id:`heritage_arcs`,name:`Heritage Arcs`,category:`Heritage`,added:`2026-06-12`,description:`Two broad contrasting arc stripes sweeping across the panel — the classic endurance-racer look, with painted keylines, edge feather, and decades of clearcoat micro-wear.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fin Density`,type:`float`,min:6,max:60,default:22},{id:`u_fin_width`,name:`Fin Width`,type:`float`,min:.2,max:.8,default:.55},{id:`u_shine`,name:`Edge Shine`,type:`float`,min:0,max:1,default:.7},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Aluminum`,type:`color`,default:[.7,.71,.73,1]},{id:`u_secondary_color`,name:`Channel`,type:`color`,default:[.12,.12,.14,1]}],variants:[{name:`Raw Extrusion`,uniforms:{u_primary_color:[.7,.71,.73,1],u_secondary_color:[.12,.12,.14,1],u_rotate:0,u_shine:.7}},{name:`Black Anodized`,uniforms:{u_primary_color:[.15,.15,.17,1],u_secondary_color:[.03,.03,.04,1],u_rotate:0,u_shine:.9}},{name:`Copper Core`,uniforms:{u_primary_color:[.72,.45,.28,1],u_secondary_color:[.2,.1,.06,1],u_rotate:90,u_shine:.8}}]},xo=e({default:()=>So}),So={id:`heritage_arcs`,name:`Heritage Arcs`,category:`Heritage`,added:`2026-06-12`,description:`Two broad contrasting arc stripes sweeping across the panel — the classic endurance-racer look, with painted keylines, edge feather, and decades of clearcoat micro-wear.`,shader:`
     // signed distance to an arc band centred on a big off-panel circle
     float arcband_hrt1(vec2 p, vec2 c, float r) {
       return length(p - c) - r;
@@ -6442,7 +6617,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_arc_width`,name:`Arc Width`,type:`float`,min:.04,max:.22,default:.11},{id:`u_arc_sweep`,name:`Sweep Height`,type:`float`,min:0,max:1,default:.5},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.62,.78,.86,1]},{id:`u_arc_color`,name:`Arc Colour`,type:`color`,default:[.95,.55,.1,1]}]},po=e({default:()=>mo}),mo={id:`herringbone_weave_pro`,name:`Herringbone`,category:`Geometric`,added:`2026-04-15`,description:`Pro-grade chevron-style herringbone weave pattern.`,shader:`
+  `,uniforms:[{id:`u_arc_width`,name:`Arc Width`,type:`float`,min:.04,max:.22,default:.11},{id:`u_arc_sweep`,name:`Sweep Height`,type:`float`,min:0,max:1,default:.5},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.62,.78,.86,1]},{id:`u_arc_color`,name:`Arc Colour`,type:`color`,default:[.95,.55,.1,1]}]},Co=e({default:()=>wo}),wo={id:`herringbone_weave_pro`,name:`Herringbone`,category:`Geometric`,added:`2026-04-15`,description:`Pro-grade chevron-style herringbone weave pattern.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.x), 2.0) == 0.0) uv.y += 0.5;
@@ -6459,7 +6634,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (u_is_spec > 0.5) return vec4(0.0, 0.0, 0.0, 1.0);
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.1,.1,.1,1],u_secondary_color:[.05,.05,.05,1],u_balance:.5,u_grain:0}},{name:`Grey Tweed`,uniforms:{u_primary_color:[.55,.53,.5,1],u_secondary_color:[.32,.3,.28,1],u_balance:.5,u_grain:.18}},{name:`Oak Parquet`,uniforms:{u_primary_color:[.55,.38,.22,1],u_secondary_color:[.4,.26,.14,1],u_scale:12,u_balance:.5,u_grain:.22}},{name:`Racing Green`,uniforms:{u_primary_color:[.04,.25,.14,1],u_secondary_color:[.02,.12,.07,1],u_balance:.45,u_grain:.08}}],uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:2,max:100,default:20},{id:`u_balance`,name:`Chevron Balance`,type:`float`,min:.2,max:.8,default:.5},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.005},{id:`u_grain`,name:`Fiber Grain`,type:`float`,min:0,max:.4,default:0},{id:`u_primary_color`,name:`Primary Weave`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Secondary Weave`,type:`color`,default:[.05,.05,.05,1]}]},ho=e({default:()=>go}),go={id:`hex_basalt_natural`,name:`Hex Basalt`,category:`Natural`,added:`2026-05-01`,description:`Hexagonal columnar basalt cross-sections like the Giants Causeway, with dark joints and per-column tonal variation.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.1,.1,.1,1],u_secondary_color:[.05,.05,.05,1],u_balance:.5,u_grain:0}},{name:`Grey Tweed`,uniforms:{u_primary_color:[.55,.53,.5,1],u_secondary_color:[.32,.3,.28,1],u_balance:.5,u_grain:.18}},{name:`Oak Parquet`,uniforms:{u_primary_color:[.55,.38,.22,1],u_secondary_color:[.4,.26,.14,1],u_scale:12,u_balance:.5,u_grain:.22}},{name:`Racing Green`,uniforms:{u_primary_color:[.04,.25,.14,1],u_secondary_color:[.02,.12,.07,1],u_balance:.45,u_grain:.08}}],uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:2,max:100,default:20},{id:`u_balance`,name:`Chevron Balance`,type:`float`,min:.2,max:.8,default:.5},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.005},{id:`u_grain`,name:`Fiber Grain`,type:`float`,min:0,max:.4,default:0},{id:`u_primary_color`,name:`Primary Weave`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Secondary Weave`,type:`color`,default:[.05,.05,.05,1]}]},To=e({default:()=>Eo}),Eo={id:`hex_basalt_natural`,name:`Hex Basalt`,category:`Natural`,added:`2026-05-01`,description:`Hexagonal columnar basalt cross-sections like the Giants Causeway, with dark joints and per-column tonal variation.`,shader:`
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
     // Classic 3-check hex grid.
@@ -6536,7 +6711,54 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(rockCol, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Column Density`,type:`float`,min:2,max:16,default:7},{id:`u_rock_color`,name:`Basalt Color`,type:`color`,default:[.38,.38,.36,1]},{id:`u_joint_width`,name:`Joint Width`,type:`float`,min:.01,max:.1,default:.04}]},_o=e({default:()=>vo}),vo={id:`hex_fade`,name:`Hex Fade`,category:`Geometric`,added:`2026-06-11`,description:`The signature modern GT livery motif: a crisp honeycomb hexagon grid that shrinks and dissolves to nothing along a controllable fade direction with dithered per-cell dropout.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Column Density`,type:`float`,min:2,max:16,default:7},{id:`u_rock_color`,name:`Basalt Color`,type:`color`,default:[.38,.38,.36,1]},{id:`u_joint_width`,name:`Joint Width`,type:`float`,min:.01,max:.1,default:.04}]},Do=e({default:()=>Oo}),Oo={id:`hex_cascade`,name:`Hex Cascade`,category:`Racing`,added:`2026-07-09`,description:`Hexagonal armour dissolving along the diagonal — filled steel cells thin out into ghost outlines with scattered voltage-green accents. A livery fade with engineering underneath.`,shader:`
+    float hexdist_hxc(vec2 p) {
+      p = abs(p);
+      return max(dot(p, normalize(vec2(1.0, 1.73))), p.x);
+    }
+
+    vec4 generate() {
+      vec2 p = v_uv * u_scale;
+      vec2 r = vec2(1.0, 1.7320508);
+      vec2 h = r * 0.5;
+      vec2 a = mod(p, r) - h;
+      vec2 b = mod(p - h, r) - h;
+      vec2 gv = dot(a, a) < dot(b, b) ? a : b;
+      vec2 id = p - gv;
+      float d = hexdist_hxc(gv);
+
+      vec2 hc = id / u_scale;                       // hex centre in uv space
+      float g = (hc.x + hc.y) * 0.5;                // diagonal fade coordinate
+      float n = noise(id * 3.7 + 17.0);
+      float s = 1.0 - g * u_fade + (n - 0.5) * 0.35;
+      s = clamp((s - 0.12) / 0.75, 0.0, 1.0);
+
+      vec3 bg = vec3(0.058, 0.066, 0.078);
+      if (s < 0.03) return vec4(bg, 1.0);
+
+      float rad = 0.5 * (0.30 + 0.66 * s);
+      float u = hash(id + 4.2);
+      float fill = smoothstep(rad, rad - 0.05, d);
+      vec3 col = bg;
+
+      if (u < u_accent && s > 0.15 && s < 0.9) {
+        // rare live cell
+        col = mix(bg, vec3(0.0, 1.0, 0.61), fill * (0.5 + 0.5 * s));
+      } else if (s > 0.62 && u < 0.90) {
+        // filled steel plate with a brighter rim
+        vec3 steel = vec3(0.29, 0.33, 0.36) * (0.8 + 0.4 * hash(id + 9.1));
+        float inner = smoothstep(rad - 0.06, rad - 0.10, d);
+        col = mix(bg, steel, fill * (0.35 + 0.55 * s));
+        col = mix(col, vec3(0.43, 0.48, 0.52), fill * inner);
+      } else {
+        // outline-only cell, weight scaling with the fade
+        float w = 0.045 + 0.055 * s;
+        float outline = fill - smoothstep(rad - w, rad - w - 0.035, d);
+        col = mix(bg, vec3(0.38, 0.42, 0.45), clamp(outline, 0.0, 1.0) * (0.25 + 0.75 * s));
+      }
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_scale`,name:`Cell Density`,type:`float`,min:6,max:30,default:14},{id:`u_fade`,name:`Fade Strength`,type:`float`,min:.4,max:1.6,default:1},{id:`u_accent`,name:`Accent Cells`,type:`float`,min:0,max:.3,default:.1}]},ko=e({default:()=>Ao}),Ao={id:`hex_fade`,name:`Hex Fade`,category:`Geometric`,added:`2026-06-11`,description:`The signature modern GT livery motif: a crisp honeycomb hexagon grid that shrinks and dissolves to nothing along a controllable fade direction with dithered per-cell dropout.`,shader:`
 
     // Signed-ish distance to a hexagon edge in cell space (edge sits at 0.5)
     float hexEdge(vec2 p) {
@@ -6575,7 +6797,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 color = mix(u_color_bg, u_color_hex, hexMask);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Carbon Fade`,uniforms:{u_color_hex:[.16,.17,.19,1],u_color_bg:[.05,.05,.06,1]}},{name:`Victory Red`,uniforms:{u_color_hex:[.82,.07,.1,1],u_color_bg:[.96,.96,.96,1]}},{name:`Electric Blue`,uniforms:{u_color_hex:[.05,.55,1,1],u_color_bg:[.02,.04,.1,1]}},{name:`Stealth`,uniforms:{u_color_hex:[.1,.1,.11,1],u_color_bg:[.2,.21,.23,1]}}],uniforms:[{id:`u_scale`,name:`Hex Scale`,type:`float`,min:4,max:40,default:14},{id:`u_fade_angle`,name:`Fade Angle (deg)`,type:`float`,min:0,max:360,default:0},{id:`u_fade_start`,name:`Fade Start`,type:`float`,min:0,max:1,default:.2},{id:`u_fade_length`,name:`Fade Length`,type:`float`,min:.05,max:1,default:.6},{id:`u_border`,name:`Hex Border`,type:`float`,min:0,max:.3,default:.08},{id:`u_color_hex`,name:`Hex Color`,type:`color`,default:[.16,.17,.19,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.05,.05,.06,1]}]},yo=e({default:()=>bo}),bo={id:`hex_mesh_pro`,name:`Aerodynamic Hex`,category:`Technology`,added:`2026-04-15`,description:`Technical high-airflow hexagonal mesh grid.`,shader:`
+  `,variants:[{name:`Carbon Fade`,uniforms:{u_color_hex:[.16,.17,.19,1],u_color_bg:[.05,.05,.06,1]}},{name:`Victory Red`,uniforms:{u_color_hex:[.82,.07,.1,1],u_color_bg:[.96,.96,.96,1]}},{name:`Electric Blue`,uniforms:{u_color_hex:[.05,.55,1,1],u_color_bg:[.02,.04,.1,1]}},{name:`Stealth`,uniforms:{u_color_hex:[.1,.1,.11,1],u_color_bg:[.2,.21,.23,1]}}],uniforms:[{id:`u_scale`,name:`Hex Scale`,type:`float`,min:4,max:40,default:14},{id:`u_fade_angle`,name:`Fade Angle (deg)`,type:`float`,min:0,max:360,default:0},{id:`u_fade_start`,name:`Fade Start`,type:`float`,min:0,max:1,default:.2},{id:`u_fade_length`,name:`Fade Length`,type:`float`,min:.05,max:1,default:.6},{id:`u_border`,name:`Hex Border`,type:`float`,min:0,max:.3,default:.08},{id:`u_color_hex`,name:`Hex Color`,type:`color`,default:[.16,.17,.19,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.05,.05,.06,1]}]},jo=e({default:()=>Mo}),Mo={id:`hex_mesh_pro`,name:`Aerodynamic Hex`,category:`Technology`,added:`2026-04-15`,description:`Technical high-airflow hexagonal mesh grid.`,shader:`
     float hexDist(vec2 p) {
       p = abs(p);
       float c = dot(p, normalize(vec2(1.0, 1.73)));
@@ -6599,7 +6821,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb = mix(color.rgb, color.rgb * 0.55, bevel);
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.35,.35,.4,1],u_secondary_color:[.02,.02,.02,1],u_inset:.43,u_bevel:0}},{name:`Stealth Mesh`,uniforms:{u_primary_color:[.08,.08,.09,1],u_secondary_color:[0,0,0,1],u_inset:.43,u_bevel:.5}},{name:`Radiator Brass`,uniforms:{u_primary_color:[.72,.55,.25,1],u_secondary_color:[.06,.04,.02,1],u_inset:.4,u_bevel:.6}},{name:`Tron Grid`,uniforms:{u_primary_color:[.04,.05,.07,1],u_secondary_color:[.1,.9,1,1],u_inset:.45,u_bevel:0}}],uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:10,max:100,default:40},{id:`u_inset`,name:`Cell Size`,type:`float`,min:.2,max:.49,default:.43},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.08,default:.008},{id:`u_bevel`,name:`Bevel Shading`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Mesh`,type:`color`,default:[.35,.35,.4,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.02,.02,1]}]},xo=e({default:()=>So}),So={id:`holographic_foil_artisan`,name:`Holographic Foil`,category:`Abstract`,added:`2026-05-13`,description:`Multi-layered, shifting prismatic gradients reminiscent of rare trading cards.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.35,.35,.4,1],u_secondary_color:[.02,.02,.02,1],u_inset:.43,u_bevel:0}},{name:`Stealth Mesh`,uniforms:{u_primary_color:[.08,.08,.09,1],u_secondary_color:[0,0,0,1],u_inset:.43,u_bevel:.5}},{name:`Radiator Brass`,uniforms:{u_primary_color:[.72,.55,.25,1],u_secondary_color:[.06,.04,.02,1],u_inset:.4,u_bevel:.6}},{name:`Tron Grid`,uniforms:{u_primary_color:[.04,.05,.07,1],u_secondary_color:[.1,.9,1,1],u_inset:.45,u_bevel:0}}],uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:10,max:100,default:40},{id:`u_inset`,name:`Cell Size`,type:`float`,min:.2,max:.49,default:.43},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.08,default:.008},{id:`u_bevel`,name:`Bevel Shading`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Mesh`,type:`color`,default:[.35,.35,.4,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.02,.02,1]}]},No=e({default:()=>Po}),Po={id:`holographic_foil_artisan`,name:`Holographic Foil`,category:`Abstract`,added:`2026-05-13`,description:`Multi-layered, shifting prismatic gradients reminiscent of rare trading cards.`,shader:`
     vec4 generate() {
         vec2 uv = v_uv * u_scale;
         
@@ -6626,7 +6848,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return baseFoil + pattern * scatter * u_pattern_brightness;
     }
-  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:5,max:50,default:20},{id:`u_foil_intensity`,name:`Spectral Saturation`,type:`float`,min:0,max:2,default:1},{id:`u_pattern_brightness`,name:`Foil Glint`,type:`float`,min:0,max:2,default:1.2},{id:`u_shift`,name:`Angle Shift`,type:`float`,min:0,max:10,default:0}]},Co=e({default:()=>wo}),wo={id:`holographic_glitch_artisan`,name:`Hologlitch`,category:`Abstract`,added:`2026-04-16`,description:`Chromatic offset stripes and holographic artifacts mimicking digital interference.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:5,max:50,default:20},{id:`u_foil_intensity`,name:`Spectral Saturation`,type:`float`,min:0,max:2,default:1},{id:`u_pattern_brightness`,name:`Foil Glint`,type:`float`,min:0,max:2,default:1.2},{id:`u_shift`,name:`Angle Shift`,type:`float`,min:0,max:10,default:0}]},Fo=e({default:()=>Io}),Io={id:`holographic_glitch_artisan`,name:`Hologlitch`,category:`Abstract`,added:`2026-04-16`,description:`Chromatic offset stripes and holographic artifacts mimicking digital interference.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * 40.0);
@@ -6634,7 +6856,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float r = step(0.5, fract(v_uv.x * 10.0 + offset));
       return mix(u_secondary_color, u_primary_color, r);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Cyan Beam`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Magenta Blur`,type:`color`,default:[1,0,1,1]}]},To=e({default:()=>Eo}),Eo={id:`honeycomb_bio`,name:`HoneyComb Bio`,category:`Natural`,added:`2026-04-15`,description:`Precise hexagonal organic cell wall structure.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Cyan Beam`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Magenta Blur`,type:`color`,default:[1,0,1,1]}]},Lo=e({default:()=>Ro}),Ro={id:`honeycomb_bio`,name:`HoneyComb Bio`,category:`Natural`,added:`2026-04-15`,description:`Precise hexagonal organic cell wall structure.`,shader:`
     float hexDist(vec2 p) {
       p = abs(p);
       float c = dot(p, normalize(vec2(1, 1.73)));
@@ -6652,7 +6874,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.45, d);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:40,default:12},{id:`u_primary_color`,name:`Honey Fill`,type:`color`,default:[1,.7,0,1]},{id:`u_secondary_color`,name:`Wax Wall`,type:`color`,default:[.2,.1,0,1]}]},Do=e({default:()=>Oo}),Oo={id:`honeycomb_metal`,name:`Honeycomb Metal`,category:`Industrial`,added:`2026-05-01`,description:`Aerospace aluminium honeycomb panel â€” machine-perfect hexagonal cells with bright thin walls and deep dark interiors.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:40,default:12},{id:`u_primary_color`,name:`Honey Fill`,type:`color`,default:[1,.7,0,1]},{id:`u_secondary_color`,name:`Wax Wall`,type:`color`,default:[.2,.1,0,1]}]},zo=e({default:()=>Bo}),Bo={id:`honeycomb_metal`,name:`Honeycomb Metal`,category:`Industrial`,added:`2026-05-01`,description:`Aerospace aluminium honeycomb panel â€” machine-perfect hexagonal cells with bright thin walls and deep dark interiors.`,shader:`
     // Perfect hexagonal grid SDF
     // Returns: x = dist to hex centre, y = dist to nearest wall
     vec2 hexGrid(vec2 uv) {
@@ -6725,7 +6947,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Cell Scale`},{id:`u_wall_color`,type:`color`,default:[.78,.8,.82,1],name:`Wall Colour`},{id:`u_cell_depth`,type:`float`,default:.85,min:.2,max:1,name:`Cell Depth`}]},ko=e({default:()=>Ao}),Ao={id:`hood_louvers`,name:`Hood Louvers`,category:`Industrial`,added:`2026-07-07`,description:`Stamped sheet-metal louver rows — hot-rod hood venting with deep slot shadows.`,shader:`
+  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Cell Scale`},{id:`u_wall_color`,type:`color`,default:[.78,.8,.82,1],name:`Wall Colour`},{id:`u_cell_depth`,type:`float`,default:.85,min:.2,max:1,name:`Cell Depth`}]},Vo=e({default:()=>Ho}),Ho={id:`hood_louvers`,name:`Hood Louvers`,category:`Industrial`,added:`2026-07-07`,description:`Stamped sheet-metal louver rows — hot-rod hood venting with deep slot shadows.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -6752,7 +6974,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(base.rgb, c, mix(1.0, cap, step(0.15, fy)));
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Louver Rows`,type:`float`,min:4,max:40,default:14},{id:`u_span`,name:`Louver Length`,type:`float`,min:1,max:8,default:3},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Panel`,type:`color`,default:[.55,.56,.58,1]},{id:`u_secondary_color`,name:`Slot Shadow`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Bare Steel`,uniforms:{u_primary_color:[.55,.56,.58,1],u_secondary_color:[.04,.04,.05,1],u_rotate:0}},{name:`Hot Rod Black`,uniforms:{u_primary_color:[.12,.12,.13,1],u_secondary_color:[.01,.01,.01,1],u_rotate:0}},{name:`Race Red`,uniforms:{u_primary_color:[.68,.09,.1,1],u_secondary_color:[.05,.02,.02,1],u_rotate:90}}]},jo=e({default:()=>Mo}),Mo={id:`hotrod_flames`,name:`Hot Rod Flames`,category:`Racing`,added:`2026-06-11`,description:`Classic hot rod flame licks streaming left to right: fbm-warped tongues that taper and curl, layered outer, mid and hot-core colours for the traditional outlined look.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Louver Rows`,type:`float`,min:4,max:40,default:14},{id:`u_span`,name:`Louver Length`,type:`float`,min:1,max:8,default:3},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Panel`,type:`color`,default:[.55,.56,.58,1]},{id:`u_secondary_color`,name:`Slot Shadow`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Bare Steel`,uniforms:{u_primary_color:[.55,.56,.58,1],u_secondary_color:[.04,.04,.05,1],u_rotate:0}},{name:`Hot Rod Black`,uniforms:{u_primary_color:[.12,.12,.13,1],u_secondary_color:[.01,.01,.01,1],u_rotate:0}},{name:`Race Red`,uniforms:{u_primary_color:[.68,.09,.1,1],u_secondary_color:[.05,.02,.02,1],u_rotate:90}}]},Uo=e({default:()=>Wo}),Wo={id:`hotrod_flames`,name:`Hot Rod Flames`,category:`Racing`,added:`2026-06-11`,description:`Classic hot rod flame licks streaming left to right: fbm-warped tongues that taper and curl, layered outer, mid and hot-core colours for the traditional outlined look.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv;
@@ -6782,7 +7004,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color = mix(color, u_color_core, core);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Classic Orange`,uniforms:{u_color_outer:[.75,.05,.02,1],u_color_mid:[1,.45,.02,1],u_color_core:[1,.9,.25,1],u_color_bg:[.03,.03,.04,1]}},{name:`Blue Flame`,uniforms:{u_color_outer:[.05,.1,.45,1],u_color_mid:[.1,.45,.95,1],u_color_core:[.8,.95,1,1],u_color_bg:[.02,.02,.05,1]}},{name:`Green Envy`,uniforms:{u_color_outer:[.04,.3,.06,1],u_color_mid:[.2,.8,.1,1],u_color_core:[.85,1,.4,1],u_color_bg:[.02,.04,.02,1]}},{name:`Purple Haze`,uniforms:{u_color_outer:[.28,.04,.45,1],u_color_mid:[.65,.2,.95,1],u_color_core:[.95,.75,1,1],u_color_bg:[.04,.02,.06,1]}}],uniforms:[{id:`u_scale`,name:`Flame Scale`,type:`float`,min:2,max:12,default:5},{id:`u_length`,name:`Lick Length`,type:`float`,min:.3,max:1.5,default:.95},{id:`u_stretch`,name:`Lick Stretch`,type:`float`,min:.4,max:3,default:1.2},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:0,max:1.5,default:.6},{id:`u_color_outer`,name:`Outer Flame`,type:`color`,default:[.75,.05,.02,1]},{id:`u_color_mid`,name:`Mid Flame`,type:`color`,default:[1,.45,.02,1]},{id:`u_color_core`,name:`Hot Core`,type:`color`,default:[1,.9,.25,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.03,.03,.04,1]}]},No=e({default:()=>Po}),Po={id:`houndstooth`,name:`Houndstooth`,category:`Geometric`,added:`2026-04-15`,description:`Pro-grade textile pattern for classic racing interiors.`,shader:`
+  `,variants:[{name:`Classic Orange`,uniforms:{u_color_outer:[.75,.05,.02,1],u_color_mid:[1,.45,.02,1],u_color_core:[1,.9,.25,1],u_color_bg:[.03,.03,.04,1]}},{name:`Blue Flame`,uniforms:{u_color_outer:[.05,.1,.45,1],u_color_mid:[.1,.45,.95,1],u_color_core:[.8,.95,1,1],u_color_bg:[.02,.02,.05,1]}},{name:`Green Envy`,uniforms:{u_color_outer:[.04,.3,.06,1],u_color_mid:[.2,.8,.1,1],u_color_core:[.85,1,.4,1],u_color_bg:[.02,.04,.02,1]}},{name:`Purple Haze`,uniforms:{u_color_outer:[.28,.04,.45,1],u_color_mid:[.65,.2,.95,1],u_color_core:[.95,.75,1,1],u_color_bg:[.04,.02,.06,1]}}],uniforms:[{id:`u_scale`,name:`Flame Scale`,type:`float`,min:2,max:12,default:5},{id:`u_length`,name:`Lick Length`,type:`float`,min:.3,max:1.5,default:.95},{id:`u_stretch`,name:`Lick Stretch`,type:`float`,min:.4,max:3,default:1.2},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:0,max:1.5,default:.6},{id:`u_color_outer`,name:`Outer Flame`,type:`color`,default:[.75,.05,.02,1]},{id:`u_color_mid`,name:`Mid Flame`,type:`color`,default:[1,.45,.02,1]},{id:`u_color_core`,name:`Hot Core`,type:`color`,default:[1,.9,.25,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.03,.03,.04,1]}]},Go=e({default:()=>Ko}),Ko={id:`houndstooth`,name:`Houndstooth`,category:`Geometric`,added:`2026-04-15`,description:`Pro-grade textile pattern for classic racing interiors.`,shader:`
     float ht_edge(float edge, float x, float s) {
       return smoothstep(edge - s, edge + s, x);
     }
@@ -6808,7 +7030,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb = mix(color.rgb, color.rgb * (0.85 + weave * 0.3), u_weave);
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,1,1,1],u_secondary_color:[.05,.05,.05,1],u_rotate:0,u_weave:0}},{name:`Camel Coat`,uniforms:{u_primary_color:[.82,.66,.45,1],u_secondary_color:[.25,.16,.1,1],u_rotate:0,u_weave:.5}},{name:`Grey Tweed`,uniforms:{u_primary_color:[.75,.75,.78,1],u_secondary_color:[.12,.12,.14,1],u_rotate:0,u_weave:.35}},{name:`Speed Punch`,uniforms:{u_primary_color:[.95,.25,.1,1],u_secondary_color:[.05,.05,.06,1],u_rotate:45,u_weave:0}}],uniforms:[{id:`u_scale`,name:`Pattern Size`,type:`float`,min:5,max:100,default:40},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_weave`,name:`Thread Texture`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Primary Thread`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Secondary Thread`,type:`color`,default:[.05,.05,.05,1]}]},Fo=e({default:()=>Io}),Io={id:`hunting_camo_forest`,name:`Forest Hunting Camo`,category:`Racing`,added:`2026-04-15`,description:`Pro-grade wilderness camouflage with organic branch and leaf shapes.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,1,1,1],u_secondary_color:[.05,.05,.05,1],u_rotate:0,u_weave:0}},{name:`Camel Coat`,uniforms:{u_primary_color:[.82,.66,.45,1],u_secondary_color:[.25,.16,.1,1],u_rotate:0,u_weave:.5}},{name:`Grey Tweed`,uniforms:{u_primary_color:[.75,.75,.78,1],u_secondary_color:[.12,.12,.14,1],u_rotate:0,u_weave:.35}},{name:`Speed Punch`,uniforms:{u_primary_color:[.95,.25,.1,1],u_secondary_color:[.05,.05,.06,1],u_rotate:45,u_weave:0}}],uniforms:[{id:`u_scale`,name:`Pattern Size`,type:`float`,min:5,max:100,default:40},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_weave`,name:`Thread Texture`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Primary Thread`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Secondary Thread`,type:`color`,default:[.05,.05,.05,1]}]},qo=e({default:()=>Jo}),Jo={id:`hunting_camo_forest`,name:`Forest Hunting Camo`,category:`Racing`,added:`2026-04-15`,description:`Pro-grade wilderness camouflage with organic branch and leaf shapes.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -6827,7 +7049,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (u_is_spec > 0.5) return vec4(0.0, 0.9, 0.0, 1.0);
       return color;
     }
-  `,variants:[{name:`Forest (Default)`,uniforms:{u_color_green:[.1,.15,.05,1],u_color_tan:[.5,.45,.3,1],u_color_brown:[.25,.15,.1,1],u_color_dark:[.05,.05,.02,1]}},{name:`Blackout Stealth`,uniforms:{u_color_green:[.06,.06,.07,1],u_color_tan:[.15,.15,.16,1],u_color_brown:[.03,.03,.04,1],u_color_dark:[0,0,0,1]}}],uniforms:[{id:`u_scale`,name:`Detail Density`,type:`float`,min:1,max:10,default:3.5},{id:`u_color_green`,name:`Greenish`,type:`color`,default:[.1,.15,.05,1]},{id:`u_color_tan`,name:`Tan Base`,type:`color`,default:[.5,.45,.3,1]},{id:`u_color_brown`,name:`Brown`,type:`color`,default:[.25,.15,.1,1]},{id:`u_color_dark`,name:`Dark`,type:`color`,default:[.05,.05,.02,1]}]},Lo=e({default:()=>Ro}),Ro={id:`hydrothermal_vent`,name:`Hydrothermal Vent`,category:`Ocean`,added:`2026-06-11`,description:`Black smoker chimneys belching turbulent mineral plumes over fissured basalt veined with magma glow.`,shader:`
+  `,variants:[{name:`Forest (Default)`,uniforms:{u_color_green:[.1,.15,.05,1],u_color_tan:[.5,.45,.3,1],u_color_brown:[.25,.15,.1,1],u_color_dark:[.05,.05,.02,1]}},{name:`Blackout Stealth`,uniforms:{u_color_green:[.06,.06,.07,1],u_color_tan:[.15,.15,.16,1],u_color_brown:[.03,.03,.04,1],u_color_dark:[0,0,0,1]}}],uniforms:[{id:`u_scale`,name:`Detail Density`,type:`float`,min:1,max:10,default:3.5},{id:`u_color_green`,name:`Greenish`,type:`color`,default:[.1,.15,.05,1]},{id:`u_color_tan`,name:`Tan Base`,type:`color`,default:[.5,.45,.3,1]},{id:`u_color_brown`,name:`Brown`,type:`color`,default:[.25,.15,.1,1]},{id:`u_color_dark`,name:`Dark`,type:`color`,default:[.05,.05,.02,1]}]},Yo=e({default:()=>Xo}),Xo={id:`hydrothermal_vent`,name:`Hydrothermal Vent`,category:`Ocean`,added:`2026-06-11`,description:`Black smoker chimneys belching turbulent mineral plumes over fissured basalt veined with magma glow.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -6897,7 +7119,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_plume_width`,name:`Plume Spread`,type:`float`,min:.2,max:2,default:1},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:.2,max:1.5,default:.9},{id:`u_glow_amt`,name:`Magma Glow`,type:`float`,min:0,max:1.5,default:.7},{id:`u_glow_color`,name:`Glow Color`,type:`color`,default:[1,.35,.05,1]}]},zo=e({default:()=>Bo}),Bo={id:`ikat_weave`,name:`Ikat Weave`,category:`Textile`,added:`2026-06-12`,description:`Resist-dyed ikat diamonds with the signature blurred, feathered edges — each warp thread carries its own slightly misaligned dye, over a visible warp-faced weave.`,shader:`
+  `,uniforms:[{id:`u_plume_width`,name:`Plume Spread`,type:`float`,min:.2,max:2,default:1},{id:`u_turbulence`,name:`Turbulence`,type:`float`,min:.2,max:1.5,default:.9},{id:`u_glow_amt`,name:`Magma Glow`,type:`float`,min:0,max:1.5,default:.7},{id:`u_glow_color`,name:`Glow Color`,type:`color`,default:[1,.35,.05,1]}]},Zo=e({default:()=>Qo}),Qo={id:`ikat_weave`,name:`Ikat Weave`,category:`Textile`,added:`2026-06-12`,description:`Resist-dyed ikat diamonds with the signature blurred, feathered edges — each warp thread carries its own slightly misaligned dye, over a visible warp-faced weave.`,shader:`
     // Triangle wave 0..1, period 1 — keeps everything tileable
     float tri_ikw(float x) {
       return abs(fract(x) - 0.5) * 2.0;
@@ -6960,12 +7182,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_repeats`,name:`Diamond Repeats`,type:`float`,min:1,max:8,default:3},{id:`u_feather`,name:`Edge Feathering`,type:`float`,min:0,max:1,default:.55},{id:`u_dye_color`,name:`Dye Color`,type:`color`,default:[.55,.13,.18,1]}]},Vo=e({default:()=>Ho}),Ho={id:`impasto_paint_artisan`,name:`Impasto Paint`,category:`Abstract`,added:`2026-04-16`,description:`Thick, textured brush strokes and heavy oil paint impasto effects.`,shader:`
+  `,uniforms:[{id:`u_repeats`,name:`Diamond Repeats`,type:`float`,min:1,max:8,default:3},{id:`u_feather`,name:`Edge Feathering`,type:`float`,min:0,max:1,default:.55},{id:`u_dye_color`,name:`Dye Color`,type:`color`,default:[.55,.13,.18,1]}]},$o=e({default:()=>es}),es={id:`impasto_paint_artisan`,name:`Impasto Paint`,category:`Abstract`,added:`2026-04-16`,description:`Thick, textured brush strokes and heavy oil paint impasto effects.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 10.0 + noise(v_uv * 20.0));
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Paint Peak`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Canvas Base`,type:`color`,default:[.4,0,0,1]}]},Uo=e({default:()=>Wo}),Wo={id:`infinite_spiral_pro`,name:`Infinite Spiral`,category:`Abstract`,added:`2026-04-15`,description:`Mathematical spirograph with static interlocking floral loops.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Paint Peak`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Canvas Base`,type:`color`,default:[.4,0,0,1]}]},ts=e({default:()=>ns}),ns={id:`infinite_spiral_pro`,name:`Infinite Spiral`,category:`Abstract`,added:`2026-04-15`,description:`Mathematical spirograph with static interlocking floral loops.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float r = length(uv);
@@ -6977,14 +7199,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, 1.0 - mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Spiral Power`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Ink Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[0,0,0,1]}]},Go=e({default:()=>Ko}),Ko={id:`ink_blot_test_artisan`,name:`Ink Blot`,category:`Abstract`,added:`2026-04-16`,description:`Symmetrical organic Rorschach blobs mimicking organic ink flow on folded paper.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Spiral Power`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Ink Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[0,0,0,1]}]},rs=e({default:()=>is}),is={id:`ink_blot_test_artisan`,name:`Ink Blot`,category:`Abstract`,added:`2026-04-16`,description:`Symmetrical organic Rorschach blobs mimicking organic ink flow on folded paper.`,shader:`
     vec4 generate() {
       vec2 uv = abs(v_uv - 0.5) * 2.0;
       float n = noise(uv * 5.0 + noise(uv * 10.0));
       float mask = step(0.5, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Ink Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.9,1]}]},qo=e({default:()=>Jo}),Jo={id:`interference_rings`,name:`Interference Rings`,category:`Abstract`,added:`2026-05-01`,description:`Newton's rings â€” concentric iridescent interference fringes radiating from a contact point.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Ink Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Paper White`,type:`color`,default:[.95,.95,.9,1]}]},as=e({default:()=>os}),os={id:`interference_rings`,name:`Interference Rings`,category:`Abstract`,added:`2026-05-01`,description:`Newton's rings â€” concentric iridescent interference fringes radiating from a contact point.`,shader:`
     // Convert HSV to RGB (GLSL 1.0 compatible)
     vec3 hsv2rgb(float h, float s, float v) {
       float hh = mod(h * 6.0, 6.0);
@@ -7042,7 +7264,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_fringe_freq`,type:`float`,default:18,min:4,max:40,name:`Fringe Frequency`},{id:`u_iridescence`,type:`float`,default:1.2,min:0,max:2,name:`Iridescence`},{id:`u_center`,type:`float`,default:.5,min:.1,max:.9,name:`Ring Centre X`}]},Yo=e({default:()=>Xo}),Xo={id:`iris_fibers_artisan`,name:`Iris Fibers`,category:`Natural`,added:`2026-04-15`,description:`Radial organic fibrous patterns found in the human eye iris.`,shader:`
+  `,uniforms:[{id:`u_fringe_freq`,type:`float`,default:18,min:4,max:40,name:`Fringe Frequency`},{id:`u_iridescence`,type:`float`,default:1.2,min:0,max:2,name:`Iridescence`},{id:`u_center`,type:`float`,default:.5,min:.1,max:.9,name:`Ring Centre X`}]},ss=e({default:()=>cs}),cs={id:`iris_fibers_artisan`,name:`Iris Fibers`,category:`Natural`,added:`2026-04-15`,description:`Radial organic fibrous patterns found in the human eye iris.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * 2.0;
       float d = length(uv);
@@ -7051,7 +7273,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.1, 0.8, d + n * 0.2);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Pupil Edge`,type:`color`,default:[.1,.3,.6,1]},{id:`u_secondary_color`,name:`Outer Stroma`,type:`color`,default:[0,.05,.1,1]}]},Zo=e({default:()=>Qo}),Qo={id:`ivy_vines`,name:`Ivy Vines`,category:`Natural`,added:`2026-07-07`,description:`Climbing ivy — sinuous stems winding upward with pointed leaves scattered along them.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Pupil Edge`,type:`color`,default:[.1,.3,.6,1]},{id:`u_secondary_color`,name:`Outer Stroma`,type:`color`,default:[0,.05,.1,1]}]},ls=e({default:()=>us}),us={id:`ivy_vines`,name:`Ivy Vines`,category:`Natural`,added:`2026-07-07`,description:`Climbing ivy — sinuous stems winding upward with pointed leaves scattered along them.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -7085,7 +7307,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Vine Scale`,type:`float`,min:2,max:12,default:5},{id:`u_scale_x`,name:`Spread`,type:`float`,min:.5,max:2,default:1},{id:`u_primary_color`,name:`Ivy Green`,type:`color`,default:[.16,.4,.18,1]},{id:`u_accent_color`,name:`New Leaves`,type:`color`,default:[.4,.62,.25,1]},{id:`u_secondary_color`,name:`Wall`,type:`color`,default:[.75,.7,.62,1]}],variants:[{name:`Garden Wall`,uniforms:{u_primary_color:[.16,.4,.18,1],u_accent_color:[.4,.62,.25,1],u_secondary_color:[.75,.7,.62,1]}},{name:`Autumn Creeper`,uniforms:{u_primary_color:[.55,.18,.1,1],u_accent_color:[.8,.4,.15,1],u_secondary_color:[.6,.58,.55,1]}},{name:`Midnight Ivy`,uniforms:{u_primary_color:[.08,.2,.14,1],u_accent_color:[.18,.38,.28,1],u_secondary_color:[.12,.12,.14,1]}}]},$o=e({default:()=>es}),es={id:`jade_polish`,name:`Jade Polish`,category:`Geology`,added:`2026-06-12`,description:`Polished nephrite jade — deep translucent green with drifting cloudy inclusions, dark specks, and the characteristic soft waxy lustre.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Vine Scale`,type:`float`,min:2,max:12,default:5},{id:`u_scale_x`,name:`Spread`,type:`float`,min:.5,max:2,default:1},{id:`u_primary_color`,name:`Ivy Green`,type:`color`,default:[.16,.4,.18,1]},{id:`u_accent_color`,name:`New Leaves`,type:`color`,default:[.4,.62,.25,1]},{id:`u_secondary_color`,name:`Wall`,type:`color`,default:[.75,.7,.62,1]}],variants:[{name:`Garden Wall`,uniforms:{u_primary_color:[.16,.4,.18,1],u_accent_color:[.4,.62,.25,1],u_secondary_color:[.75,.7,.62,1]}},{name:`Autumn Creeper`,uniforms:{u_primary_color:[.55,.18,.1,1],u_accent_color:[.8,.4,.15,1],u_secondary_color:[.6,.58,.55,1]}},{name:`Midnight Ivy`,uniforms:{u_primary_color:[.08,.2,.14,1],u_accent_color:[.18,.38,.28,1],u_secondary_color:[.12,.12,.14,1]}}]},ds=e({default:()=>fs}),fs={id:`jade_polish`,name:`Jade Polish`,category:`Geology`,added:`2026-06-12`,description:`Polished nephrite jade — deep translucent green with drifting cloudy inclusions, dark specks, and the characteristic soft waxy lustre.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -7139,7 +7361,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_cloud_scale`,name:`Cloud Scale`,type:`float`,min:1.5,max:12,default:4},{id:`u_cloudiness`,name:`Cloudiness`,type:`float`,min:0,max:1.5,default:.8},{id:`u_waxiness`,name:`Waxy Lustre`,type:`float`,min:0,max:2,default:1},{id:`u_jade_color`,name:`Jade Green`,type:`color`,default:[.13,.42,.25,1]}]},ts=e({default:()=>ns}),ns={id:`julia_fractal`,name:`Julia Set`,category:`Abstract`,added:`2026-04-15`,description:`High-symmetry mathematical fractal based on complex number seeds.`,shader:`
+  `,uniforms:[{id:`u_cloud_scale`,name:`Cloud Scale`,type:`float`,min:1.5,max:12,default:4},{id:`u_cloudiness`,name:`Cloudiness`,type:`float`,min:0,max:1.5,default:.8},{id:`u_waxiness`,name:`Waxy Lustre`,type:`float`,min:0,max:2,default:1},{id:`u_jade_color`,name:`Jade Green`,type:`color`,default:[.13,.42,.25,1]}]},ps=e({default:()=>ms}),ms={id:`julia_fractal`,name:`Julia Set`,category:`Abstract`,added:`2026-04-15`,description:`High-symmetry mathematical fractal based on complex number seeds.`,shader:`
     vec4 generate() {
       vec2 z = (v_uv - 0.5) * 4.0 / u_scale;
       vec2 c = vec2(-0.7, 0.27015);
@@ -7155,7 +7377,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = iter / max_iter;
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fractal Size`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Core Color`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Outer Space`,type:`color`,default:[0,0,.1,1]}]},rs=e({default:()=>is}),is={id:`kaleidoscope`,name:`Kaleidoscope`,category:`Abstract`,added:`2026-07-07`,description:`Mirror-folded color chips — a glass kaleidoscope chamber frozen mid-turn.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fractal Size`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Core Color`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Outer Space`,type:`color`,default:[0,0,.1,1]}]},hs=e({default:()=>gs}),gs={id:`kaleidoscope`,name:`Kaleidoscope`,category:`Abstract`,added:`2026-07-07`,description:`Mirror-folded color chips — a glass kaleidoscope chamber frozen mid-turn.`,shader:`
     vec4 generate() {
       vec2 p = (v_uv - 0.5) * u_scale;
       float r = length(p);
@@ -7179,7 +7401,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= smoothstep(2.2, 0.9, r) * 0.35 + 0.65;
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:3},{id:`u_segments`,name:`Mirror Segments`,type:`float`,min:3,max:16,default:8},{id:`u_glint`,name:`Glass Glint`,type:`float`,min:0,max:1,default:.5},{id:`u_secondary_color`,name:`Chamber`,type:`color`,default:[.1,.08,.14,1]},{id:`u_primary_color`,name:`Chip 1`,type:`color`,default:[.85,.3,.4,1]},{id:`u_accent_color`,name:`Chip 2`,type:`color`,default:[.25,.6,.75,1]},{id:`u_pop_color`,name:`Chip 3`,type:`color`,default:[.95,.75,.25,1]}],variants:[{name:`Toy Scope`,uniforms:{u_secondary_color:[.1,.08,.14,1],u_primary_color:[.85,.3,.4,1],u_accent_color:[.25,.6,.75,1],u_pop_color:[.95,.75,.25,1],u_segments:8}},{name:`Cathedral`,uniforms:{u_secondary_color:[.06,.06,.1,1],u_primary_color:[.5,.15,.5,1],u_accent_color:[.15,.3,.65,1],u_pop_color:[.9,.6,.2,1],u_segments:12}},{name:`Citrus Wheel`,uniforms:{u_secondary_color:[.95,.93,.85,1],u_primary_color:[.95,.6,.15,1],u_accent_color:[.6,.8,.3,1],u_pop_color:[.95,.85,.3,1],u_segments:6}}]},as=e({default:()=>os}),os={id:`kantha_stitch`,name:`Kantha Quilt`,category:`Textile`,added:`2026-06-12`,description:`Bengali kantha: layered sari-cloth quilt covered edge to edge in dense parallel running stitches, the cloth rippling between rows, with mismatched patch colours showing through.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:3},{id:`u_segments`,name:`Mirror Segments`,type:`float`,min:3,max:16,default:8},{id:`u_glint`,name:`Glass Glint`,type:`float`,min:0,max:1,default:.5},{id:`u_secondary_color`,name:`Chamber`,type:`color`,default:[.1,.08,.14,1]},{id:`u_primary_color`,name:`Chip 1`,type:`color`,default:[.85,.3,.4,1]},{id:`u_accent_color`,name:`Chip 2`,type:`color`,default:[.25,.6,.75,1]},{id:`u_pop_color`,name:`Chip 3`,type:`color`,default:[.95,.75,.25,1]}],variants:[{name:`Toy Scope`,uniforms:{u_secondary_color:[.1,.08,.14,1],u_primary_color:[.85,.3,.4,1],u_accent_color:[.25,.6,.75,1],u_pop_color:[.95,.75,.25,1],u_segments:8}},{name:`Cathedral`,uniforms:{u_secondary_color:[.06,.06,.1,1],u_primary_color:[.5,.15,.5,1],u_accent_color:[.15,.3,.65,1],u_pop_color:[.9,.6,.2,1],u_segments:12}},{name:`Citrus Wheel`,uniforms:{u_secondary_color:[.95,.93,.85,1],u_primary_color:[.95,.6,.15,1],u_accent_color:[.6,.8,.3,1],u_pop_color:[.95,.85,.3,1],u_segments:6}}]},_s=e({default:()=>vs}),vs={id:`kantha_stitch`,name:`Kantha Quilt`,category:`Textile`,added:`2026-06-12`,description:`Bengali kantha: layered sari-cloth quilt covered edge to edge in dense parallel running stitches, the cloth rippling between rows, with mismatched patch colours showing through.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -7244,7 +7466,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rows`,name:`Stitch Rows`,type:`float`,min:10,max:50,default:24},{id:`u_cloth_color`,name:`Cloth Color`,type:`color`,default:[.78,.62,.45,1]},{id:`u_thread_color`,name:`Thread Color`,type:`color`,default:[.92,.9,.84,1]}]},ss=e({default:()=>cs}),cs={id:`kelp_forest`,name:`Kelp Forest`,category:`Ocean`,added:`2026-06-11`,description:`Sinuous kelp stalks with fluttering blades rising through teal water, layered into hazy depth under slanting light shafts.`,shader:`
+  `,uniforms:[{id:`u_rows`,name:`Stitch Rows`,type:`float`,min:10,max:50,default:24},{id:`u_cloth_color`,name:`Cloth Color`,type:`color`,default:[.78,.62,.45,1]},{id:`u_thread_color`,name:`Thread Color`,type:`color`,default:[.92,.9,.84,1]}]},ys=e({default:()=>bs}),bs={id:`kelp_forest`,name:`Kelp Forest`,category:`Ocean`,added:`2026-06-11`,description:`Sinuous kelp stalks with fluttering blades rising through teal water, layered into hazy depth under slanting light shafts.`,shader:`
     // One depth layer of kelp: returns stalk+blade mask for a column field
     float kelp_layer_klp(vec2 uv, float count, float sway, float seed) {
       float xc = uv.x * count;
@@ -7316,7 +7538,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_stalks`,name:`Stalk Count`,type:`float`,min:3,max:14,default:7},{id:`u_sway`,name:`Current Sway`,type:`float`,min:0,max:.25,default:.1},{id:`u_water_color`,name:`Water Color`,type:`color`,default:[.03,.2,.24,1]},{id:`u_light_color`,name:`Light Shafts`,type:`color`,default:[.55,.85,.75,1]}]},ls=e({default:()=>us}),us={id:`kente_cloth`,name:`Kente Cloth`,category:`Textile`,added:`2026-06-12`,description:`Ghanaian strip-woven kente: narrow horizontal strips divided into blocks of alternating motifs — gold ground with red, green and black stripe, zigzag and check designs, with visible strip seams.`,shader:`
+  `,uniforms:[{id:`u_stalks`,name:`Stalk Count`,type:`float`,min:3,max:14,default:7},{id:`u_sway`,name:`Current Sway`,type:`float`,min:0,max:.25,default:.1},{id:`u_water_color`,name:`Water Color`,type:`color`,default:[.03,.2,.24,1]},{id:`u_light_color`,name:`Light Shafts`,type:`color`,default:[.55,.85,.75,1]}]},xs=e({default:()=>Ss}),Ss={id:`kente_cloth`,name:`Kente Cloth`,category:`Textile`,added:`2026-06-12`,description:`Ghanaian strip-woven kente: narrow horizontal strips divided into blocks of alternating motifs — gold ground with red, green and black stripe, zigzag and check designs, with visible strip seams.`,shader:`
     float tri_ken(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -7400,7 +7622,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_strips`,name:`Strip Count`,type:`float`,min:3,max:12,default:6},{id:`u_sheen`,name:`Silk Sheen`,type:`float`,min:0,max:1,default:.5}]},ds=e({default:()=>fs}),fs={id:`kers_containment_core_artisan`,name:`KERS Containment Core`,category:`Technology`,added:`2026-05-13`,description:`Glowing, high-energy plasma cells wrapped in intricate copper coiling.`,shader:`
+  `,uniforms:[{id:`u_strips`,name:`Strip Count`,type:`float`,min:3,max:12,default:6},{id:`u_sheen`,name:`Silk Sheen`,type:`float`,min:0,max:1,default:.5}]},Cs=e({default:()=>ws}),ws={id:`kers_containment_core_artisan`,name:`KERS Containment Core`,category:`Technology`,added:`2026-05-13`,description:`Glowing, high-energy plasma cells wrapped in intricate copper coiling.`,shader:`
     vec2 random2( vec2 p ) {
         return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
@@ -7438,7 +7660,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return mix(plasmaLayer, coilLayer, coilMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Core Scale`,type:`float`,min:2,max:20,default:5},{id:`u_bg_color`,name:`Housing`,type:`color`,default:[.05,.05,.08,1]},{id:`u_plasma_color`,name:`Plasma Energy`,type:`color`,default:[0,.8,1,1]},{id:`u_copper_light`,name:`Copper Coil Highlight`,type:`color`,default:[.8,.4,.2,1]},{id:`u_copper_dark`,name:`Copper Coil Shadow`,type:`color`,default:[.3,.1,.05,1]},{id:`u_flow`,name:`Energy Flow`,type:`float`,min:0,max:100,default:0}]},ps=e({default:()=>ms}),ms={id:`kevlar_grid_artisan`,name:`Kevlar Weave`,category:`Industrial`,added:`2026-04-15`,description:`Heavy tactical weave used in protective armor and performance gear.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Core Scale`,type:`float`,min:2,max:20,default:5},{id:`u_bg_color`,name:`Housing`,type:`color`,default:[.05,.05,.08,1]},{id:`u_plasma_color`,name:`Plasma Energy`,type:`color`,default:[0,.8,1,1]},{id:`u_copper_light`,name:`Copper Coil Highlight`,type:`color`,default:[.8,.4,.2,1]},{id:`u_copper_dark`,name:`Copper Coil Shadow`,type:`color`,default:[.3,.1,.05,1]},{id:`u_flow`,name:`Energy Flow`,type:`float`,min:0,max:100,default:0}]},Ts=e({default:()=>Es}),Es={id:`kevlar_grid_artisan`,name:`Kevlar Weave`,category:`Industrial`,added:`2026-04-15`,description:`Heavy tactical weave used in protective armor and performance gear.`,shader:`
     vec4 generate() {
       float lines = sin(v_uv.x * u_scale) * sin(v_uv.y * u_scale);
       float mask = smoothstep(-u_softness, u_softness, lines);
@@ -7449,7 +7671,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb += sheen * 0.35;
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.8,.7,.2,1],u_secondary_color:[.1,.1,.1,1],u_scale:400,u_softness:.5,u_sheen:0}},{name:`Black Ops`,uniforms:{u_primary_color:[.16,.16,.17,1],u_secondary_color:[.04,.04,.05,1],u_scale:500,u_softness:.45,u_sheen:.3}},{name:`Blue Aramid`,uniforms:{u_primary_color:[.15,.35,.75,1],u_secondary_color:[.03,.05,.1,1],u_scale:400,u_softness:.5,u_sheen:.35}},{name:`Crimson Hybrid`,uniforms:{u_primary_color:[.7,.1,.12,1],u_secondary_color:[.06,.04,.04,1],u_scale:320,u_softness:.55,u_sheen:.4}}],uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:100,max:1e3,default:400},{id:`u_softness`,name:`Weave Softness`,type:`float`,min:.05,max:1,default:.5},{id:`u_sheen`,name:`Tow Sheen`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Kevlar Gold`,type:`color`,default:[.8,.7,.2,1]},{id:`u_secondary_color`,name:`Outer Mesh`,type:`color`,default:[.1,.1,.1,1]}]},hs=e({default:()=>gs}),gs={id:`kilim_rug`,name:`Kilim Rug`,category:`Textile`,added:`2026-06-12`,description:`Anatolian flatweave kilim: hooked geometric medallions in madder red and indigo with abrash — the horizontal colour shifts of hand-dyed wool lots — over a tight weft-faced rib.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.8,.7,.2,1],u_secondary_color:[.1,.1,.1,1],u_scale:400,u_softness:.5,u_sheen:0}},{name:`Black Ops`,uniforms:{u_primary_color:[.16,.16,.17,1],u_secondary_color:[.04,.04,.05,1],u_scale:500,u_softness:.45,u_sheen:.3}},{name:`Blue Aramid`,uniforms:{u_primary_color:[.15,.35,.75,1],u_secondary_color:[.03,.05,.1,1],u_scale:400,u_softness:.5,u_sheen:.35}},{name:`Crimson Hybrid`,uniforms:{u_primary_color:[.7,.1,.12,1],u_secondary_color:[.06,.04,.04,1],u_scale:320,u_softness:.55,u_sheen:.4}}],uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:100,max:1e3,default:400},{id:`u_softness`,name:`Weave Softness`,type:`float`,min:.05,max:1,default:.5},{id:`u_sheen`,name:`Tow Sheen`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Kevlar Gold`,type:`color`,default:[.8,.7,.2,1]},{id:`u_secondary_color`,name:`Outer Mesh`,type:`color`,default:[.1,.1,.1,1]}]},Ds=e({default:()=>Os}),Os={id:`kilim_rug`,name:`Kilim Rug`,category:`Textile`,added:`2026-06-12`,description:`Anatolian flatweave kilim: hooked geometric medallions in madder red and indigo with abrash — the horizontal colour shifts of hand-dyed wool lots — over a tight weft-faced rib.`,shader:`
     float tri_klm(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -7523,7 +7745,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_medallions`,name:`Medallion Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_abrash`,name:`Abrash Shift`,type:`float`,min:0,max:1,default:.6},{id:`u_field_color`,name:`Field Color`,type:`color`,default:[.58,.16,.13,1]}]},_s=e({default:()=>vs}),vs={id:`knurl_grip`,name:`Knurl Grip`,category:`Racing`,added:`2026-05-01`,description:`Diamond knurl grip pattern — two sets of diagonal machined ridges crossing at 45 degrees to form sharp pyramid diamonds with bright tips and dark valleys.`,shader:`
+  `,uniforms:[{id:`u_medallions`,name:`Medallion Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_abrash`,name:`Abrash Shift`,type:`float`,min:0,max:1,default:.6},{id:`u_field_color`,name:`Field Color`,type:`color`,default:[.58,.16,.13,1]}]},ks=e({default:()=>As}),As={id:`knurl_grip`,name:`Knurl Grip`,category:`Racing`,added:`2026-05-01`,description:`Diamond knurl grip pattern — two sets of diagonal machined ridges crossing at 45 degrees to form sharp pyramid diamonds with bright tips and dark valleys.`,shader:`
     // Rotate a UV coordinate by angle (radians)
     vec2 rot2d(vec2 p, float a) {
       float s = sin(a); float c = cos(a);
@@ -7577,7 +7799,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_density`,name:`Diamond Density`,type:`float`,min:4,max:40,default:16},{id:`u_base_color`,name:`Base Metal`,type:`color`,default:[.55,.55,.57,1]},{id:`u_depth`,name:`Ridge Depth`,type:`float`,min:.2,max:2,default:1}]},ys=e({default:()=>bs}),bs={id:`labradorite_flash`,name:`Labradorite Flash`,category:`Geology`,added:`2026-06-12`,description:`Grey feldspar with labradorescence — electric blue and gold schiller flashes confined to angular cleavage domains, with fine lamellar striations.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Diamond Density`,type:`float`,min:4,max:40,default:16},{id:`u_base_color`,name:`Base Metal`,type:`color`,default:[.55,.55,.57,1]},{id:`u_depth`,name:`Ridge Depth`,type:`float`,min:.2,max:2,default:1}]},js=e({default:()=>Ms}),Ms={id:`labradorite_flash`,name:`Labradorite Flash`,category:`Geology`,added:`2026-06-12`,description:`Grey feldspar with labradorescence — electric blue and gold schiller flashes confined to angular cleavage domains, with fine lamellar striations.`,shader:`
     vec2 hash2_lab(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -7655,7 +7877,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_domain_scale`,name:`Domain Scale`,type:`float`,min:1.5,max:12,default:4.5},{id:`u_flash_coverage`,name:`Flash Coverage`,type:`float`,min:.1,max:1,default:.5},{id:`u_flash_strength`,name:`Schiller`,type:`float`,min:0,max:1.5,default:1},{id:`u_flash_color`,name:`Flash Blue`,type:`color`,default:[.1,.4,.95,1]}]},xs=e({default:()=>Ss}),Ss={id:`lapis_lazuli`,name:`Lapis Lazuli`,category:`Geology`,added:`2026-06-12`,description:`Deep ultramarine lapis with glittering gold pyrite flecks and soft white calcite swirls — the classic royal stone.`,shader:`
+  `,uniforms:[{id:`u_domain_scale`,name:`Domain Scale`,type:`float`,min:1.5,max:12,default:4.5},{id:`u_flash_coverage`,name:`Flash Coverage`,type:`float`,min:.1,max:1,default:.5},{id:`u_flash_strength`,name:`Schiller`,type:`float`,min:0,max:1.5,default:1},{id:`u_flash_color`,name:`Flash Blue`,type:`color`,default:[.1,.4,.95,1]}]},Ns=e({default:()=>Ps}),Ps={id:`lapis_lazuli`,name:`Lapis Lazuli`,category:`Geology`,added:`2026-06-12`,description:`Deep ultramarine lapis with glittering gold pyrite flecks and soft white calcite swirls — the classic royal stone.`,shader:`
     vec2 hash2_lap(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -7718,7 +7940,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_fleck_density`,name:`Pyrite Flecks`,type:`float`,min:10,max:80,default:35},{id:`u_calcite_amount`,name:`Calcite Swirls`,type:`float`,min:0,max:1.5,default:.7},{id:`u_base_color`,name:`Ultramarine`,type:`color`,default:[.1,.18,.55,1]}]},Cs=e({default:()=>ws}),ws={id:`laser_etch`,name:`Laser Etch`,category:`Technology`,added:`2026-05-01`,description:`Laser-engraved geometric lines on dark anodized metal, revealing bright bare aluminium in precise 45-degree patterns.`,shader:`
+  `,uniforms:[{id:`u_fleck_density`,name:`Pyrite Flecks`,type:`float`,min:10,max:80,default:35},{id:`u_calcite_amount`,name:`Calcite Swirls`,type:`float`,min:0,max:1.5,default:.7},{id:`u_base_color`,name:`Ultramarine`,type:`color`,default:[.1,.18,.55,1]}]},Fs=e({default:()=>Is}),Is={id:`laser_etch`,name:`Laser Etch`,category:`Technology`,added:`2026-05-01`,description:`Laser-engraved geometric lines on dark anodized metal, revealing bright bare aluminium in precise 45-degree patterns.`,shader:`
     // --- helpers BEFORE generate() ---
 
     // Rotate UV by 45 degrees
@@ -7792,7 +8014,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_line_density`,name:`Line Density`,type:`float`,min:4,max:40,default:16},{id:`u_background`,name:`Background`,type:`color`,default:[.08,.08,.1,1]},{id:`u_etch_color`,name:`Etch Color`,type:`color`,default:[.85,.87,.88,1]},{id:`u_line_width`,name:`Line Width`,type:`float`,min:.01,max:.2,default:.06}]},Ts=e({default:()=>Es}),Es={id:`lava_crust_pro`,name:`Lava Crust`,category:`Natural`,added:`2026-04-15`,description:`Static volcanic cooling patterns with high-heat emission cracks.`,shader:`
+  `,uniforms:[{id:`u_line_density`,name:`Line Density`,type:`float`,min:4,max:40,default:16},{id:`u_background`,name:`Background`,type:`color`,default:[.08,.08,.1,1]},{id:`u_etch_color`,name:`Etch Color`,type:`color`,default:[.85,.87,.88,1]},{id:`u_line_width`,name:`Line Width`,type:`float`,min:.01,max:.2,default:.06}]},Ls=e({default:()=>Rs}),Rs={id:`lava_crust_pro`,name:`Lava Crust`,category:`Natural`,added:`2026-04-15`,description:`Static volcanic cooling patterns with high-heat emission cracks.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // Removed time from noise offset
@@ -7804,7 +8026,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(heat, rock, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Flow Intensity`,type:`float`,min:1,max:10,default:4}]},Ds=e({default:()=>Os}),Os={id:`lava_lamp`,name:`Lava Lamp`,category:`Retro`,added:`2026-06-11`,description:`Molten wax suspended mid-rise — backlit metaball globs stretching and necking apart in violet liquid, hot yellow cores cooling to orange skins with a gooey glow.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flow Intensity`,type:`float`,min:1,max:10,default:4}]},zs=e({default:()=>Bs}),Bs={id:`lava_lamp`,name:`Lava Lamp`,category:`Retro`,added:`2026-06-11`,description:`Molten wax suspended mid-rise — backlit metaball globs stretching and necking apart in violet liquid, hot yellow cores cooling to orange skins with a gooey glow.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -7868,7 +8090,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_blob_scale`,name:`Glob Size`,type:`float`,min:.5,max:2,default:1},{id:`u_goo`,name:`Goo Wobble`,type:`float`,min:0,max:2,default:1},{id:`u_wax_color`,name:`Wax`,type:`color`,default:[1,.45,.08,1]},{id:`u_fluid_color`,name:`Liquid`,type:`color`,default:[.25,.05,.45,1]}]},ks=e({default:()=>As}),As={id:`leaf_skeleton_pro`,name:`Leaf Skeleton`,category:`Natural`,added:`2026-04-15`,description:`Technical vein structure mimicking a decaying leaf skeleton.`,shader:`
+  `,uniforms:[{id:`u_blob_scale`,name:`Glob Size`,type:`float`,min:.5,max:2,default:1},{id:`u_goo`,name:`Goo Wobble`,type:`float`,min:0,max:2,default:1},{id:`u_wax_color`,name:`Wax`,type:`color`,default:[1,.45,.08,1]},{id:`u_fluid_color`,name:`Liquid`,type:`color`,default:[.25,.05,.45,1]}]},Vs=e({default:()=>Hs}),Hs={id:`leaf_skeleton_pro`,name:`Leaf Skeleton`,category:`Natural`,added:`2026-04-15`,description:`Technical vein structure mimicking a decaying leaf skeleton.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
@@ -7879,7 +8101,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, clamp(mask, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Vein Detail`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Vein Color`,type:`color`,default:[.95,.95,.9,1]},{id:`u_secondary_color`,name:`Void Space`,type:`color`,default:[.05,.05,.05,1]}]},js=e({default:()=>Ms}),Ms={id:`lemans_twin_stripes`,name:`Le Mans Twin Stripes`,category:`Heritage`,added:`2026-06-12`,description:`Twin centre racing stripes running nose to tail — stitch-edge detail along each border, masked-paint ridge, and a body colour worn satin by seasons of polishing.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Vein Detail`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Vein Color`,type:`color`,default:[.95,.95,.9,1]},{id:`u_secondary_color`,name:`Void Space`,type:`color`,default:[.05,.05,.05,1]}]},Us=e({default:()=>Ws}),Ws={id:`lemans_twin_stripes`,name:`Le Mans Twin Stripes`,category:`Heritage`,added:`2026-06-12`,description:`Twin centre racing stripes running nose to tail — stitch-edge detail along each border, masked-paint ridge, and a body colour worn satin by seasons of polishing.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -7940,7 +8162,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_stripe_width`,name:`Stripe Width`,type:`float`,min:.04,max:.22,default:.13},{id:`u_stripe_gap`,name:`Centre Gap`,type:`float`,min:.01,max:.12,default:.045},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.42,.51,.62,1]},{id:`u_stripe_color`,name:`Stripe Colour`,type:`color`,default:[.95,.94,.9,1]}]},Ns=e({default:()=>Ps}),Ps={id:`leopard_print`,name:`Leopard Print`,category:`Organic`,added:`2026-06-11`,description:`Classic leopard rosettes: irregular broken dark rings around tan centres scattered with hash jitter over a cream-gold base, with noise-driven ring break-up and size variance.`,shader:`
+  `,uniforms:[{id:`u_stripe_width`,name:`Stripe Width`,type:`float`,min:.04,max:.22,default:.13},{id:`u_stripe_gap`,name:`Centre Gap`,type:`float`,min:.01,max:.12,default:.045},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.42,.51,.62,1]},{id:`u_stripe_color`,name:`Stripe Colour`,type:`color`,default:[.95,.94,.9,1]}]},Gs=e({default:()=>Ks}),Ks={id:`leopard_print`,name:`Leopard Print`,category:`Organic`,added:`2026-06-11`,description:`Classic leopard rosettes: irregular broken dark rings around tan centres scattered with hash jitter over a cream-gold base, with noise-driven ring break-up and size variance.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -7986,18 +8208,18 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color = mix(color, u_color_ring, clamp(ringAcc, 0.0, 1.0));
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Classic`,uniforms:{u_color_base:[.87,.76,.55,1],u_color_ring:[.1,.07,.05,1],u_color_center:[.72,.51,.28,1]}},{name:`Snow Leopard`,uniforms:{u_color_base:[.93,.93,.95,1],u_color_ring:[.15,.15,.18,1],u_color_center:[.65,.65,.7,1]}},{name:`Pink Pop`,uniforms:{u_color_base:[.98,.8,.88,1],u_color_ring:[.22,.02,.12,1],u_color_center:[.95,.35,.6,1]}},{name:`Midnight`,uniforms:{u_color_base:[.1,.11,.15,1],u_color_ring:[.01,.01,.02,1],u_color_center:[.22,.24,.33,1]}}],uniforms:[{id:`u_scale`,name:`Spot Scale`,type:`float`,min:2,max:15,default:6},{id:`u_rosette`,name:`Rosette Size`,type:`float`,min:.15,max:.6,default:.38},{id:`u_break`,name:`Ring Break-Up`,type:`float`,min:0,max:1,default:.45},{id:`u_color_base`,name:`Base Coat`,type:`color`,default:[.87,.76,.55,1]},{id:`u_color_ring`,name:`Rosette Ring`,type:`color`,default:[.1,.07,.05,1]},{id:`u_color_center`,name:`Spot Center`,type:`color`,default:[.72,.51,.28,1]}]},Fs=e({default:()=>Is}),Is={id:`lichen_growth_artisan`,name:`Lichen Moss`,category:`Natural`,added:`2026-04-16`,description:`Splotchy organic crust and symbiotic growths found on weathered rocks and trees.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_color_base:[.87,.76,.55,1],u_color_ring:[.1,.07,.05,1],u_color_center:[.72,.51,.28,1]}},{name:`Snow Leopard`,uniforms:{u_color_base:[.93,.93,.95,1],u_color_ring:[.15,.15,.18,1],u_color_center:[.65,.65,.7,1]}},{name:`Pink Pop`,uniforms:{u_color_base:[.98,.8,.88,1],u_color_ring:[.22,.02,.12,1],u_color_center:[.95,.35,.6,1]}},{name:`Midnight`,uniforms:{u_color_base:[.1,.11,.15,1],u_color_ring:[.01,.01,.02,1],u_color_center:[.22,.24,.33,1]}}],uniforms:[{id:`u_scale`,name:`Spot Scale`,type:`float`,min:2,max:15,default:6},{id:`u_rosette`,name:`Rosette Size`,type:`float`,min:.15,max:.6,default:.38},{id:`u_break`,name:`Ring Break-Up`,type:`float`,min:0,max:1,default:.45},{id:`u_color_base`,name:`Base Coat`,type:`color`,default:[.87,.76,.55,1]},{id:`u_color_ring`,name:`Rosette Ring`,type:`color`,default:[.1,.07,.05,1]},{id:`u_color_center`,name:`Spot Center`,type:`color`,default:[.72,.51,.28,1]}]},qs=e({default:()=>Js}),Js={id:`lichen_growth_artisan`,name:`Lichen Moss`,category:`Natural`,added:`2026-04-16`,description:`Splotchy organic crust and symbiotic growths found on weathered rocks and trees.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 10.0 + noise(v_uv * 20.0));
       return mix(u_secondary_color, u_primary_color, step(0.5, n));
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Lichen High`,type:`color`,default:[.7,.8,.5,1]},{id:`u_secondary_color`,name:`Rock Base`,type:`color`,default:[.2,.2,.2,1]}]},Ls=e({default:()=>Rs}),Rs={id:`lichtenberg_trees_artisan`,name:`Lichtenberg Trees`,category:`Abstract`,added:`2026-04-15`,description:`Fractal electrical discharge patterns found in high-voltage dielectric breakdown.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Lichen High`,type:`color`,default:[.7,.8,.5,1]},{id:`u_secondary_color`,name:`Rock Base`,type:`color`,default:[.2,.2,.2,1]}]},Ys=e({default:()=>Xs}),Xs={id:`lichtenberg_trees_artisan`,name:`Lichtenberg Trees`,category:`Abstract`,added:`2026-04-15`,description:`Fractal electrical discharge patterns found in high-voltage dielectric breakdown.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * 100.0);
       float branch = step(0.98, n * hash(v_uv * 10.0));
       return mix(u_secondary_color, u_primary_color, branch);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Discharge`,type:`color`,default:[.4,.8,1,1]},{id:`u_secondary_color`,name:`Insulator`,type:`color`,default:[.05,.05,.08,1]}]},zs=e({default:()=>Bs}),Bs={id:`lidar_point_cloud`,name:`LiDAR Point Cloud`,category:`Technology`,added:`2026-07-07`,description:`Laser-scanned terrain — dot rows sweeping in scan rings, colored by elevation.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Discharge`,type:`color`,default:[.4,.8,1,1]},{id:`u_secondary_color`,name:`Insulator`,type:`color`,default:[.05,.05,.08,1]}]},Zs=e({default:()=>Qs}),Qs={id:`lidar_point_cloud`,name:`LiDAR Point Cloud`,category:`Technology`,added:`2026-07-07`,description:`Laser-scanned terrain — dot rows sweeping in scan rings, colored by elevation.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // underlying elevation field drives color and dot density
@@ -8021,7 +8243,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += u_accent_color.rgb * 0.05 * smoothstep(0.45, 0.5, abs(fract(uv.y * 0.5) - 0.5));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Scan Density`,type:`float`,min:4,max:30,default:12},{id:`u_dot`,name:`Point Size`,type:`float`,min:.05,max:.4,default:.16},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.03,.05,1]},{id:`u_primary_color`,name:`Low Elevation`,type:`color`,default:[.1,.3,.9,1]},{id:`u_accent_color`,name:`High Elevation`,type:`color`,default:[.2,1,.6,1]}],variants:[{name:`Survey`,uniforms:{u_secondary_color:[.02,.03,.05,1],u_primary_color:[.1,.3,.9,1],u_accent_color:[.2,1,.6,1],u_dot:.16}},{name:`Thermal Scan`,uniforms:{u_secondary_color:[.04,.02,.02,1],u_primary_color:[.5,.08,.4,1],u_accent_color:[1,.7,.1,1],u_dot:.2}},{name:`Ghost White`,uniforms:{u_secondary_color:[.03,.03,.04,1],u_primary_color:[.35,.38,.45,1],u_accent_color:[.95,.97,1,1],u_dot:.12}}]},Vs=e({default:()=>Hs}),Hs={id:`lightning_bolt_retro`,name:`Retro Lightning Bolt`,category:`Heritage`,added:`2026-06-12`,description:`Fifties chrome-age lightning bolts repeating across candy paint — zigzag spears with chrome gradient fill, dark keyline shadow offset, and starburst glints.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scan Density`,type:`float`,min:4,max:30,default:12},{id:`u_dot`,name:`Point Size`,type:`float`,min:.05,max:.4,default:.16},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.02,.03,.05,1]},{id:`u_primary_color`,name:`Low Elevation`,type:`color`,default:[.1,.3,.9,1]},{id:`u_accent_color`,name:`High Elevation`,type:`color`,default:[.2,1,.6,1]}],variants:[{name:`Survey`,uniforms:{u_secondary_color:[.02,.03,.05,1],u_primary_color:[.1,.3,.9,1],u_accent_color:[.2,1,.6,1],u_dot:.16}},{name:`Thermal Scan`,uniforms:{u_secondary_color:[.04,.02,.02,1],u_primary_color:[.5,.08,.4,1],u_accent_color:[1,.7,.1,1],u_dot:.2}},{name:`Ghost White`,uniforms:{u_secondary_color:[.03,.03,.04,1],u_primary_color:[.35,.38,.45,1],u_accent_color:[.95,.97,1,1],u_dot:.12}}]},$s=e({default:()=>ec}),ec={id:`lightning_bolt_retro`,name:`Retro Lightning Bolt`,category:`Heritage`,added:`2026-06-12`,description:`Fifties chrome-age lightning bolts repeating across candy paint — zigzag spears with chrome gradient fill, dark keyline shadow offset, and starburst glints.`,shader:`
     // signed distance to a stylised three-kink lightning bolt, length ~1.2 tall
     float bolt_hrt16(vec2 p) {
       // bolt path: three line segments zig-zagging downward
@@ -8104,7 +8326,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_bolt_scale`,name:`Bolts Per Tile`,type:`float`,min:1,max:6,default:3},{id:`u_glint`,name:`Glint Strength`,type:`float`,min:0,max:1,default:.55},{id:`u_body_color`,name:`Candy Colour`,type:`color`,default:[.05,.28,.32,1]},{id:`u_chrome_color`,name:`Chrome Tint`,type:`color`,default:[.62,.66,.74,1]}]},Us=e({default:()=>Ws}),Ws={id:`lily_pads`,name:`Lily Pads`,category:`Natural`,added:`2026-07-07`,description:`Round pads with radial veins and a cut notch, floating on rippling dark water.`,shader:`
+  `,uniforms:[{id:`u_bolt_scale`,name:`Bolts Per Tile`,type:`float`,min:1,max:6,default:3},{id:`u_glint`,name:`Glint Strength`,type:`float`,min:0,max:1,default:.55},{id:`u_body_color`,name:`Candy Colour`,type:`color`,default:[.05,.28,.32,1]},{id:`u_chrome_color`,name:`Chrome Tint`,type:`color`,default:[.62,.66,.74,1]}]},tc=e({default:()=>nc}),nc={id:`lily_pads`,name:`Lily Pads`,category:`Natural`,added:`2026-07-07`,description:`Round pads with radial veins and a cut notch, floating on rippling dark water.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // water with soft concentric ripples
@@ -8140,12 +8362,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Pad Density`,type:`float`,min:2,max:12,default:4},{id:`u_primary_color`,name:`Pad Green`,type:`color`,default:[.2,.5,.24,1]},{id:`u_accent_color`,name:`Pad Light`,type:`color`,default:[.5,.7,.3,1]},{id:`u_secondary_color`,name:`Pond Water`,type:`color`,default:[.05,.12,.14,1]}],variants:[{name:`Monet Pond`,uniforms:{u_primary_color:[.2,.5,.24,1],u_accent_color:[.5,.7,.3,1],u_secondary_color:[.05,.12,.14,1]}},{name:`Twilight Pond`,uniforms:{u_primary_color:[.12,.3,.28,1],u_accent_color:[.3,.5,.45,1],u_secondary_color:[.04,.05,.12,1]}},{name:`Koi Garden`,uniforms:{u_primary_color:[.35,.55,.2,1],u_accent_color:[.7,.75,.35,1],u_secondary_color:[.1,.2,.25,1]}}]},Gs=e({default:()=>Ks}),Ks={id:`linear_gradient_artisan`,name:`Master Linear`,category:`Abstract`,added:`2026-04-15`,description:`High-precision linear gradient for base transitions.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pad Density`,type:`float`,min:2,max:12,default:4},{id:`u_primary_color`,name:`Pad Green`,type:`color`,default:[.2,.5,.24,1]},{id:`u_accent_color`,name:`Pad Light`,type:`color`,default:[.5,.7,.3,1]},{id:`u_secondary_color`,name:`Pond Water`,type:`color`,default:[.05,.12,.14,1]}],variants:[{name:`Monet Pond`,uniforms:{u_primary_color:[.2,.5,.24,1],u_accent_color:[.5,.7,.3,1],u_secondary_color:[.05,.12,.14,1]}},{name:`Twilight Pond`,uniforms:{u_primary_color:[.12,.3,.28,1],u_accent_color:[.3,.5,.45,1],u_secondary_color:[.04,.05,.12,1]}},{name:`Koi Garden`,uniforms:{u_primary_color:[.35,.55,.2,1],u_accent_color:[.7,.75,.35,1],u_secondary_color:[.1,.2,.25,1]}}]},rc=e({default:()=>ic}),ic={id:`linear_gradient_artisan`,name:`Master Linear`,category:`Abstract`,added:`2026-04-15`,description:`High-precision linear gradient for base transitions.`,shader:`
     vec4 generate() {
       float mask = v_uv.x;
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Start Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`End Color`,type:`color`,default:[0,0,0,1]}]},qs=e({default:()=>Js}),Js={id:`linen_weave`,name:`Linen Weave`,category:`Industrial`,added:`2026-05-01`,description:`Natural linen plain weave with organic fibre slubs and warm ecru tones.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Start Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`End Color`,type:`color`,default:[0,0,0,1]}]},ac=e({default:()=>oc}),oc={id:`linen_weave`,name:`Linen Weave`,category:`Industrial`,added:`2026-05-01`,description:`Natural linen plain weave with organic fibre slubs and warm ecru tones.`,shader:`
     // Hash for pseudo-random noise
     float hash11(float p) {
       p = fract(p * 0.1031);
@@ -8229,7 +8451,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_weave_scale`,type:`float`,default:18,min:4,max:40,name:`Weave Scale`},{id:`u_base_color`,type:`color`,default:[.82,.75,.58,1],name:`Warp Colour`},{id:`u_warp_color`,type:`color`,default:[.72,.64,.48,1],name:`Weft Colour`}]},Ys=e({default:()=>Xs}),Xs={id:`liquid_mercury_artisan`,name:`Liquid Mercury`,category:`Abstract`,added:`2026-04-15`,description:`Smooth, blobby metallic shapes with high specularity mimicking liquid metal.`,shader:`
+  `,uniforms:[{id:`u_weave_scale`,type:`float`,default:18,min:4,max:40,name:`Weave Scale`},{id:`u_base_color`,type:`color`,default:[.82,.75,.58,1],name:`Warp Colour`},{id:`u_warp_color`,type:`color`,default:[.72,.64,.48,1],name:`Weft Colour`}]},sc=e({default:()=>cc}),cc={id:`liquid_mercury_artisan`,name:`Liquid Mercury`,category:`Abstract`,added:`2026-04-15`,description:`Smooth, blobby metallic shapes with high specularity mimicking liquid metal.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * u_scale);
       float mask = smoothstep(0.4, 0.45, n);
@@ -8240,7 +8462,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Blob Size`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Mercury`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.1,.1,.12,1]}]},Zs=e({default:()=>Qs}),Qs={id:`loom_beadwork`,name:`Loom Beadwork`,category:`Heritage`,added:`2026-07-07`,description:`Rows of glass seed beads woven on a loom, building stepped diamond motifs.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Blob Size`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Mercury`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[.1,.1,.12,1]}]},lc=e({default:()=>uc}),uc={id:`loom_beadwork`,name:`Loom Beadwork`,category:`Heritage`,added:`2026-07-07`,description:`Rows of glass seed beads woven on a loom, building stepped diamond motifs.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -8263,7 +8485,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 c = mix(vec3(0.16, 0.13, 0.1), beadC, bead);       // thread gaps between beads
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Bead Density`,type:`float`,min:10,max:60,default:26},{id:`u_primary_color`,name:`Diamond Core`,type:`color`,default:[.85,.15,.15,1]},{id:`u_accent_color`,name:`Diamond Ring`,type:`color`,default:[.95,.8,.2,1]},{id:`u_pop_color`,name:`Outline Row`,type:`color`,default:[.12,.3,.55,1]},{id:`u_secondary_color`,name:`Field Beads`,type:`color`,default:[.92,.9,.85,1]}],variants:[{name:`Plains Diamond`,uniforms:{u_primary_color:[.85,.15,.15,1],u_accent_color:[.95,.8,.2,1],u_pop_color:[.12,.3,.55,1],u_secondary_color:[.92,.9,.85,1]}},{name:`Turquoise Trail`,uniforms:{u_primary_color:[.15,.6,.6,1],u_accent_color:[.9,.55,.2,1],u_pop_color:[.2,.2,.22,1],u_secondary_color:[.9,.86,.78,1]}},{name:`Night Dance`,uniforms:{u_primary_color:[.9,.85,.75,1],u_accent_color:[.6,.2,.3,1],u_pop_color:[.3,.5,.75,1],u_secondary_color:[.1,.1,.14,1]}}]},$s=e({default:()=>ec}),ec={id:`louis_check_artisan`,name:`Louis Check`,category:`Abstract`,added:`2026-04-15`,description:`Luxury designer-style checkered leather pattern with premium soft shading.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Bead Density`,type:`float`,min:10,max:60,default:26},{id:`u_primary_color`,name:`Diamond Core`,type:`color`,default:[.85,.15,.15,1]},{id:`u_accent_color`,name:`Diamond Ring`,type:`color`,default:[.95,.8,.2,1]},{id:`u_pop_color`,name:`Outline Row`,type:`color`,default:[.12,.3,.55,1]},{id:`u_secondary_color`,name:`Field Beads`,type:`color`,default:[.92,.9,.85,1]}],variants:[{name:`Plains Diamond`,uniforms:{u_primary_color:[.85,.15,.15,1],u_accent_color:[.95,.8,.2,1],u_pop_color:[.12,.3,.55,1],u_secondary_color:[.92,.9,.85,1]}},{name:`Turquoise Trail`,uniforms:{u_primary_color:[.15,.6,.6,1],u_accent_color:[.9,.55,.2,1],u_pop_color:[.2,.2,.22,1],u_secondary_color:[.9,.86,.78,1]}},{name:`Night Dance`,uniforms:{u_primary_color:[.9,.85,.75,1],u_accent_color:[.6,.2,.3,1],u_pop_color:[.3,.5,.75,1],u_secondary_color:[.1,.1,.14,1]}}]},dc=e({default:()=>fc}),fc={id:`louis_check_artisan`,name:`Louis Check`,category:`Abstract`,added:`2026-04-15`,description:`Luxury designer-style checkered leather pattern with premium soft shading.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
 
@@ -8282,7 +8504,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color.rgb += (noise(uv * 18.0) - 0.5) * u_grain;
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.3,.2,.15,1],u_secondary_color:[.6,.45,.35,1],u_edge_shade:.2,u_grain:0}},{name:`Noir Damier`,uniforms:{u_primary_color:[.05,.05,.06,1],u_secondary_color:[.22,.22,.24,1],u_edge_shade:.25,u_grain:.1}},{name:`Burgundy Lux`,uniforms:{u_primary_color:[.3,.06,.1,1],u_secondary_color:[.55,.2,.22,1],u_edge_shade:.2,u_grain:.12}},{name:`Cream Canvas`,uniforms:{u_primary_color:[.78,.7,.58,1],u_secondary_color:[.92,.87,.76,1],u_edge_shade:.3,u_grain:.06}}],uniforms:[{id:`u_scale`,name:`Check Zoom`,type:`float`,min:2,max:20,default:8},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.01},{id:`u_edge_shade`,name:`Edge Shading`,type:`float`,min:0,max:.6,default:.2},{id:`u_grain`,name:`Leather Grain`,type:`float`,min:0,max:.4,default:0},{id:`u_primary_color`,name:`Leather Dark`,type:`color`,default:[.3,.2,.15,1]},{id:`u_secondary_color`,name:`Leather Tan`,type:`color`,default:[.6,.45,.35,1]}]},tc=e({default:()=>nc}),nc={id:`low_poly_facets`,name:`Low-Poly Facets`,category:`Geometric`,added:`2026-06-11`,description:`Triangulated low-poly mosaic with flat per-face shading: hash-jittered facet brightness over a large-scale lighting gradient so the surface reads like a faceted 3D render.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.3,.2,.15,1],u_secondary_color:[.6,.45,.35,1],u_edge_shade:.2,u_grain:0}},{name:`Noir Damier`,uniforms:{u_primary_color:[.05,.05,.06,1],u_secondary_color:[.22,.22,.24,1],u_edge_shade:.25,u_grain:.1}},{name:`Burgundy Lux`,uniforms:{u_primary_color:[.3,.06,.1,1],u_secondary_color:[.55,.2,.22,1],u_edge_shade:.2,u_grain:.12}},{name:`Cream Canvas`,uniforms:{u_primary_color:[.78,.7,.58,1],u_secondary_color:[.92,.87,.76,1],u_edge_shade:.3,u_grain:.06}}],uniforms:[{id:`u_scale`,name:`Check Zoom`,type:`float`,min:2,max:20,default:8},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.01},{id:`u_edge_shade`,name:`Edge Shading`,type:`float`,min:0,max:.6,default:.2},{id:`u_grain`,name:`Leather Grain`,type:`float`,min:0,max:.4,default:0},{id:`u_primary_color`,name:`Leather Dark`,type:`color`,default:[.3,.2,.15,1]},{id:`u_secondary_color`,name:`Leather Tan`,type:`color`,default:[.6,.45,.35,1]}]},pc=e({default:()=>mc}),mc={id:`low_poly_facets`,name:`Low-Poly Facets`,category:`Geometric`,added:`2026-06-11`,description:`Triangulated low-poly mosaic with flat per-face shading: hash-jittered facet brightness over a large-scale lighting gradient so the surface reads like a faceted 3D render.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -8312,7 +8534,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Ice`,uniforms:{u_color_a:[.25,.38,.55,1],u_color_b:[.92,.97,1,1]}},{name:`Gunmetal`,uniforms:{u_color_a:[.09,.1,.12,1],u_color_b:[.48,.51,.56,1]}},{name:`Sunset`,uniforms:{u_color_a:[.45,.08,.25,1],u_color_b:[1,.62,.2,1]}},{name:`Emerald`,uniforms:{u_color_a:[.02,.18,.1,1],u_color_b:[.25,.85,.5,1]}}],uniforms:[{id:`u_scale`,name:`Facet Scale`,type:`float`,min:3,max:30,default:9},{id:`u_contrast`,name:`Shading Contrast`,type:`float`,min:0,max:1,default:.55},{id:`u_border`,name:`Border Strength`,type:`float`,min:0,max:1,default:.35},{id:`u_color_a`,name:`Shadow Color`,type:`color`,default:[.25,.38,.55,1]},{id:`u_color_b`,name:`Highlight Color`,type:`color`,default:[.92,.97,1,1]}]},rc=e({default:()=>ic}),ic={id:`lunar_phases`,name:`Lunar Phases`,category:`Cosmos`,added:`2026-07-07`,description:`The moon cycling through its phases — cratered discs from new to full on a starlit field.`,shader:`
+  `,variants:[{name:`Ice`,uniforms:{u_color_a:[.25,.38,.55,1],u_color_b:[.92,.97,1,1]}},{name:`Gunmetal`,uniforms:{u_color_a:[.09,.1,.12,1],u_color_b:[.48,.51,.56,1]}},{name:`Sunset`,uniforms:{u_color_a:[.45,.08,.25,1],u_color_b:[1,.62,.2,1]}},{name:`Emerald`,uniforms:{u_color_a:[.02,.18,.1,1],u_color_b:[.25,.85,.5,1]}}],uniforms:[{id:`u_scale`,name:`Facet Scale`,type:`float`,min:3,max:30,default:9},{id:`u_contrast`,name:`Shading Contrast`,type:`float`,min:0,max:1,default:.55},{id:`u_border`,name:`Border Strength`,type:`float`,min:0,max:1,default:.35},{id:`u_color_a`,name:`Shadow Color`,type:`color`,default:[.25,.38,.55,1]},{id:`u_color_b`,name:`Highlight Color`,type:`color`,default:[.92,.97,1,1]}]},hc=e({default:()=>gc}),gc={id:`lunar_phases`,name:`Lunar Phases`,category:`Cosmos`,added:`2026-07-07`,description:`The moon cycling through its phases — cratered discs from new to full on a starlit field.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -8346,7 +8568,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += disc * (1.0 - onLit) * smoothstep(0.9, 1.0, r) * 0.06;
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Moon Density`,type:`float`,min:2,max:12,default:4},{id:`u_primary_color`,name:`Moon`,type:`color`,default:[.85,.84,.8,1]},{id:`u_secondary_color`,name:`Night Sky`,type:`color`,default:[.03,.04,.08,1]}],variants:[{name:`Silver Moon`,uniforms:{u_primary_color:[.85,.84,.8,1],u_secondary_color:[.03,.04,.08,1]}},{name:`Harvest`,uniforms:{u_primary_color:[.95,.7,.4,1],u_secondary_color:[.06,.03,.05,1]}},{name:`Blue Hour`,uniforms:{u_primary_color:[.75,.82,.95,1],u_secondary_color:[.05,.08,.16,1]}}]},ac=e({default:()=>oc}),oc={id:`machined_wheel`,name:`Machined Wheel`,category:`Racing`,added:`2026-04-30`,description:`CNC machined aluminum wheel face with concentric lathe rings, radial spoke shadows, and a polished centre hub.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Moon Density`,type:`float`,min:2,max:12,default:4},{id:`u_primary_color`,name:`Moon`,type:`color`,default:[.85,.84,.8,1]},{id:`u_secondary_color`,name:`Night Sky`,type:`color`,default:[.03,.04,.08,1]}],variants:[{name:`Silver Moon`,uniforms:{u_primary_color:[.85,.84,.8,1],u_secondary_color:[.03,.04,.08,1]}},{name:`Harvest`,uniforms:{u_primary_color:[.95,.7,.4,1],u_secondary_color:[.06,.03,.05,1]}},{name:`Blue Hour`,uniforms:{u_primary_color:[.75,.82,.95,1],u_secondary_color:[.05,.08,.16,1]}}]},_c=e({default:()=>vc}),vc={id:`machined_wheel`,name:`Machined Wheel`,category:`Racing`,added:`2026-04-30`,description:`CNC machined aluminum wheel face with concentric lathe rings, radial spoke shadows, and a polished centre hub.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv - 0.5;          // centre at 0,0
@@ -8405,14 +8627,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_ring_freq`,name:`Ring Density`,type:`float`,min:10,max:60,default:30},{id:`u_spoke_count`,name:`Spoke Count`,type:`float`,min:3,max:10,default:5}]},sc=e({default:()=>cc}),cc={id:`macrame_knot_artisan`,name:`Macrame Knot`,category:`Abstract`,added:`2026-04-15`,description:`Interlocking geometric square knots found in traditional fiber crafts.`,shader:`
+  `,uniforms:[{id:`u_ring_freq`,name:`Ring Density`,type:`float`,min:10,max:60,default:30},{id:`u_spoke_count`,name:`Spoke Count`,type:`float`,min:3,max:10,default:5}]},yc=e({default:()=>bc}),bc={id:`macrame_knot_artisan`,name:`Macrame Knot`,category:`Abstract`,added:`2026-04-15`,description:`Interlocking geometric square knots found in traditional fiber crafts.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
       float mask = smoothstep(0.4, 0.5, abs(gv.x - 0.5) + abs(gv.y - 0.5));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Knot Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Cotton Rope`,type:`color`,default:[.95,.9,.85,1]},{id:`u_secondary_color`,name:`Knot Deep`,type:`color`,default:[.6,.55,.5,1]}]},lc=e({default:()=>uc}),uc={id:`malachite_bands`,name:`Malachite Bands`,category:`Geology`,added:`2026-06-12`,description:`Polished malachite with concentric green botryoidal banding — nodule domes ringed by irregular light/dark bands with a silky polish sheen.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Knot Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Cotton Rope`,type:`color`,default:[.95,.9,.85,1]},{id:`u_secondary_color`,name:`Knot Deep`,type:`color`,default:[.6,.55,.5,1]}]},xc=e({default:()=>Sc}),Sc={id:`malachite_bands`,name:`Malachite Bands`,category:`Geology`,added:`2026-06-12`,description:`Polished malachite with concentric green botryoidal banding — nodule domes ringed by irregular light/dark bands with a silky polish sheen.`,shader:`
     // --- helpers ---
     vec2 hash2_mb(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
@@ -8490,7 +8712,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_nodule_scale`,name:`Nodule Scale`,type:`float`,min:1.5,max:12,default:4},{id:`u_band_density`,name:`Band Density`,type:`float`,min:3,max:30,default:12},{id:`u_polish`,name:`Polish Sheen`,type:`float`,min:0,max:2,default:1},{id:`u_light_color`,name:`Light Green`,type:`color`,default:[.36,.78,.52,1]}]},dc=e({default:()=>fc}),fc={id:`mandala_radial_artisan`,name:`Mandala Radial`,category:`Abstract`,added:`2026-04-16`,description:`Harmonic geometric recurrence and radial symmetry patterns.`,shader:`
+  `,uniforms:[{id:`u_nodule_scale`,name:`Nodule Scale`,type:`float`,min:1.5,max:12,default:4},{id:`u_band_density`,name:`Band Density`,type:`float`,min:3,max:30,default:12},{id:`u_polish`,name:`Polish Sheen`,type:`float`,min:0,max:2,default:1},{id:`u_light_color`,name:`Light Green`,type:`color`,default:[.36,.78,.52,1]}]},Cc=e({default:()=>wc}),wc={id:`mandala_radial_artisan`,name:`Mandala Radial`,category:`Abstract`,added:`2026-04-16`,description:`Harmonic geometric recurrence and radial symmetry patterns.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float angle = atan(uv.y, uv.x);
@@ -8499,7 +8721,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.0, pulses);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Geometry Glow`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Mental Void`,type:`color`,default:[0,0,0,1]}]},pc=e({default:()=>mc}),mc={id:`mandelbrot_fractal`,name:`Mandelbrot Explorer`,category:`Abstract`,added:`2026-04-15`,description:`Pure mathematical fractal boundary with high-precision iteration.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Geometry Glow`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Mental Void`,type:`color`,default:[0,0,0,1]}]},Tc=e({default:()=>Ec}),Ec={id:`mandelbrot_fractal`,name:`Mandelbrot Explorer`,category:`Abstract`,added:`2026-04-15`,description:`Pure mathematical fractal boundary with high-precision iteration.`,shader:`
     vec4 generate() {
       vec2 c = (v_uv - 0.5) * 4.0 / u_scale - vec2(0.5, 0.0);
       vec2 z = vec2(0.0);
@@ -8515,7 +8737,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = iter / max_iter;
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Zoom Level`,type:`float`,min:1,max:20,default:2},{id:`u_primary_color`,name:`Inner Glow`,type:`color`,default:[1,.4,0,1]},{id:`u_secondary_color`,name:`Void Depth`,type:`color`,default:[.05,0,.05,1]}]},hc=e({default:()=>gc}),gc={id:`manta_wing_gradient`,name:`Manta Wing Gradient`,category:`Ocean`,added:`2026-06-11`,description:`Manta-ray countershading — velvet black dorsal sweeping into white belly along a curved wing line, with shoulder chevrons and skin speckle.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Zoom Level`,type:`float`,min:1,max:20,default:2},{id:`u_primary_color`,name:`Inner Glow`,type:`color`,default:[1,.4,0,1]},{id:`u_secondary_color`,name:`Void Depth`,type:`color`,default:[.05,0,.05,1]}]},Dc=e({default:()=>Oc}),Oc={id:`manta_wing_gradient`,name:`Manta Wing Gradient`,category:`Ocean`,added:`2026-06-11`,description:`Manta-ray countershading — velvet black dorsal sweeping into white belly along a curved wing line, with shoulder chevrons and skin speckle.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -8569,7 +8791,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_curve`,name:`Wing Curve`,type:`float`,min:0,max:.3,default:.14},{id:`u_speckle`,name:`Skin Speckle`,type:`float`,min:0,max:2,default:1},{id:`u_dark_color`,name:`Dorsal Color`,type:`color`,default:[.04,.05,.08,1]},{id:`u_light_color`,name:`Ventral Color`,type:`color`,default:[.92,.94,.95,1]}]},_c=e({default:()=>vc}),vc={id:`maori_koru`,name:`Koru Spirals`,category:`Heritage`,added:`2026-07-07`,description:`Unfurling fern spirals in bold contrast — the Maori koru, symbol of new life.`,shader:`
+  `,uniforms:[{id:`u_curve`,name:`Wing Curve`,type:`float`,min:0,max:.3,default:.14},{id:`u_speckle`,name:`Skin Speckle`,type:`float`,min:0,max:2,default:1},{id:`u_dark_color`,name:`Dorsal Color`,type:`color`,default:[.04,.05,.08,1]},{id:`u_light_color`,name:`Ventral Color`,type:`color`,default:[.92,.94,.95,1]}]},kc=e({default:()=>Ac}),Ac={id:`maori_koru`,name:`Koru Spirals`,category:`Heritage`,added:`2026-07-07`,description:`Unfurling fern spirals in bold contrast — the Maori koru, symbol of new life.`,shader:`
     float koru(vec2 p, float dir) {
       float r = length(p);
       float ang = atan(p.y, p.x) * dir;
@@ -8595,7 +8817,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb, clamp(stem, 0.0, 1.0) * u_link);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Koru Density`,type:`float`,min:2,max:14,default:5},{id:`u_link`,name:`Linking Stems`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Koru`,type:`color`,default:[.94,.93,.9,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.1,.11,1]}],variants:[{name:`Kowhaiwhai`,uniforms:{u_primary_color:[.94,.93,.9,1],u_secondary_color:[.1,.1,.11,1],u_link:.6}},{name:`Red Ochre`,uniforms:{u_primary_color:[.75,.2,.12,1],u_secondary_color:[.95,.92,.85,1],u_link:.8}},{name:`Pounamu`,uniforms:{u_primary_color:[.2,.5,.32,1],u_secondary_color:[.06,.12,.08,1],u_link:.4}}]},yc=e({default:()=>bc}),bc={id:`maple_leaves_artisan`,name:`Maple Leaf Scatter`,category:`Natural`,added:`2026-04-15`,description:`Randomly distributed maple leaf shapes with rotation and scale variance.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Koru Density`,type:`float`,min:2,max:14,default:5},{id:`u_link`,name:`Linking Stems`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Koru`,type:`color`,default:[.94,.93,.9,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.1,.1,.11,1]}],variants:[{name:`Kowhaiwhai`,uniforms:{u_primary_color:[.94,.93,.9,1],u_secondary_color:[.1,.1,.11,1],u_link:.6}},{name:`Red Ochre`,uniforms:{u_primary_color:[.75,.2,.12,1],u_secondary_color:[.95,.92,.85,1],u_link:.8}},{name:`Pounamu`,uniforms:{u_primary_color:[.2,.5,.32,1],u_secondary_color:[.06,.12,.08,1],u_link:.4}}]},jc=e({default:()=>Mc}),Mc={id:`maple_leaves_artisan`,name:`Maple Leaf Scatter`,category:`Natural`,added:`2026-04-15`,description:`Randomly distributed maple leaf shapes with rotation and scale variance.`,shader:`
     float maple(vec2 p) {
       float a = atan(p.y, p.x);
       float r = length(p);
@@ -8621,7 +8843,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:15,default:6},{id:`u_primary_color`,name:`Leaf Color`,type:`color`,default:[1,.4,.1,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.1,.1,.05,1]}]},xc=e({default:()=>Sc}),Sc={id:`marble_stone_artisan`,name:`Marbled Stone`,category:`Organic`,added:`2026-04-15`,description:`Natural stone texture with randomized crystalline veins.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:15,default:6},{id:`u_primary_color`,name:`Leaf Color`,type:`color`,default:[1,.4,.1,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.1,.1,.05,1]}]},Nc=e({default:()=>Pc}),Pc={id:`marble_stone_artisan`,name:`Marbled Stone`,category:`Organic`,added:`2026-04-15`,description:`Natural stone texture with randomized crystalline veins.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -8629,7 +8851,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.6, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Vein Density`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Vein Color`,type:`color`,default:[.95,.95,1,1]},{id:`u_secondary_color`,name:`Stone Base`,type:`color`,default:[.3,.3,.35,1]}]},Cc=e({default:()=>wc}),wc={id:`martian_surface`,name:`Martian Surface`,category:`Cosmos`,added:`2026-06-11`,description:`Rust-red Martian terrain — wind-combed dune ripples, scattered dark basalt cobbles, and pale dust pooling in the hollows.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Vein Density`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Vein Color`,type:`color`,default:[.95,.95,1,1]},{id:`u_secondary_color`,name:`Stone Base`,type:`color`,default:[.3,.3,.35,1]}]},Fc=e({default:()=>Ic}),Ic={id:`martian_surface`,name:`Martian Surface`,category:`Cosmos`,added:`2026-06-11`,description:`Rust-red Martian terrain — wind-combed dune ripples, scattered dark basalt cobbles, and pale dust pooling in the hollows.`,shader:`
     // Wind ripples: asymmetric sawtooth ridges warped along the wind
     float ripples_mts(vec2 uv, float freq) {
       // Ripple crests run perpendicular to the wind (wind blows +x-ish)
@@ -8704,7 +8926,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ripple_freq`,name:`Dune Ripples`,type:`float`,min:4,max:30,default:12},{id:`u_dust_cover`,name:`Dust Cover`,type:`float`,min:0,max:1.5,default:.8},{id:`u_soil_color`,name:`Soil Colour`,type:`color`,default:[.66,.32,.18,1]}]},Tc=e({default:()=>Ec}),Ec={id:`matte_clearcoat`,name:`Matte Clearcoat`,category:`Racing`,added:`2026-04-30`,description:`Flat/satin automotive paint finish with micro-surface grain, mimicking matte-wrapped or flat-painted race cars.`,shader:`
+  `,uniforms:[{id:`u_ripple_freq`,name:`Dune Ripples`,type:`float`,min:4,max:30,default:12},{id:`u_dust_cover`,name:`Dust Cover`,type:`float`,min:0,max:1.5,default:.8},{id:`u_soil_color`,name:`Soil Colour`,type:`color`,default:[.66,.32,.18,1]}]},Lc=e({default:()=>Rc}),Rc={id:`matte_clearcoat`,name:`Matte Clearcoat`,category:`Racing`,added:`2026-04-30`,description:`Flat/satin automotive paint finish with micro-surface grain, mimicking matte-wrapped or flat-painted race cars.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
 
     float noise(vec2 p) {
@@ -8758,7 +8980,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_paint_color.a * u_opacity);
     }
-  `,uniforms:[{id:`u_paint_color`,name:`Paint Color`,type:`color`,default:[.08,.08,.08,1]},{id:`u_noise_scale`,name:`Grain Scale`,type:`float`,min:.5,max:20,default:8},{id:`u_sheen`,name:`Satin Sheen`,type:`float`,min:0,max:1,default:.15}]},Dc=e({default:()=>Oc}),Oc={id:`memphis_squiggle`,name:`Memphis Squiggle`,category:`Retro`,added:`2026-07-07`,description:`1980s Memphis design chaos — squiggles, outlined circles, triangles, and confetti dots.`,shader:`
+  `,uniforms:[{id:`u_paint_color`,name:`Paint Color`,type:`color`,default:[.08,.08,.08,1]},{id:`u_noise_scale`,name:`Grain Scale`,type:`float`,min:.5,max:20,default:8},{id:`u_sheen`,name:`Satin Sheen`,type:`float`,min:0,max:1,default:.15}]},zc=e({default:()=>Bc}),Bc={id:`memphis_squiggle`,name:`Memphis Squiggle`,category:`Retro`,added:`2026-07-07`,description:`1980s Memphis design chaos — squiggles, outlined circles, triangles, and confetti dots.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -8798,7 +9020,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Element Density`,type:`float`,min:2,max:12,default:5},{id:`u_secondary_color`,name:`Field`,type:`color`,default:[.95,.94,.9,1]},{id:`u_primary_color`,name:`Shape 1`,type:`color`,default:[.95,.3,.55,1]},{id:`u_accent_color`,name:`Shape 2`,type:`color`,default:[.15,.7,.7,1]},{id:`u_pop_color`,name:`Shape 3`,type:`color`,default:[.15,.15,.18,1]}],variants:[{name:`Milano 84`,uniforms:{u_secondary_color:[.95,.94,.9,1],u_primary_color:[.95,.3,.55,1],u_accent_color:[.15,.7,.7,1],u_pop_color:[.15,.15,.18,1]}},{name:`Saved by the Bell`,uniforms:{u_secondary_color:[.12,.08,.2,1],u_primary_color:[.95,.85,.1,1],u_accent_color:[.9,.25,.7,1],u_pop_color:[.2,.85,.6,1]}},{name:`Soft Sorbet`,uniforms:{u_secondary_color:[.97,.93,.88,1],u_primary_color:[.95,.65,.6,1],u_accent_color:[.65,.8,.75,1],u_pop_color:[.75,.7,.85,1]}}]},kc=e({default:()=>Ac}),Ac={id:`mesh_gradient`,name:`Mesh Gradient`,category:`Abstract`,added:`2026-07-07`,description:`Silky multi-point color mesh — four hues melting into each other with no hard edges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Element Density`,type:`float`,min:2,max:12,default:5},{id:`u_secondary_color`,name:`Field`,type:`color`,default:[.95,.94,.9,1]},{id:`u_primary_color`,name:`Shape 1`,type:`color`,default:[.95,.3,.55,1]},{id:`u_accent_color`,name:`Shape 2`,type:`color`,default:[.15,.7,.7,1]},{id:`u_pop_color`,name:`Shape 3`,type:`color`,default:[.15,.15,.18,1]}],variants:[{name:`Milano 84`,uniforms:{u_secondary_color:[.95,.94,.9,1],u_primary_color:[.95,.3,.55,1],u_accent_color:[.15,.7,.7,1],u_pop_color:[.15,.15,.18,1]}},{name:`Saved by the Bell`,uniforms:{u_secondary_color:[.12,.08,.2,1],u_primary_color:[.95,.85,.1,1],u_accent_color:[.9,.25,.7,1],u_pop_color:[.2,.85,.6,1]}},{name:`Soft Sorbet`,uniforms:{u_secondary_color:[.97,.93,.88,1],u_primary_color:[.95,.65,.6,1],u_accent_color:[.65,.8,.75,1],u_pop_color:[.75,.7,.85,1]}}]},Vc=e({default:()=>Hc}),Hc={id:`mesh_gradient`,name:`Mesh Gradient`,category:`Abstract`,added:`2026-07-07`,description:`Silky multi-point color mesh — four hues melting into each other with no hard edges.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
       // five anchor points; positions gently perturbed by the scale control
@@ -8821,7 +9043,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= 0.97 + 0.03 * snoise(uv * 3.0 * u_scale);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Texture Detail`,type:`float`,min:.5,max:6,default:2},{id:`u_tightness`,name:`Blend Tightness`,type:`float`,min:2,max:20,default:7},{id:`u_drift`,name:`Anchor Drift`,type:`float`,min:0,max:6.28,default:1},{id:`u_primary_color`,name:`Corner 1`,type:`color`,default:[.95,.5,.35,1]},{id:`u_accent_color`,name:`Corner 2`,type:`color`,default:[.55,.35,.85,1]},{id:`u_pop_color`,name:`Corner 3`,type:`color`,default:[.2,.55,.85,1]},{id:`u_secondary_color`,name:`Corner 4`,type:`color`,default:[.95,.75,.5,1]}],variants:[{name:`App Launch`,uniforms:{u_primary_color:[.95,.5,.35,1],u_accent_color:[.55,.35,.85,1],u_pop_color:[.2,.55,.85,1],u_secondary_color:[.95,.75,.5,1],u_tightness:7}},{name:`Deep Sea Silk`,uniforms:{u_primary_color:[.05,.25,.4,1],u_accent_color:[.1,.5,.55,1],u_pop_color:[.04,.08,.2,1],u_secondary_color:[.3,.7,.65,1],u_tightness:5}},{name:`Peach Cream`,uniforms:{u_primary_color:[.98,.8,.7,1],u_accent_color:[.95,.65,.6,1],u_pop_color:[.9,.85,.75,1],u_secondary_color:[.85,.7,.8,1],u_tightness:9}}]},jc=e({default:()=>Mc}),Mc={id:`mesh_jersey`,name:`Mesh Jersey`,category:`Industrial`,added:`2026-05-01`,description:`Open-hole sports jersey knit mesh with rounded thread loops forming a regular grid of holes.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Texture Detail`,type:`float`,min:.5,max:6,default:2},{id:`u_tightness`,name:`Blend Tightness`,type:`float`,min:2,max:20,default:7},{id:`u_drift`,name:`Anchor Drift`,type:`float`,min:0,max:6.28,default:1},{id:`u_primary_color`,name:`Corner 1`,type:`color`,default:[.95,.5,.35,1]},{id:`u_accent_color`,name:`Corner 2`,type:`color`,default:[.55,.35,.85,1]},{id:`u_pop_color`,name:`Corner 3`,type:`color`,default:[.2,.55,.85,1]},{id:`u_secondary_color`,name:`Corner 4`,type:`color`,default:[.95,.75,.5,1]}],variants:[{name:`App Launch`,uniforms:{u_primary_color:[.95,.5,.35,1],u_accent_color:[.55,.35,.85,1],u_pop_color:[.2,.55,.85,1],u_secondary_color:[.95,.75,.5,1],u_tightness:7}},{name:`Deep Sea Silk`,uniforms:{u_primary_color:[.05,.25,.4,1],u_accent_color:[.1,.5,.55,1],u_pop_color:[.04,.08,.2,1],u_secondary_color:[.3,.7,.65,1],u_tightness:5}},{name:`Peach Cream`,uniforms:{u_primary_color:[.98,.8,.7,1],u_accent_color:[.95,.65,.6,1],u_pop_color:[.9,.85,.75,1],u_secondary_color:[.85,.7,.8,1],u_tightness:9}}]},Uc=e({default:()=>Wc}),Wc={id:`mesh_jersey`,name:`Mesh Jersey`,category:`Industrial`,added:`2026-05-01`,description:`Open-hole sports jersey knit mesh with rounded thread loops forming a regular grid of holes.`,shader:`
     // Smooth minimum for rounded shape merging
     float smin(float a, float b, float k) {
       float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
@@ -8892,7 +9114,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col3, 0.0, 1.0), 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Mesh Scale`},{id:`u_thread_color`,type:`color`,default:[.9,.9,.9,1],name:`Thread Colour`},{id:`u_hole_size`,type:`float`,default:.45,min:.2,max:.7,name:`Hole Size`}]},Nc=e({default:()=>Pc}),Pc={id:`metal_flake`,name:`Metal Flake`,category:`Racing`,added:`2026-04-30`,description:`Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.`,shader:`
+  `,uniforms:[{id:`u_scale`,type:`float`,default:14,min:4,max:30,name:`Mesh Scale`},{id:`u_thread_color`,type:`color`,default:[.9,.9,.9,1],name:`Thread Colour`},{id:`u_hole_size`,type:`float`,default:.45,min:.2,max:.7,name:`Hole Size`}]},Gc=e({default:()=>Kc}),Kc={id:`metal_flake`,name:`Metal Flake`,category:`Racing`,added:`2026-04-30`,description:`Automotive metallic flake base coat with dense randomly oriented aluminium flakes sparkling in a tinted binder.`,shader:`
     float hash1(float n) { return fract(sin(n) * 43758.5453); }
 
     vec4 generate() {
@@ -8955,7 +9177,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.08,.15,.35,1]},{id:`u_flake_density`,name:`Flake Density`,type:`float`,min:200,max:2e3,default:800},{id:`u_flake_brightness`,name:`Flake Brightness`,type:`float`,min:.3,max:1.5,default:1}]},Fc=e({default:()=>Ic}),Ic={id:`meteor_shower`,name:`Meteor Shower`,category:`Cosmos`,added:`2026-06-11`,description:`A radiant burst of shooting stars — parallel incandescent streaks with white-hot heads, sputtering ember trails, and a calm starfield behind.`,shader:`
+  `,uniforms:[{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.08,.15,.35,1]},{id:`u_flake_density`,name:`Flake Density`,type:`float`,min:200,max:2e3,default:800},{id:`u_flake_brightness`,name:`Flake Brightness`,type:`float`,min:.3,max:1.5,default:1}]},qc=e({default:()=>Jc}),Jc={id:`meteor_shower`,name:`Meteor Shower`,category:`Cosmos`,added:`2026-06-11`,description:`A radiant burst of shooting stars — parallel incandescent streaks with white-hot heads, sputtering ember trails, and a calm starfield behind.`,shader:`
     vec2 rot_msh(vec2 p, float a) {
       float c = cos(a); float s = sin(a);
       return vec2(c * p.x - s * p.y, s * p.x + c * p.y);
@@ -9027,7 +9249,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Meteor Count`,type:`float`,min:2,max:9,default:4},{id:`u_angle`,name:`Fall Angle`,type:`float`,min:0,max:6.28,default:5.6},{id:`u_trail_color`,name:`Trail Colour`,type:`color`,default:[.6,.8,1,1]}]},Lc=e({default:()=>Rc}),Rc={id:`micro_cells_artisan`,name:`Micro Cells`,category:`Natural`,added:`2026-04-15`,description:`Biological cellular membranes and nuclei mimicking microscopic organic life.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Meteor Count`,type:`float`,min:2,max:9,default:4},{id:`u_angle`,name:`Fall Angle`,type:`float`,min:0,max:6.28,default:5.6},{id:`u_trail_color`,name:`Trail Colour`,type:`color`,default:[.6,.8,1,1]}]},Yc=e({default:()=>Xc}),Xc={id:`micro_cells_artisan`,name:`Micro Cells`,category:`Natural`,added:`2026-04-15`,description:`Biological cellular membranes and nuclei mimicking microscopic organic life.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -9046,13 +9268,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float nucleus = smoothstep(0.1, 0.0, m_dist);
       return mix(u_secondary_color, u_primary_color, mask + nucleus);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Magnification`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Organelle`,type:`color`,default:[.8,.4,.6,1]},{id:`u_secondary_color`,name:`Cytoplasm`,type:`color`,default:[.1,.05,.1,1]}]},zc=e({default:()=>Bc}),Bc={id:`micro_logic_grid_artisan`,name:`Logic Array`,category:`Technology`,added:`2026-04-16`,description:`Microscopic grid of semiconductor logic gates and data-bus structures.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Magnification`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Organelle`,type:`color`,default:[.8,.4,.6,1]},{id:`u_secondary_color`,name:`Cytoplasm`,type:`color`,default:[.1,.05,.1,1]}]},Zc=e({default:()=>Qc}),Qc={id:`micro_logic_grid_artisan`,name:`Logic Array`,category:`Technology`,added:`2026-04-16`,description:`Microscopic grid of semiconductor logic gates and data-bus structures.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float grid = step(0.95, fract(uv.x)) + step(0.95, fract(uv.y));
       return mix(u_secondary_color, u_primary_color, clamp(grid, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Gate Matrix`,type:`float`,min:10,max:200,default:80},{id:`u_primary_color`,name:`Bus Copper`,type:`color`,default:[.8,1,0,1]},{id:`u_secondary_color`,name:`Silicon Base`,type:`color`,default:[.05,.05,.1,1]}]},Vc=e({default:()=>Hc}),Hc={id:`microchip_wafer_pro`,name:`Microchip Die`,category:`Technology`,added:`2026-04-15`,description:`High-density silicon wafer etching with localized circuit density.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Gate Matrix`,type:`float`,min:10,max:200,default:80},{id:`u_primary_color`,name:`Bus Copper`,type:`color`,default:[.8,1,0,1]},{id:`u_secondary_color`,name:`Silicon Base`,type:`color`,default:[.05,.05,.1,1]}]},$c=e({default:()=>el}),el={id:`microchip_wafer_pro`,name:`Microchip Die`,category:`Technology`,added:`2026-04-15`,description:`High-density silicon wafer etching with localized circuit density.`,shader:`
     vec4 generate() {
       vec2 id = floor(v_uv * u_scale);
       vec2 gv = fract(v_uv * u_scale);
@@ -9068,14 +9290,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, clamp(mask, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Wafer Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Etched Metal`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Silicon`,type:`color`,default:[.1,.1,.12,1]}]},Uc=e({default:()=>Wc}),Wc={id:`moire_silk_artisan`,name:`Moire Silk`,category:`Abstract`,added:`2026-04-15`,description:`Water-like wavy fabric interference patterns found in heavy silk moire.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wafer Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Etched Metal`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Silicon`,type:`color`,default:[.1,.1,.12,1]}]},tl=e({default:()=>nl}),nl={id:`moire_silk_artisan`,name:`Moire Silk`,category:`Abstract`,added:`2026-04-15`,description:`Water-like wavy fabric interference patterns found in heavy silk moire.`,shader:`
     vec4 generate() {
       float lines1 = sin(v_uv.x * 400.0);
       float lines2 = sin((v_uv.x + v_uv.y * 0.1) * 405.0);
       float mask = smoothstep(-0.5, 0.5, lines1 * lines2);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Sheen`,type:`color`,default:[.3,.35,.5,1]},{id:`u_secondary_color`,name:`Deep Silk`,type:`color`,default:[.1,.1,.2,1]}]},Gc=e({default:()=>Kc}),Kc={id:`mola_applique`,name:`Mola Appliqué`,category:`Textile`,added:`2026-06-12`,description:`Guna mola reverse-appliqué: stacked cloth layers cut back into nested outline bands around a central motif, every band edge turned under and hemmed with tiny stitches.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Sheen`,type:`color`,default:[.3,.35,.5,1]},{id:`u_secondary_color`,name:`Deep Silk`,type:`color`,default:[.1,.1,.2,1]}]},rl=e({default:()=>il}),il={id:`mola_applique`,name:`Mola Appliqué`,category:`Textile`,added:`2026-06-12`,description:`Guna mola reverse-appliqué: stacked cloth layers cut back into nested outline bands around a central motif, every band edge turned under and hemmed with tiny stitches.`,shader:`
     // central motif distance field: rounded diamond with lobes (bird-belly blob)
     float motif_mla(vec2 p) {
       float a = atan(p.y, p.x);
@@ -9161,7 +9383,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_repeats`,name:`Motif Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_stitches`,name:`Hem Stitches`,type:`float`,min:0,max:1,default:.7},{id:`u_top_color`,name:`Top Cloth`,type:`color`,default:[.7,.12,.1,1]}]},qc=e({default:()=>Jc}),Jc={id:`molten_tungsten_artisan`,name:`Molten Tungsten`,category:`Industrial`,added:`2026-05-13`,description:`Superheated, cracked metal surface glowing intensely white-hot in the deep fissures.`,shader:`
+  `,uniforms:[{id:`u_repeats`,name:`Motif Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_stitches`,name:`Hem Stitches`,type:`float`,min:0,max:1,default:.7},{id:`u_top_color`,name:`Top Cloth`,type:`color`,default:[.7,.12,.1,1]}]},al=e({default:()=>ol}),ol={id:`molten_tungsten_artisan`,name:`Molten Tungsten`,category:`Industrial`,added:`2026-05-13`,description:`Superheated, cracked metal surface glowing intensely white-hot in the deep fissures.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
     // Cellular noise for cracks
     vec2 random2( vec2 p ) {
@@ -9205,7 +9427,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return mix(crackGlow, coolSurface, crack);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crack Scale`,type:`float`,min:2,max:15,default:5},{id:`u_cool_metal`,name:`Cooled Surface`,type:`color`,default:[.1,.1,.12,1]},{id:`u_hot_metal`,name:`Warm Surface`,type:`color`,default:[.4,.1,.05,1]},{id:`u_heat_core`,name:`Fissure Core`,type:`color`,default:[1,.4,0,1]},{id:`u_heat`,name:`Heat Pulse`,type:`float`,min:0,max:100,default:0}]},Yc=e({default:()=>Xc}),Xc={id:`monstera_leaf_artisan`,name:`Monstera Split-Leaf`,category:`Natural`,added:`2026-04-15`,description:`The iconic tropical split-leaf silhouette with decorative voids.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crack Scale`,type:`float`,min:2,max:15,default:5},{id:`u_cool_metal`,name:`Cooled Surface`,type:`color`,default:[.1,.1,.12,1]},{id:`u_hot_metal`,name:`Warm Surface`,type:`color`,default:[.4,.1,.05,1]},{id:`u_heat_core`,name:`Fissure Core`,type:`color`,default:[1,.4,0,1]},{id:`u_heat`,name:`Heat Pulse`,type:`float`,min:0,max:100,default:0}]},sl=e({default:()=>cl}),cl={id:`monstera_leaf_artisan`,name:`Monstera Split-Leaf`,category:`Natural`,added:`2026-04-15`,description:`The iconic tropical split-leaf silhouette with decorative voids.`,shader:`
     float circle(vec2 p, float r) { return length(p) - r; }
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
@@ -9222,7 +9444,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Leaf Size`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Foliage Color`,type:`color`,default:[0,.5,.2,1]},{id:`u_secondary_color`,name:`Negative Space`,type:`color`,default:[0,0,0,0]}]},Zc=e({default:()=>Qc}),Qc={id:`moon_jelly_glow`,name:`Moon Jelly Glow`,category:`Ocean`,added:`2026-06-11`,description:`Translucent moon jellies drifting in dark water — glassy bell rims, four-leaf gonad rings and trailing wisps of oral arms.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Leaf Size`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Foliage Color`,type:`color`,default:[0,.5,.2,1]},{id:`u_secondary_color`,name:`Negative Space`,type:`color`,default:[0,0,0,0]}]},ll=e({default:()=>ul}),ul={id:`moon_jelly_glow`,name:`Moon Jelly Glow`,category:`Ocean`,added:`2026-06-11`,description:`Translucent moon jellies drifting in dark water — glassy bell rims, four-leaf gonad rings and trailing wisps of oral arms.`,shader:`
     // One jelly bell at local coords p (cell-centred), returns added light
     vec3 jelly_mjg(vec2 p, float seed, vec3 glow, vec3 organ) {
       float r = length(p);
@@ -9307,7 +9529,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Jelly Density`,type:`float`,min:1,max:6,default:2.5},{id:`u_glow_color`,name:`Bell Glow`,type:`color`,default:[.55,.75,.95,1]},{id:`u_organ_color`,name:`Gonad Rings`,type:`color`,default:[.85,.55,.7,1]},{id:`u_water_color`,name:`Water Color`,type:`color`,default:[.02,.04,.1,1]}]},$c=e({default:()=>el}),el={id:`moorish_zellige`,name:`Moorish Zellige`,category:`Architecture`,added:`2026-06-12`,description:`Eight-fold star-and-cross zellige mosaic — hand-cut glazed clay in the Fez manner, every piece a slightly different depth of glaze, set into pale gypsum with chisel-soft edges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Jelly Density`,type:`float`,min:1,max:6,default:2.5},{id:`u_glow_color`,name:`Bell Glow`,type:`color`,default:[.55,.75,.95,1]},{id:`u_organ_color`,name:`Gonad Rings`,type:`color`,default:[.85,.55,.7,1]},{id:`u_water_color`,name:`Water Color`,type:`color`,default:[.02,.04,.1,1]}]},dl=e({default:()=>fl}),fl={id:`moorish_zellige`,name:`Moorish Zellige`,category:`Architecture`,added:`2026-06-12`,description:`Eight-fold star-and-cross zellige mosaic — hand-cut glazed clay in the Fez manner, every piece a slightly different depth of glaze, set into pale gypsum with chisel-soft edges.`,shader:`
     float hash_mzl(vec2 p) {
       return fract(sin(dot(p, vec2(133.7, 219.5))) * 44721.3595);
     }
@@ -9394,7 +9616,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_star_count`,name:`Star Scale`,type:`float`,min:2,max:12,default:5},{id:`u_star_color`,name:`Star Glaze`,type:`color`,default:[.09,.32,.36,1]},{id:`u_cross_color`,name:`Cross Glaze`,type:`color`,default:[.88,.83,.72,1]}]},tl=e({default:()=>nl}),nl={id:`morpho_iridescence_natural`,name:`Morpho Iridescence`,category:`Natural`,added:`2026-05-01`,description:`Deep structural blue iridescence of the Morpho butterfly wing — pure nanostructure diffraction blue with fine scale-row banding and angle-dependent shimmer.`,shader:`
+  `,uniforms:[{id:`u_star_count`,name:`Star Scale`,type:`float`,min:2,max:12,default:5},{id:`u_star_color`,name:`Star Glaze`,type:`color`,default:[.09,.32,.36,1]},{id:`u_cross_color`,name:`Cross Glaze`,type:`color`,default:[.88,.83,.72,1]}]},pl=e({default:()=>ml}),ml={id:`morpho_iridescence_natural`,name:`Morpho Iridescence`,category:`Natural`,added:`2026-05-01`,description:`Deep structural blue iridescence of the Morpho butterfly wing — pure nanostructure diffraction blue with fine scale-row banding and angle-dependent shimmer.`,shader:`
     float hash11(float p) { return fract(sin(p * 127.1) * 43758.5453); }
     float hash21(vec2 p)  { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
@@ -9463,7 +9685,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_base_blue`,name:`Morpho Blue`,type:`color`,default:[.05,.15,.92,1]},{id:`u_scale_freq`,name:`Scale Row Frequency`,type:`float`,min:10,max:80,default:40},{id:`u_shimmer`,name:`Shimmer Intensity`,type:`float`,min:0,max:1,default:.7}]},rl=e({default:()=>il}),il={id:`morse_code`,name:`Morse Code`,category:`Technology`,added:`2026-07-07`,description:`Rows of dots and dashes ticking across the surface — a hidden transmission.`,shader:`
+  `,uniforms:[{id:`u_base_blue`,name:`Morpho Blue`,type:`color`,default:[.05,.15,.92,1]},{id:`u_scale_freq`,name:`Scale Row Frequency`,type:`float`,min:10,max:80,default:40},{id:`u_shimmer`,name:`Shimmer Intensity`,type:`float`,min:0,max:1,default:.7}]},hl=e({default:()=>gl}),gl={id:`morse_code`,name:`Morse Code`,category:`Technology`,added:`2026-07-07`,description:`Rows of dots and dashes ticking across the surface — a hidden transmission.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float row = floor(uv.y);
@@ -9487,7 +9709,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += u_primary_color.rgb * m * u_glow * 0.5;
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Signal Density`,type:`float`,min:4,max:40,default:14},{id:`u_weight`,name:`Mark Weight`,type:`float`,min:.06,max:.3,default:.14},{id:`u_glow`,name:`Glow`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Signal`,type:`color`,default:[.3,.95,.5,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.03,.06,.04,1]}],variants:[{name:`Radio Room`,uniforms:{u_primary_color:[.3,.95,.5,1],u_secondary_color:[.03,.06,.04,1],u_glow:.4}},{name:`Ink on Tape`,uniforms:{u_primary_color:[.15,.15,.17,1],u_secondary_color:[.93,.9,.82,1],u_glow:0}},{name:`Distress Amber`,uniforms:{u_primary_color:[1,.65,.1,1],u_secondary_color:[.08,.05,.02,1],u_glow:.7}}]},al=e({default:()=>ol}),ol={id:`mosaic_tesserae`,name:`Mosaic Tesserae`,category:`Architecture`,added:`2026-06-12`,description:`Hand-set glass tesserae — small irregular squares each tilted in its mortar bed, colours flowing through a smalti gradient across the field, glassy sparks where facets catch the light.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Signal Density`,type:`float`,min:4,max:40,default:14},{id:`u_weight`,name:`Mark Weight`,type:`float`,min:.06,max:.3,default:.14},{id:`u_glow`,name:`Glow`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Signal`,type:`color`,default:[.3,.95,.5,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.03,.06,.04,1]}],variants:[{name:`Radio Room`,uniforms:{u_primary_color:[.3,.95,.5,1],u_secondary_color:[.03,.06,.04,1],u_glow:.4}},{name:`Ink on Tape`,uniforms:{u_primary_color:[.15,.15,.17,1],u_secondary_color:[.93,.9,.82,1],u_glow:0}},{name:`Distress Amber`,uniforms:{u_primary_color:[1,.65,.1,1],u_secondary_color:[.08,.05,.02,1],u_glow:.7}}]},_l=e({default:()=>vl}),vl={id:`mosaic_tesserae`,name:`Mosaic Tesserae`,category:`Architecture`,added:`2026-06-12`,description:`Hand-set glass tesserae — small irregular squares each tilted in its mortar bed, colours flowing through a smalti gradient across the field, glassy sparks where facets catch the light.`,shader:`
     float hash_mts(vec2 p) {
       return fract(sin(dot(p, vec2(167.1, 253.9))) * 45137.7919);
     }
@@ -9570,13 +9792,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 col = mix(mortar, glass, inTess);
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Tesserae`,type:`float`,min:8,max:40,default:18},{id:`u_color_a`,name:`Colour A`,type:`color`,default:[.1,.25,.5,1]},{id:`u_color_b`,name:`Colour B`,type:`color`,default:[.9,.78,.35,1]}]},sl=e({default:()=>cl}),cl={id:`mother_of_pearl_artisan`,name:`Mother of Pearl`,category:`Natural`,added:`2026-04-15`,description:`Iridescent-like wavy organic noise smears mimicking biological nacre.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Tesserae`,type:`float`,min:8,max:40,default:18},{id:`u_color_a`,name:`Colour A`,type:`color`,default:[.1,.25,.5,1]},{id:`u_color_b`,name:`Colour B`,type:`color`,default:[.9,.78,.35,1]}]},yl=e({default:()=>bl}),bl={id:`mother_of_pearl_artisan`,name:`Mother of Pearl`,category:`Natural`,added:`2026-04-15`,description:`Iridescent-like wavy organic noise smears mimicking biological nacre.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * u_scale);
       float m = noise(v_uv * u_scale * 2.0 + n);
       return mix(u_secondary_color, u_primary_color, m);
     }
-  `,uniforms:[{id:`u_scale`,name:`Iridescence Detail`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Shell Pearl`,type:`color`,default:[.9,.95,1,1]},{id:`u_secondary_color`,name:`Shell Deep`,type:`color`,default:[.8,.85,.9,1]}]},ll=e({default:()=>ul}),ul={id:`mud_cloth`,name:`Mud Cloth`,category:`Textile`,added:`2026-06-12`,description:`Malian bogolanfini: rows of hand-painted white symbols — zigzags, dots, combs and crosses — on fermented-mud-dyed cotton strips, every line wavering like a real brush.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Iridescence Detail`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Shell Pearl`,type:`color`,default:[.9,.95,1,1]},{id:`u_secondary_color`,name:`Shell Deep`,type:`color`,default:[.8,.85,.9,1]}]},xl=e({default:()=>Sl}),Sl={id:`mud_cloth`,name:`Mud Cloth`,category:`Textile`,added:`2026-06-12`,description:`Malian bogolanfini: rows of hand-painted white symbols — zigzags, dots, combs and crosses — on fermented-mud-dyed cotton strips, every line wavering like a real brush.`,shader:`
     float tri_mdc(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -9664,7 +9886,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rows`,name:`Symbol Rows`,type:`float`,min:3,max:14,default:7},{id:`u_ground_color`,name:`Mud Color`,type:`color`,default:[.16,.1,.07,1]}]},dl=e({default:()=>fl}),fl={id:`mud_cracks_artisan`,name:`Dried Mud`,category:`Natural`,added:`2026-04-15`,description:`High-fidelity organic polygonal fissures mimicking cracked desert earth.`,shader:`
+  `,uniforms:[{id:`u_rows`,name:`Symbol Rows`,type:`float`,min:3,max:14,default:7},{id:`u_ground_color`,name:`Mud Color`,type:`color`,default:[.16,.1,.07,1]}]},Cl=e({default:()=>wl}),wl={id:`mud_cracks_artisan`,name:`Dried Mud`,category:`Natural`,added:`2026-04-15`,description:`High-fidelity organic polygonal fissures mimicking cracked desert earth.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -9682,7 +9904,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.05, 0.1, m_dist);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crack Density`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Earth`,type:`color`,default:[.4,.3,.2,1]},{id:`u_secondary_color`,name:`Fissure`,type:`color`,default:[.15,.1,.05,1]}]},pl=e({default:()=>ml}),ml={id:`mud_splatter`,name:`Mud Splatter`,category:`Racing`,added:`2026-04-30`,description:`Dried mud and dirt splatter with organic layered blobs of varying size and opacity, typical of rally or race car bodywork.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crack Density`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Earth`,type:`color`,default:[.4,.3,.2,1]},{id:`u_secondary_color`,name:`Fissure`,type:`color`,default:[.15,.1,.05,1]}]},Tl=e({default:()=>El}),El={id:`mud_splatter`,name:`Mud Splatter`,category:`Racing`,added:`2026-04-30`,description:`Dried mud and dirt splatter with organic layered blobs of varying size and opacity, typical of rally or race car bodywork.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.2; a *= 0.48; }
@@ -9758,7 +9980,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_mud_color`,name:`Mud Color`,type:`color`,default:[.3,.22,.12,1]},{id:`u_substrate`,name:`Substrate`,type:`color`,default:[.15,.13,.12,1]},{id:`u_density`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_size`,name:`Blob Size`,type:`float`,min:.5,max:3,default:1}]},hl=e({default:()=>gl}),gl={id:`multi_env_camo`,name:`Multi-Environment Camo`,category:`Organic`,added:`2026-05-12`,description:`An advanced shader that uses smooth gradients and soft blending between layers rather than hard edges, creating a highly modern, versatile camouflage.`,shader:`
+  `,uniforms:[{id:`u_mud_color`,name:`Mud Color`,type:`color`,default:[.3,.22,.12,1]},{id:`u_substrate`,name:`Substrate`,type:`color`,default:[.15,.13,.12,1]},{id:`u_density`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_size`,name:`Blob Size`,type:`float`,min:.5,max:3,default:1}]},Dl=e({default:()=>Ol}),Ol={id:`multi_env_camo`,name:`Multi-Environment Camo`,category:`Organic`,added:`2026-05-12`,description:`An advanced shader that uses smooth gradients and soft blending between layers rather than hard edges, creating a highly modern, versatile camouflage.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -9788,7 +10010,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Arid (Default)`,uniforms:{u_color_base:[.65,.6,.5,1],u_color_1:[.55,.5,.4,1],u_color_2:[.45,.4,.35,1],u_color_3:[.3,.25,.2,1],u_color_4:[.8,.75,.65,1]}},{name:`Tropic`,uniforms:{u_color_base:[.35,.45,.25,1],u_color_1:[.25,.35,.15,1],u_color_2:[.15,.25,.1,1],u_color_3:[.05,.15,.05,1],u_color_4:[.55,.65,.4,1]}},{name:`Alpine`,uniforms:{u_color_base:[.85,.85,.9,1],u_color_1:[.7,.7,.75,1],u_color_2:[.55,.55,.6,1],u_color_3:[.3,.3,.35,1],u_color_4:[.95,.95,1,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.12,.12,.12,1],u_color_2:[.09,.09,.09,1],u_color_3:[.05,.05,.05,1],u_color_4:[.25,.25,.25,1]}}],uniforms:[{id:`u_scale`,name:`Blend Scale`,type:`float`,min:1,max:20,default:4},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.65,.6,.5,1]},{id:`u_color_1`,name:`Gradient 1`,type:`color`,default:[.55,.5,.4,1]},{id:`u_color_2`,name:`Gradient 2`,type:`color`,default:[.45,.4,.35,1]},{id:`u_color_3`,name:`Dark Accent`,type:`color`,default:[.3,.25,.2,1]},{id:`u_color_4`,name:`Light Accent`,type:`color`,default:[.8,.75,.65,1]}]},_l=e({default:()=>vl}),vl={id:`multicam`,name:`MultiCam`,category:`Organic`,added:`2026-06-11`,description:`The modern multi-terrain camouflage standard: a drifting tan-to-cream base gradient layered with organic olive and brown blobs and the signature small dark and cream spots.`,shader:`
+  `,variants:[{name:`Arid (Default)`,uniforms:{u_color_base:[.65,.6,.5,1],u_color_1:[.55,.5,.4,1],u_color_2:[.45,.4,.35,1],u_color_3:[.3,.25,.2,1],u_color_4:[.8,.75,.65,1]}},{name:`Tropic`,uniforms:{u_color_base:[.35,.45,.25,1],u_color_1:[.25,.35,.15,1],u_color_2:[.15,.25,.1,1],u_color_3:[.05,.15,.05,1],u_color_4:[.55,.65,.4,1]}},{name:`Alpine`,uniforms:{u_color_base:[.85,.85,.9,1],u_color_1:[.7,.7,.75,1],u_color_2:[.55,.55,.6,1],u_color_3:[.3,.3,.35,1],u_color_4:[.95,.95,1,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.12,.12,.12,1],u_color_2:[.09,.09,.09,1],u_color_3:[.05,.05,.05,1],u_color_4:[.25,.25,.25,1]}}],uniforms:[{id:`u_scale`,name:`Blend Scale`,type:`float`,min:1,max:20,default:4},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.65,.6,.5,1]},{id:`u_color_1`,name:`Gradient 1`,type:`color`,default:[.55,.5,.4,1]},{id:`u_color_2`,name:`Gradient 2`,type:`color`,default:[.45,.4,.35,1]},{id:`u_color_3`,name:`Dark Accent`,type:`color`,default:[.3,.25,.2,1]},{id:`u_color_4`,name:`Light Accent`,type:`color`,default:[.8,.75,.65,1]}]},kl=e({default:()=>Al}),Al={id:`multicam`,name:`MultiCam`,category:`Organic`,added:`2026-06-11`,description:`The modern multi-terrain camouflage standard: a drifting tan-to-cream base gradient layered with organic olive and brown blobs and the signature small dark and cream spots.`,shader:`
 
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -9817,7 +10039,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Original`,uniforms:{u_color_base:[.62,.56,.43,1],u_color_light:[.85,.81,.69,1],u_color_olive:[.42,.43,.3,1],u_color_brown:[.49,.39,.28,1],u_color_dark:[.27,.21,.15,1]}},{name:`Black`,uniforms:{u_color_base:[.2,.2,.21,1],u_color_light:[.38,.38,.4,1],u_color_olive:[.13,.13,.14,1],u_color_brown:[.24,.23,.25,1],u_color_dark:[.05,.05,.06,1]}},{name:`Tropic`,uniforms:{u_color_base:[.3,.4,.22,1],u_color_light:[.55,.62,.38,1],u_color_olive:[.18,.28,.13,1],u_color_brown:[.32,.27,.17,1],u_color_dark:[.08,.14,.07,1]}},{name:`Arid`,uniforms:{u_color_base:[.72,.65,.5,1],u_color_light:[.89,.85,.73,1],u_color_olive:[.55,.5,.36,1],u_color_brown:[.6,.49,.35,1],u_color_dark:[.38,.3,.21,1]}},{name:`Alpine`,uniforms:{u_color_base:[.78,.79,.82,1],u_color_light:[.94,.94,.96,1],u_color_olive:[.58,.6,.65,1],u_color_brown:[.66,.66,.7,1],u_color_dark:[.4,.41,.46,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base Tan`,type:`color`,default:[.62,.56,.43,1]},{id:`u_color_light`,name:`Highlight Cream`,type:`color`,default:[.85,.81,.69,1]},{id:`u_color_olive`,name:`Olive Blobs`,type:`color`,default:[.42,.43,.3,1]},{id:`u_color_brown`,name:`Brown Blobs`,type:`color`,default:[.49,.39,.28,1]},{id:`u_color_dark`,name:`Dark Spots`,type:`color`,default:[.27,.21,.15,1]}]},yl=e({default:()=>bl}),bl={id:`murmuration`,name:`Murmuration`,category:`Natural`,added:`2026-07-07`,description:`A starling flock at dusk — thousands of tiny wing-flecks pooling into dense waves.`,shader:`
+  `,variants:[{name:`Original`,uniforms:{u_color_base:[.62,.56,.43,1],u_color_light:[.85,.81,.69,1],u_color_olive:[.42,.43,.3,1],u_color_brown:[.49,.39,.28,1],u_color_dark:[.27,.21,.15,1]}},{name:`Black`,uniforms:{u_color_base:[.2,.2,.21,1],u_color_light:[.38,.38,.4,1],u_color_olive:[.13,.13,.14,1],u_color_brown:[.24,.23,.25,1],u_color_dark:[.05,.05,.06,1]}},{name:`Tropic`,uniforms:{u_color_base:[.3,.4,.22,1],u_color_light:[.55,.62,.38,1],u_color_olive:[.18,.28,.13,1],u_color_brown:[.32,.27,.17,1],u_color_dark:[.08,.14,.07,1]}},{name:`Arid`,uniforms:{u_color_base:[.72,.65,.5,1],u_color_light:[.89,.85,.73,1],u_color_olive:[.55,.5,.36,1],u_color_brown:[.6,.49,.35,1],u_color_dark:[.38,.3,.21,1]}},{name:`Alpine`,uniforms:{u_color_base:[.78,.79,.82,1],u_color_light:[.94,.94,.96,1],u_color_olive:[.58,.6,.65,1],u_color_brown:[.66,.66,.7,1],u_color_dark:[.4,.41,.46,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base Tan`,type:`color`,default:[.62,.56,.43,1]},{id:`u_color_light`,name:`Highlight Cream`,type:`color`,default:[.85,.81,.69,1]},{id:`u_color_olive`,name:`Olive Blobs`,type:`color`,default:[.42,.43,.3,1]},{id:`u_color_brown`,name:`Brown Blobs`,type:`color`,default:[.49,.39,.28,1]},{id:`u_color_dark`,name:`Dark Spots`,type:`color`,default:[.27,.21,.15,1]}]},jl=e({default:()=>Ml}),Ml={id:`murmuration`,name:`Murmuration`,category:`Natural`,added:`2026-07-07`,description:`A starling flock at dusk — thousands of tiny wing-flecks pooling into dense waves.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // dusk sky gradient
@@ -9841,7 +10063,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb, density * density * 0.25);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Flock Scale`,type:`float`,min:1,max:10,default:4},{id:`u_flock`,name:`Flock Density`,type:`float`,min:.2,max:1,default:.85},{id:`u_primary_color`,name:`Birds`,type:`color`,default:[.1,.09,.12,1]},{id:`u_secondary_color`,name:`Sky High`,type:`color`,default:[.45,.5,.65,1]},{id:`u_accent_color`,name:`Horizon`,type:`color`,default:[.95,.6,.35,1]}],variants:[{name:`Dusk Flock`,uniforms:{u_primary_color:[.1,.09,.12,1],u_secondary_color:[.45,.5,.65,1],u_accent_color:[.95,.6,.35,1],u_flock:.85}},{name:`Storm Front`,uniforms:{u_primary_color:[.06,.06,.08,1],u_secondary_color:[.35,.38,.42,1],u_accent_color:[.6,.62,.66,1],u_flock:1}},{name:`Dawn Rose`,uniforms:{u_primary_color:[.2,.12,.18,1],u_secondary_color:[.55,.55,.75,1],u_accent_color:[.98,.75,.7,1],u_flock:.6}}]},xl=e({default:()=>Sl}),Sl={id:`muscle_fibers`,name:`Muscle Fibers`,category:`Organic`,added:`2026-07-07`,description:`Anatomical fiber bundles — wavy parallel strands with cross striations and fascia streaks.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flock Scale`,type:`float`,min:1,max:10,default:4},{id:`u_flock`,name:`Flock Density`,type:`float`,min:.2,max:1,default:.85},{id:`u_primary_color`,name:`Birds`,type:`color`,default:[.1,.09,.12,1]},{id:`u_secondary_color`,name:`Sky High`,type:`color`,default:[.45,.5,.65,1]},{id:`u_accent_color`,name:`Horizon`,type:`color`,default:[.95,.6,.35,1]}],variants:[{name:`Dusk Flock`,uniforms:{u_primary_color:[.1,.09,.12,1],u_secondary_color:[.45,.5,.65,1],u_accent_color:[.95,.6,.35,1],u_flock:.85}},{name:`Storm Front`,uniforms:{u_primary_color:[.06,.06,.08,1],u_secondary_color:[.35,.38,.42,1],u_accent_color:[.6,.62,.66,1],u_flock:1}},{name:`Dawn Rose`,uniforms:{u_primary_color:[.2,.12,.18,1],u_secondary_color:[.55,.55,.75,1],u_accent_color:[.98,.75,.7,1],u_flock:.6}}]},Nl=e({default:()=>Pl}),Pl={id:`muscle_fibers`,name:`Muscle Fibers`,category:`Organic`,added:`2026-07-07`,description:`Anatomical fiber bundles — wavy parallel strands with cross striations and fascia streaks.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -9865,7 +10087,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c += vec3(0.08) * pow(max(shade, 0.0), 8.0);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fiber Density`,type:`float`,min:2,max:16,default:6},{id:`u_striation`,name:`Striations`,type:`float`,min:0,max:1,default:.6},{id:`u_fascia`,name:`Fascia`,type:`float`,min:0,max:1,default:.5},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Fiber`,type:`color`,default:[.75,.25,.25,1]},{id:`u_secondary_color`,name:`Between`,type:`color`,default:[.35,.08,.1,1]}],variants:[{name:`Anatomy Plate`,uniforms:{u_primary_color:[.75,.25,.25,1],u_secondary_color:[.35,.08,.1,1],u_striation:.6,u_fascia:.5}},{name:`Cybernetic`,uniforms:{u_primary_color:[.6,.62,.68,1],u_secondary_color:[.15,.16,.2,1],u_striation:.9,u_fascia:.2}},{name:`Demon Sinew`,uniforms:{u_primary_color:[.5,.12,.3,1],u_secondary_color:[.12,.03,.08,1],u_striation:.4,u_fascia:.7}}]},Cl=e({default:()=>wl}),wl={id:`mushroom_gills_artisan`,name:`Fungi Gills`,category:`Natural`,added:`2026-04-16`,description:`Radiant organic ridges found on the underside of exotic fungal caps.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fiber Density`,type:`float`,min:2,max:16,default:6},{id:`u_striation`,name:`Striations`,type:`float`,min:0,max:1,default:.6},{id:`u_fascia`,name:`Fascia`,type:`float`,min:0,max:1,default:.5},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Fiber`,type:`color`,default:[.75,.25,.25,1]},{id:`u_secondary_color`,name:`Between`,type:`color`,default:[.35,.08,.1,1]}],variants:[{name:`Anatomy Plate`,uniforms:{u_primary_color:[.75,.25,.25,1],u_secondary_color:[.35,.08,.1,1],u_striation:.6,u_fascia:.5}},{name:`Cybernetic`,uniforms:{u_primary_color:[.6,.62,.68,1],u_secondary_color:[.15,.16,.2,1],u_striation:.9,u_fascia:.2}},{name:`Demon Sinew`,uniforms:{u_primary_color:[.5,.12,.3,1],u_secondary_color:[.12,.03,.08,1],u_striation:.4,u_fascia:.7}}]},Fl=e({default:()=>Il}),Il={id:`mushroom_gills_artisan`,name:`Fungi Gills`,category:`Natural`,added:`2026-04-16`,description:`Radiant organic ridges found on the underside of exotic fungal caps.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float angle = atan(uv.y, uv.x);
@@ -9873,7 +10095,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.0, gills);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Gill Count`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Gill Ridge`,type:`color`,default:[.8,.75,.7,1]},{id:`u_secondary_color`,name:`Cap Depth`,type:`color`,default:[.4,.35,.3,1]}]},Tl=e({default:()=>El}),El={id:`mylar_heatshield`,name:`Mylar Heat Shield`,category:`Racing`,added:`2026-05-01`,description:`Crumpled gold mylar foil — crease facets with directional striations and hard specular flashes.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Gill Count`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Gill Ridge`,type:`color`,default:[.8,.75,.7,1]},{id:`u_secondary_color`,name:`Cap Depth`,type:`color`,default:[.4,.35,.3,1]}]},Ll=e({default:()=>Rl}),Rl={id:`mylar_heatshield`,name:`Mylar Heat Shield`,category:`Racing`,added:`2026-05-01`,description:`Crumpled gold mylar foil — crease facets with directional striations and hard specular flashes.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_crinkle * 2.0;
       // crumple facets: voronoi cells, each a flat-ish plane of foil
@@ -9909,7 +10131,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       foil *= 0.96 + 0.04 * snoise(uv * 30.0);
       return vec4(clamp(foil, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_foil_color`,name:`Foil Color`,type:`color`,default:[.92,.72,.22,1]},{id:`u_crinkle`,name:`Crinkle Intensity`,type:`float`,min:1,max:10,default:4},{id:`u_reflectivity`,name:`Highlight Brightness`,type:`float`,min:.3,max:2,default:1.1}],variants:[{name:`Gold NASA`,uniforms:{u_foil_color:[.92,.72,.22,1],u_crinkle:4,u_reflectivity:1.1}},{name:`Silver Emergency`,uniforms:{u_foil_color:[.75,.77,.8,1],u_crinkle:5,u_reflectivity:1.3}},{name:`Copper Shield`,uniforms:{u_foil_color:[.8,.45,.25,1],u_crinkle:3,u_reflectivity:1}}]},Dl=e({default:()=>Ol}),Ol={id:`nanotech_cells_artisan`,name:`Nano Plating`,category:`Technology`,added:`2026-04-16`,description:`Microscopic hexagonal active plating designed for dynamic aerodynamic surfaces.`,shader:`
+  `,uniforms:[{id:`u_foil_color`,name:`Foil Color`,type:`color`,default:[.92,.72,.22,1]},{id:`u_crinkle`,name:`Crinkle Intensity`,type:`float`,min:1,max:10,default:4},{id:`u_reflectivity`,name:`Highlight Brightness`,type:`float`,min:.3,max:2,default:1.1}],variants:[{name:`Gold NASA`,uniforms:{u_foil_color:[.92,.72,.22,1],u_crinkle:4,u_reflectivity:1.1}},{name:`Silver Emergency`,uniforms:{u_foil_color:[.75,.77,.8,1],u_crinkle:5,u_reflectivity:1.3}},{name:`Copper Shield`,uniforms:{u_foil_color:[.8,.45,.25,1],u_crinkle:3,u_reflectivity:1}}]},zl=e({default:()=>Bl}),Bl={id:`nanotech_cells_artisan`,name:`Nano Plating`,category:`Technology`,added:`2026-04-16`,description:`Microscopic hexagonal active plating designed for dynamic aerodynamic surfaces.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -9918,12 +10140,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.48, 0.46, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Nano Zoom`,type:`float`,min:10,max:100,default:60},{id:`u_primary_color`,name:`Plate Surface`,type:`color`,default:[.15,.15,.18,1]},{id:`u_secondary_color`,name:`Nano Joint`,type:`color`,default:[0,.8,1,1]}]},kl=e({default:()=>Al}),Al={id:`nappa_leather_artisan`,name:`Nappa Leather`,category:`Racing`,added:`2026-04-16`,description:`Smooth premium leather grain with subtle organic pores found in high-end bucket seats.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Nano Zoom`,type:`float`,min:10,max:100,default:60},{id:`u_primary_color`,name:`Plate Surface`,type:`color`,default:[.15,.15,.18,1]},{id:`u_secondary_color`,name:`Nano Joint`,type:`color`,default:[0,.8,1,1]}]},Vl=e({default:()=>Hl}),Hl={id:`nappa_leather_artisan`,name:`Nappa Leather`,category:`Racing`,added:`2026-04-16`,description:`Smooth premium leather grain with subtle organic pores found in high-end bucket seats.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * u_scale);
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Zoom`,type:`float`,min:50,max:200,default:100},{id:`u_primary_color`,name:`Leather Top`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Pore Deep`,type:`color`,default:[.05,.05,.05,1]}]},jl=e({default:()=>Ml}),Ml={id:`nautilus_spiral`,name:`Nautilus Spiral`,category:`Ocean`,added:`2026-06-11`,description:`A chambered nautilus in cross-section — logarithmic spiral whorls, curved septa walls and flame-striped cream shell.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Zoom`,type:`float`,min:50,max:200,default:100},{id:`u_primary_color`,name:`Leather Top`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Pore Deep`,type:`color`,default:[.05,.05,.05,1]}]},Ul=e({default:()=>Wl}),Wl={id:`nautilus_spiral`,name:`Nautilus Spiral`,category:`Ocean`,added:`2026-06-11`,description:`A chambered nautilus in cross-section — logarithmic spiral whorls, curved septa walls and flame-striped cream shell.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float r = max(length(uv) * 2.0, 0.001);
@@ -9989,7 +10211,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_tightness`,name:`Spiral Tightness`,type:`float`,min:.15,max:.8,default:.35},{id:`u_chambers`,name:`Chamber Count`,type:`float`,min:4,max:20,default:11},{id:`u_shell_color`,name:`Shell Color`,type:`color`,default:[.93,.88,.78,1]},{id:`u_stripe_color`,name:`Stripe Color`,type:`color`,default:[.55,.22,.1,1]}]},Nl=e({default:()=>Pl}),Pl={id:`nebula_dust_artisan`,name:`Nebula Dust`,category:`Natural`,added:`2026-04-15`,description:`Soft, colored organic dust clouds found in interstellar gas formations.`,shader:`
+  `,uniforms:[{id:`u_tightness`,name:`Spiral Tightness`,type:`float`,min:.15,max:.8,default:.35},{id:`u_chambers`,name:`Chamber Count`,type:`float`,min:4,max:20,default:11},{id:`u_shell_color`,name:`Shell Color`,type:`color`,default:[.93,.88,.78,1]},{id:`u_stripe_color`,name:`Stripe Color`,type:`color`,default:[.55,.22,.1,1]}]},Gl=e({default:()=>Kl}),Kl={id:`nebula_dust_artisan`,name:`Nebula Dust`,category:`Natural`,added:`2026-04-15`,description:`Soft, colored organic dust clouds found in interstellar gas formations.`,shader:`
     float noise(vec2 p) {
       vec2 i = floor(p); vec2 f = fract(p);
       return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
@@ -10000,7 +10222,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.2, 0.8, n / 1.5);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Gas Density`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Ionized Gas`,type:`color`,default:[.6,.1,.8,1]},{id:`u_secondary_color`,name:`Vacuum`,type:`color`,default:[0,0,.05,1]}]},Fl=e({default:()=>Il}),Il={id:`neon_marquee_chase`,name:`Marquee Chase Lights`,category:`Retro`,added:`2026-06-11`,description:`Theatre-marquee bulb rows frozen mid-chase — every third incandescent globe blazing in its brass socket, the rest cooling amber to dead glass on enamelled red channel.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Gas Density`,type:`float`,min:1,max:10,default:3},{id:`u_primary_color`,name:`Ionized Gas`,type:`color`,default:[.6,.1,.8,1]},{id:`u_secondary_color`,name:`Vacuum`,type:`color`,default:[0,0,.05,1]}]},ql=e({default:()=>Jl}),Jl={id:`neon_marquee_chase`,name:`Marquee Chase Lights`,category:`Retro`,added:`2026-06-11`,description:`Theatre-marquee bulb rows frozen mid-chase — every third incandescent globe blazing in its brass socket, the rest cooling amber to dead glass on enamelled red channel.`,shader:`
     vec4 generate() {
       float rows = u_rows;
       float ry = v_uv.y * rows;
@@ -10059,13 +10281,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rows`,name:`Bulb Rows`,type:`float`,min:2,max:8,default:4},{id:`u_bulb_count`,name:`Bulbs Per Row`,type:`float`,min:6,max:24,default:12},{id:`u_glow`,name:`Halo Spill`,type:`float`,min:0,max:2,default:1},{id:`u_lit_color`,name:`Filament Glow`,type:`color`,default:[1,.85,.55,1]},{id:`u_panel_color`,name:`Channel Enamel`,type:`color`,default:[.48,.08,.07,1]}]},Ll=e({default:()=>Rl}),Rl={id:`neon_tubes_artisan`,name:`Neon Path`,category:`Abstract`,added:`2026-04-16`,description:`Glowing tubular neon paths mimicking high-fidelity urban lighting rigs.`,shader:`
+  `,uniforms:[{id:`u_rows`,name:`Bulb Rows`,type:`float`,min:2,max:8,default:4},{id:`u_bulb_count`,name:`Bulbs Per Row`,type:`float`,min:6,max:24,default:12},{id:`u_glow`,name:`Halo Spill`,type:`float`,min:0,max:2,default:1},{id:`u_lit_color`,name:`Filament Glow`,type:`color`,default:[1,.85,.55,1]},{id:`u_panel_color`,name:`Channel Enamel`,type:`color`,default:[.48,.08,.07,1]}]},Yl=e({default:()=>Xl}),Xl={id:`neon_tubes_artisan`,name:`Neon Path`,category:`Abstract`,added:`2026-04-16`,description:`Glowing tubular neon paths mimicking high-fidelity urban lighting rigs.`,shader:`
     vec4 generate() {
       float y = fract(v_uv.y * u_scale);
       float mask = smoothstep(0.1, 0.2, y) * smoothstep(0.9, 0.8, y);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Tube Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Neon Glow`,type:`color`,default:[1,0,.5,1]},{id:`u_secondary_color`,name:`Vacuum Background`,type:`color`,default:[.05,0,.05,1]}]},zl=e({default:()=>Bl}),Bl={id:`neoprene`,name:`Neoprene`,category:`Industrial`,added:`2026-05-01`,description:`Dense rubber neoprene with a characteristic small-cell foam surface texture and slightly glossy matte finish, as used in wetsuits and padding.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tube Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Neon Glow`,type:`color`,default:[1,0,.5,1]},{id:`u_secondary_color`,name:`Vacuum Background`,type:`color`,default:[.05,0,.05,1]}]},Zl=e({default:()=>Ql}),Ql={id:`neoprene`,name:`Neoprene`,category:`Industrial`,added:`2026-05-01`,description:`Dense rubber neoprene with a characteristic small-cell foam surface texture and slightly glossy matte finish, as used in wetsuits and padding.`,shader:`
 
     // Worley nearest-cell distance for foam cells
     float worley(vec2 uv, float scale) {
@@ -10120,7 +10342,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_cell_size`,name:`Cell Size`,type:`float`,min:5,max:40,default:18},{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.05,.05,.05,1]},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.3}]},Vl=e({default:()=>Hl}),Hl={id:`neural_net_artisan`,name:`Neural Network`,category:`Technology`,added:`2026-04-16`,description:`Interconnected nodes and synthetic logic lines mimicking artificial intelligence structures.`,shader:`
+  `,uniforms:[{id:`u_cell_size`,name:`Cell Size`,type:`float`,min:5,max:40,default:18},{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.05,.05,.05,1]},{id:`u_sheen`,name:`Sheen`,type:`float`,min:0,max:1,default:.3}]},$l=e({default:()=>eu}),eu={id:`neural_net_artisan`,name:`Neural Network`,category:`Technology`,added:`2026-04-16`,description:`Interconnected nodes and synthetic logic lines mimicking artificial intelligence structures.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -10138,7 +10360,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.05, 0.0, abs(m_dist - 0.2));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Node Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Synapse`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Neural Base`,type:`color`,default:[.01,.02,.05,1]}]},Ul=e({default:()=>Wl}),Wl={id:`nineties_splash`,name:`90s Splash Graphics`,category:`Racing`,added:`2026-07-07`,description:`Torn neon splash shapes layered over each other — peak 1990s IndyCar and touring car energy.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Node Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Synapse`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Neural Base`,type:`color`,default:[.01,.02,.05,1]}]},tu=e({default:()=>nu}),nu={id:`nineties_splash`,name:`90s Splash Graphics`,category:`Racing`,added:`2026-07-07`,description:`Torn neon splash shapes layered over each other — peak 1990s IndyCar and touring car energy.`,shader:`
     float splash(vec2 uv, vec2 seed, float freq) {
       return step(u_cover, snoise(uv * freq + seed) * 0.5 + snoise(uv * freq * 2.3 + seed * 1.7) * 0.25 + 0.5);
     }
@@ -10158,7 +10380,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, vec3(0.02), clamp(edge, 0.0, 1.0) * u_keyline);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Splash Scale`,type:`float`,min:1,max:12,default:4},{id:`u_cover`,name:`Coverage`,type:`float`,min:.3,max:.8,default:.58},{id:`u_keyline`,name:`Keyline`,type:`float`,min:0,max:1,default:.7},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.97,.96,.94,1]},{id:`u_primary_color`,name:`Splash 1`,type:`color`,default:[.9,.05,.45,1]},{id:`u_accent_color`,name:`Splash 2`,type:`color`,default:[.05,.65,.9,1]},{id:`u_pop_color`,name:`Splash 3`,type:`color`,default:[1,.85,.05,1]}],variants:[{name:`Grand Prix 94`,uniforms:{u_secondary_color:[.97,.96,.94,1],u_primary_color:[.9,.05,.45,1],u_accent_color:[.05,.65,.9,1],u_pop_color:[1,.85,.05,1],u_keyline:.7}},{name:`Arcade Cab`,uniforms:{u_secondary_color:[.06,.04,.12,1],u_primary_color:[0,.9,.7,1],u_accent_color:[.85,.2,.95,1],u_pop_color:[1,.5,0,1],u_keyline:.3}},{name:`Ski Jacket`,uniforms:{u_secondary_color:[.16,.16,.55,1],u_primary_color:[.95,.3,.75,1],u_accent_color:[.3,.85,.85,1],u_pop_color:[.98,.95,.4,1],u_keyline:.9}}]},Gl=e({default:()=>Kl}),Kl={id:`nomex_weave`,name:`Nomex Fire Suit Weave`,category:`Racing`,added:`2026-05-13`,description:`FIA-grade Nomex aramid weave as found on fire suits, helmet liners, and race car interiors. Tight 2/1 diagonal twill structure.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Splash Scale`,type:`float`,min:1,max:12,default:4},{id:`u_cover`,name:`Coverage`,type:`float`,min:.3,max:.8,default:.58},{id:`u_keyline`,name:`Keyline`,type:`float`,min:0,max:1,default:.7},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.97,.96,.94,1]},{id:`u_primary_color`,name:`Splash 1`,type:`color`,default:[.9,.05,.45,1]},{id:`u_accent_color`,name:`Splash 2`,type:`color`,default:[.05,.65,.9,1]},{id:`u_pop_color`,name:`Splash 3`,type:`color`,default:[1,.85,.05,1]}],variants:[{name:`Grand Prix 94`,uniforms:{u_secondary_color:[.97,.96,.94,1],u_primary_color:[.9,.05,.45,1],u_accent_color:[.05,.65,.9,1],u_pop_color:[1,.85,.05,1],u_keyline:.7}},{name:`Arcade Cab`,uniforms:{u_secondary_color:[.06,.04,.12,1],u_primary_color:[0,.9,.7,1],u_accent_color:[.85,.2,.95,1],u_pop_color:[1,.5,0,1],u_keyline:.3}},{name:`Ski Jacket`,uniforms:{u_secondary_color:[.16,.16,.55,1],u_primary_color:[.95,.3,.75,1],u_accent_color:[.3,.85,.85,1],u_pop_color:[.98,.95,.4,1],u_keyline:.9}}]},ru=e({default:()=>iu}),iu={id:`nomex_weave`,name:`Nomex Fire Suit Weave`,category:`Racing`,added:`2026-05-13`,description:`FIA-grade Nomex aramid weave as found on fire suits, helmet liners, and race car interiors. Tight 2/1 diagonal twill structure.`,shader:`
     float hash_nw(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
     vec4 generate() {
@@ -10203,12 +10425,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale`,type:`float`,default:90,min:30,max:220},{id:`u_angle`,name:`Weave Angle`,type:`float`,default:.5,min:0,max:1},{id:`u_fiber_color`,name:`Fibre Colour`,type:`color`,default:[.92,.84,.62,1]}]},ql=e({default:()=>Jl}),Jl={id:`obsidian_fracture_artisan`,name:`Obsidian Flow`,category:`Geology`,added:`2026-04-16`,description:`Sharp, mirror-like volcanic glass fractures found in fresh obsidian flows.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale`,type:`float`,default:90,min:30,max:220},{id:`u_angle`,name:`Weave Angle`,type:`float`,default:.5,min:0,max:1},{id:`u_fiber_color`,name:`Fibre Colour`,type:`color`,default:[.92,.84,.62,1]}]},au=e({default:()=>ou}),ou={id:`obsidian_fracture_artisan`,name:`Obsidian Flow`,category:`Geology`,added:`2026-04-16`,description:`Sharp, mirror-like volcanic glass fractures found in fresh obsidian flows.`,shader:`
     vec4 generate() {
       float n = hash(floor(v_uv * u_scale));
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Fracture Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Glass High`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Glass Shore`,type:`color`,default:[0,0,0,1]}]},Yl=e({default:()=>Xl}),Xl={id:`octopus_suckers`,name:`Octopus Suckers`,category:`Ocean`,added:`2026-06-11`,description:`Underside of octopus arms — staggered double rows of fleshy suction cups with raised rims and deep cup centers on mottled mauve skin.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Fracture Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Glass High`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Glass Shore`,type:`color`,default:[0,0,0,1]}]},su=e({default:()=>cu}),cu={id:`octopus_suckers`,name:`Octopus Suckers`,category:`Ocean`,added:`2026-06-11`,description:`Underside of octopus arms — staggered double rows of fleshy suction cups with raised rims and deep cup centers on mottled mauve skin.`,shader:`
     // One sucker: returns vec2(mask, height 0..1) for shading
     vec2 sucker_ocs(vec2 p, float radius) {
       float d = length(p) / radius;
@@ -10275,14 +10497,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_arms`,name:`Arm Count`,type:`float`,min:1,max:6,default:3},{id:`u_row_density`,name:`Sucker Rows`,type:`float`,min:4,max:18,default:9},{id:`u_skin_color`,name:`Skin Color`,type:`color`,default:[.55,.3,.34,1]}]},Zl=e({default:()=>Ql}),Ql={id:`oil_canvas_artisan`,name:`Oil Canvas Strokes`,category:`Abstract`,added:`2026-04-15`,description:`Directional brush-stroke noise mimicking thick oil paint on canvas.`,shader:`
+  `,uniforms:[{id:`u_arms`,name:`Arm Count`,type:`float`,min:1,max:6,default:3},{id:`u_row_density`,name:`Sucker Rows`,type:`float`,min:4,max:18,default:9},{id:`u_skin_color`,name:`Skin Color`,type:`color`,default:[.55,.3,.34,1]}]},lu=e({default:()=>uu}),uu={id:`oil_canvas_artisan`,name:`Oil Canvas Strokes`,category:`Abstract`,added:`2026-04-15`,description:`Directional brush-stroke noise mimicking thick oil paint on canvas.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = hash(floor(uv.y * 50.0) + vec2(floor(uv.x * 2.0), 0.0));
       float mask = smoothstep(0.4, 0.6, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Canvas Zoom`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Paint Color`,type:`color`,default:[.6,.1,.2,1]},{id:`u_secondary_color`,name:`Canvas Weave`,type:`color`,default:[.8,.75,.7,1]}]},$l=e({default:()=>eu}),eu={id:`oil_slick`,name:`Oil Slick`,category:`Natural`,added:`2026-05-01`,description:`Thin-film oil interference on wet dark tarmac — rainbow iridescence bands in sinuous organic puddles.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Canvas Zoom`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Paint Color`,type:`color`,default:[.6,.1,.2,1]},{id:`u_secondary_color`,name:`Canvas Weave`,type:`color`,default:[.8,.75,.7,1]}]},du=e({default:()=>fu}),fu={id:`oil_slick`,name:`Oil Slick`,category:`Natural`,added:`2026-05-01`,description:`Thin-film oil interference on wet dark tarmac — rainbow iridescence bands in sinuous organic puddles.`,shader:`
     // --- helpers BEFORE generate() ---
 
     float hash1_os(vec2 p) {
@@ -10363,7 +10585,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_band_scale`,name:`Band Scale`,type:`float`,min:1,max:10,default:3},{id:`u_iridescence`,name:`Color Intensity`,type:`float`,min:0,max:2,default:1.2},{id:`u_wetness`,name:`Puddle Coverage`,type:`float`,min:0,max:1,default:.8}]},tu=e({default:()=>nu}),nu={id:`oil_stain`,name:`Oil Stain`,category:`Industrial`,added:`2026-04-30`,description:`Dark oil and grease stains on a concrete substrate with irregular pooling and thin-film iridescence at dried edges.`,shader:`
+  `,uniforms:[{id:`u_band_scale`,name:`Band Scale`,type:`float`,min:1,max:10,default:3},{id:`u_iridescence`,name:`Color Intensity`,type:`float`,min:0,max:2,default:1.2},{id:`u_wetness`,name:`Puddle Coverage`,type:`float`,min:0,max:1,default:.8}]},pu=e({default:()=>mu}),mu={id:`oil_stain`,name:`Oil Stain`,category:`Industrial`,added:`2026-04-30`,description:`Dark oil and grease stains on a concrete substrate with irregular pooling and thin-film iridescence at dried edges.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.1; a *= 0.5; }
@@ -10427,7 +10649,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_stain_count`,name:`Stain Count`,type:`float`,min:1,max:8,default:3},{id:`u_substrate`,name:`Substrate`,type:`color`,default:[.25,.23,.22,1]}]},ru=e({default:()=>iu}),iu={id:`olive_branch_artisan`,name:`Olive Branch`,category:`Natural`,added:`2026-04-15`,description:`Symmetrical leaf layering along a spine, symbolizing peace and precision.`,shader:`
+  `,uniforms:[{id:`u_stain_count`,name:`Stain Count`,type:`float`,min:1,max:8,default:3},{id:`u_substrate`,name:`Substrate`,type:`color`,default:[.25,.23,.22,1]}]},hu=e({default:()=>gu}),gu={id:`olive_branch_artisan`,name:`Olive Branch`,category:`Natural`,added:`2026-04-15`,description:`Symmetrical leaf layering along a spine, symbolizing peace and precision.`,shader:`
     float leaf(vec2 p) {
       p = abs(p);
       return max(length(p - vec2(0.0, 0.2)), length(p + vec2(0.0, 0.2))) - 0.3;
@@ -10446,7 +10668,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = max(spine, leafMask);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Branch Length`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Branch Color`,type:`color`,default:[.4,.5,.2,1]},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.05,.05,.02,1]}]},au=e({default:()=>ou}),ou={id:`op_art_waves`,name:`Op Art Waves`,category:`Geometric`,added:`2026-07-07`,description:`Bridget Riley-style line field — parallel stripes bulging through invisible hills.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Branch Length`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Branch Color`,type:`color`,default:[.4,.5,.2,1]},{id:`u_secondary_color`,name:`Base`,type:`color`,default:[.05,.05,.02,1]}]},_u=e({default:()=>vu}),vu={id:`op_art_waves`,name:`Op Art Waves`,category:`Geometric`,added:`2026-07-07`,description:`Bridget Riley-style line field — parallel stripes bulging through invisible hills.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -10461,7 +10683,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 col = mix(u_secondary_color, u_primary_color, m);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Line Density`,type:`float`,min:4,max:40,default:14},{id:`u_warp`,name:`Bulge`,type:`float`,min:0,max:3,default:1.2},{id:`u_swell`,name:`Thickness Swell`,type:`float`,min:0,max:1,default:.5},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Line`,type:`color`,default:[.06,.06,.07,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.96,.95,.93,1]}],variants:[{name:`Gallery Black`,uniforms:{u_primary_color:[.06,.06,.07,1],u_secondary_color:[.96,.95,.93,1],u_warp:1.2,u_swell:.5}},{name:`Cobalt Current`,uniforms:{u_primary_color:[.1,.2,.6,1],u_secondary_color:[.9,.93,.97,1],u_warp:2,u_swell:.7}},{name:`Heat Shimmer`,uniforms:{u_primary_color:[.8,.25,.1,1],u_secondary_color:[.1,.08,.07,1],u_warp:2.6,u_swell:.3}}]},su=e({default:()=>cu}),cu={id:`opalized_wood`,name:`Opalized Wood`,category:`Geology`,added:`2026-06-12`,description:`Fossil wood replaced by precious opal — brown growth rings interrupted by glassy patches blazing with spectral play-of-color.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Line Density`,type:`float`,min:4,max:40,default:14},{id:`u_warp`,name:`Bulge`,type:`float`,min:0,max:3,default:1.2},{id:`u_swell`,name:`Thickness Swell`,type:`float`,min:0,max:1,default:.5},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Line`,type:`color`,default:[.06,.06,.07,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.96,.95,.93,1]}],variants:[{name:`Gallery Black`,uniforms:{u_primary_color:[.06,.06,.07,1],u_secondary_color:[.96,.95,.93,1],u_warp:1.2,u_swell:.5}},{name:`Cobalt Current`,uniforms:{u_primary_color:[.1,.2,.6,1],u_secondary_color:[.9,.93,.97,1],u_warp:2,u_swell:.7}},{name:`Heat Shimmer`,uniforms:{u_primary_color:[.8,.25,.1,1],u_secondary_color:[.1,.08,.07,1],u_warp:2.6,u_swell:.3}}]},yu=e({default:()=>bu}),bu={id:`opalized_wood`,name:`Opalized Wood`,category:`Geology`,added:`2026-06-12`,description:`Fossil wood replaced by precious opal — brown growth rings interrupted by glassy patches blazing with spectral play-of-color.`,shader:`
     vec2 hash2_opw(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -10551,7 +10773,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grain_scale`,name:`Grain Rings`,type:`float`,min:6,max:50,default:22},{id:`u_patch_scale`,name:`Opal Patches`,type:`float`,min:2,max:16,default:6},{id:`u_opal_amount`,name:`Opal Coverage`,type:`float`,min:.1,max:1,default:.5},{id:`u_wood_color`,name:`Wood Brown`,type:`color`,default:[.52,.34,.2,1]}]},lu=e({default:()=>uu}),uu={id:`optical_fiber_bundle_artisan`,name:`Optical Fiber Bundle`,category:`Technology`,added:`2026-05-13`,description:`Glowing fiber optic cables of varying diameters, bleeding light into a dark resin matrix.`,shader:`
+  `,uniforms:[{id:`u_grain_scale`,name:`Grain Rings`,type:`float`,min:6,max:50,default:22},{id:`u_patch_scale`,name:`Opal Patches`,type:`float`,min:2,max:16,default:6},{id:`u_opal_amount`,name:`Opal Coverage`,type:`float`,min:.1,max:1,default:.5},{id:`u_wood_color`,name:`Wood Brown`,type:`color`,default:[.52,.34,.2,1]}]},xu=e({default:()=>Su}),Su={id:`optical_fiber_bundle_artisan`,name:`Optical Fiber Bundle`,category:`Technology`,added:`2026-05-13`,description:`Glowing fiber optic cables of varying diameters, bleeding light into a dark resin matrix.`,shader:`
     vec2 random2( vec2 p ) {
         return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
@@ -10601,7 +10823,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return finalColor;
     }
-  `,uniforms:[{id:`u_scale`,name:`Bundle Scale`,type:`float`,min:2,max:20,default:8},{id:`u_resin_matrix`,name:`Resin Base`,type:`color`,default:[.05,.05,.05,1]},{id:`u_cladding`,name:`Fiber Cladding`,type:`color`,default:[.2,.2,.25,1]},{id:`u_fiber_glow`,name:`Light Transmission`,type:`color`,default:[0,.8,1,1]},{id:`u_fiber_dark`,name:`Inactive Fiber`,type:`color`,default:[.1,.1,.2,1]},{id:`u_flow`,name:`Data Flow`,type:`float`,min:0,max:100,default:0}]},du=e({default:()=>fu}),fu={id:`orbital_paths`,name:`Orbital Paths`,category:`Cosmos`,added:`2026-07-07`,description:`A star chart of concentric orbits — rings, planet dots, and dashed transfer arcs.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Bundle Scale`,type:`float`,min:2,max:20,default:8},{id:`u_resin_matrix`,name:`Resin Base`,type:`color`,default:[.05,.05,.05,1]},{id:`u_cladding`,name:`Fiber Cladding`,type:`color`,default:[.2,.2,.25,1]},{id:`u_fiber_glow`,name:`Light Transmission`,type:`color`,default:[0,.8,1,1]},{id:`u_fiber_dark`,name:`Inactive Fiber`,type:`color`,default:[.1,.1,.2,1]},{id:`u_flow`,name:`Data Flow`,type:`float`,min:0,max:100,default:0}]},Cu=e({default:()=>wu}),wu={id:`orbital_paths`,name:`Orbital Paths`,category:`Cosmos`,added:`2026-07-07`,description:`A star chart of concentric orbits — rings, planet dots, and dashed transfer arcs.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       // tile the solar systems
@@ -10635,7 +10857,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_accent_color.rgb, planets);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Chart Scale`,type:`float`,min:4,max:24,default:8},{id:`u_width`,name:`Orbit Line`,type:`float`,min:.005,max:.05,default:.015},{id:`u_dash`,name:`Dashing`,type:`float`,min:0,max:1,default:.5},{id:`u_secondary_color`,name:`Chart`,type:`color`,default:[.05,.07,.12,1]},{id:`u_primary_color`,name:`Orbit Lines`,type:`color`,default:[.6,.75,.9,1]},{id:`u_accent_color`,name:`Bodies`,type:`color`,default:[1,.8,.35,1]}],variants:[{name:`Star Chart`,uniforms:{u_secondary_color:[.05,.07,.12,1],u_primary_color:[.6,.75,.9,1],u_accent_color:[1,.8,.35,1],u_dash:.5}},{name:`Mission Control`,uniforms:{u_secondary_color:[.02,.04,.03,1],u_primary_color:[.25,.9,.45,1],u_accent_color:[.95,.95,.9,1],u_dash:.8}},{name:`Antique Almanac`,uniforms:{u_secondary_color:[.9,.85,.72,1],u_primary_color:[.35,.28,.2,1],u_accent_color:[.6,.15,.1,1],u_dash:.2}}]},pu=e({default:()=>mu}),mu={id:`origami_fold`,name:`Origami Fold`,category:`Geometric`,added:`2026-05-01`,description:`Origami crease pattern with radiating mountain and valley fold lines on cream paper.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Chart Scale`,type:`float`,min:4,max:24,default:8},{id:`u_width`,name:`Orbit Line`,type:`float`,min:.005,max:.05,default:.015},{id:`u_dash`,name:`Dashing`,type:`float`,min:0,max:1,default:.5},{id:`u_secondary_color`,name:`Chart`,type:`color`,default:[.05,.07,.12,1]},{id:`u_primary_color`,name:`Orbit Lines`,type:`color`,default:[.6,.75,.9,1]},{id:`u_accent_color`,name:`Bodies`,type:`color`,default:[1,.8,.35,1]}],variants:[{name:`Star Chart`,uniforms:{u_secondary_color:[.05,.07,.12,1],u_primary_color:[.6,.75,.9,1],u_accent_color:[1,.8,.35,1],u_dash:.5}},{name:`Mission Control`,uniforms:{u_secondary_color:[.02,.04,.03,1],u_primary_color:[.25,.9,.45,1],u_accent_color:[.95,.95,.9,1],u_dash:.8}},{name:`Antique Almanac`,uniforms:{u_secondary_color:[.9,.85,.72,1],u_primary_color:[.35,.28,.2,1],u_accent_color:[.6,.15,.1,1],u_dash:.2}}]},Tu=e({default:()=>Eu}),Eu={id:`origami_fold`,name:`Origami Fold`,category:`Geometric`,added:`2026-05-01`,description:`Origami crease pattern with radiating mountain and valley fold lines on cream paper.`,shader:`
     // Distance from point p to infinite line through a and b
     float lineDistance(vec2 p, vec2 a, vec2 b) {
       vec2 ab = b - a;
@@ -10734,7 +10956,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_complexity`,type:`float`,default:2.5,min:1,max:5,name:`Complexity`},{id:`u_paper_color`,type:`color`,default:[.96,.94,.9,1],name:`Paper Colour`},{id:`u_crease_color`,type:`color`,default:[.55,.5,.45,1],name:`Crease Colour`}]},hu=e({default:()=>gu}),gu={id:`oscilloscope_lissajous`,name:`Oscilloscope Lissajous`,category:`Retro`,added:`2026-06-11`,description:`A lab scope locked on a Lissajous figure — the phosphor beam looping its frequency-ratio knot over an etched graticule, green afterglow pooling in the glass.`,shader:`
+  `,uniforms:[{id:`u_complexity`,type:`float`,default:2.5,min:1,max:5,name:`Complexity`},{id:`u_paper_color`,type:`color`,default:[.96,.94,.9,1],name:`Paper Colour`},{id:`u_crease_color`,type:`color`,default:[.55,.5,.45,1],name:`Crease Colour`}]},Du=e({default:()=>Ou}),Ou={id:`oscilloscope_lissajous`,name:`Oscilloscope Lissajous`,category:`Retro`,added:`2026-06-11`,description:`A lab scope locked on a Lissajous figure — the phosphor beam looping its frequency-ratio knot over an etched graticule, green afterglow pooling in the glass.`,shader:`
     vec4 generate() {
       vec2 p = fract(v_uv) - 0.5;
       vec2 uv = fract(v_uv);
@@ -10789,7 +11011,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ratio_a`,name:`X Frequency`,type:`float`,min:1,max:7,default:3},{id:`u_ratio_b`,name:`Y Frequency`,type:`float`,min:1,max:7,default:2},{id:`u_phase`,name:`Phase Shift`,type:`float`,min:0,max:3.14159,default:1.5708},{id:`u_beam_color`,name:`Phosphor`,type:`color`,default:[.3,1,.45,1]}]},_u=e({default:()=>vu}),vu={id:`paint_chips`,name:`Paint Chips`,category:`Industrial`,added:`2026-04-30`,description:`Chipped and scratched paint surface revealing bare metal substrate through irregular chips and long directional scratches.`,shader:`
+  `,uniforms:[{id:`u_ratio_a`,name:`X Frequency`,type:`float`,min:1,max:7,default:3},{id:`u_ratio_b`,name:`Y Frequency`,type:`float`,min:1,max:7,default:2},{id:`u_phase`,name:`Phase Shift`,type:`float`,min:0,max:3.14159,default:1.5708},{id:`u_beam_color`,name:`Phosphor`,type:`color`,default:[.3,1,.45,1]}]},ku=e({default:()=>Au}),Au={id:`paint_chips`,name:`Paint Chips`,category:`Industrial`,added:`2026-04-30`,description:`Chipped and scratched paint surface revealing bare metal substrate through irregular chips and long directional scratches.`,shader:`
     float hash1(float n) { return fract(sin(n) * 43758.5453); }
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
@@ -10847,7 +11069,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.a = u_opacity;
       return clamp(col, 0.0, 1.0);
     }
-  `,uniforms:[{id:`u_chip_density`,name:`Chip Density`,type:`float`,min:1,max:20,default:8},{id:`u_base_color`,name:`Metal Substrate`,type:`color`,default:[.15,.15,.18,1]},{id:`u_paint_color`,name:`Paint Color`,type:`color`,default:[.3,.05,.05,1]}]},yu=e({default:()=>bu}),bu={id:`paisley_bandana`,name:`Paisley Bandana`,category:`Abstract`,added:`2026-06-11`,description:`Bandana-style repeat of curled paisley boteh teardrops with echo outlines, center dots and dotted halo rings, alternating orientation on a staggered grid.`,shader:`
+  `,uniforms:[{id:`u_chip_density`,name:`Chip Density`,type:`float`,min:1,max:20,default:8},{id:`u_base_color`,name:`Metal Substrate`,type:`color`,default:[.15,.15,.18,1]},{id:`u_paint_color`,name:`Paint Color`,type:`color`,default:[.3,.05,.05,1]}]},ju=e({default:()=>Mu}),Mu={id:`paisley_bandana`,name:`Paisley Bandana`,category:`Abstract`,added:`2026-06-11`,description:`Bandana-style repeat of curled paisley boteh teardrops with echo outlines, center dots and dotted halo rings, alternating orientation on a staggered grid.`,shader:`
 
     float smin(float a, float b, float k) {
       float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
@@ -10905,7 +11127,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Bandana Red`,uniforms:{u_color_motif:[.97,.95,.92,1],u_color_accent:[.12,.05,.05,1],u_color_bg:[.62,.1,.12,1]}},{name:`Bandana Blue`,uniforms:{u_color_motif:[.96,.96,.97,1],u_color_accent:[.04,.05,.12,1],u_color_bg:[.12,.2,.45,1]}},{name:`Black & Gold`,uniforms:{u_color_motif:[.88,.71,.28,1],u_color_accent:[.55,.42,.15,1],u_color_bg:[.06,.06,.07,1]}},{name:`Ivory`,uniforms:{u_color_motif:[.35,.3,.26,1],u_color_accent:[.62,.54,.44,1],u_color_bg:[.94,.91,.84,1]}}],uniforms:[{id:`u_scale`,name:`Motif Scale`,type:`float`,min:2,max:14,default:5},{id:`u_dots`,name:`Dot Detail`,type:`float`,min:0,max:1,default:1},{id:`u_line`,name:`Line Thickness`,type:`float`,min:.005,max:.05,default:.016},{id:`u_color_motif`,name:`Motif Color`,type:`color`,default:[.97,.95,.92,1]},{id:`u_color_accent`,name:`Accent Color`,type:`color`,default:[.12,.05,.05,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.62,.1,.12,1]}]},xu=e({default:()=>Su}),Su={id:`palazzo_checker`,name:`Palazzo Checker`,category:`Architecture`,added:`2026-06-12`,description:`Worn palazzo floor — alternating marble slabs, every slab carrying its own veining at its own angle, centuries of footfall dulling the traffic lanes and hairline joints catching the dirt.`,shader:`
+  `,variants:[{name:`Bandana Red`,uniforms:{u_color_motif:[.97,.95,.92,1],u_color_accent:[.12,.05,.05,1],u_color_bg:[.62,.1,.12,1]}},{name:`Bandana Blue`,uniforms:{u_color_motif:[.96,.96,.97,1],u_color_accent:[.04,.05,.12,1],u_color_bg:[.12,.2,.45,1]}},{name:`Black & Gold`,uniforms:{u_color_motif:[.88,.71,.28,1],u_color_accent:[.55,.42,.15,1],u_color_bg:[.06,.06,.07,1]}},{name:`Ivory`,uniforms:{u_color_motif:[.35,.3,.26,1],u_color_accent:[.62,.54,.44,1],u_color_bg:[.94,.91,.84,1]}}],uniforms:[{id:`u_scale`,name:`Motif Scale`,type:`float`,min:2,max:14,default:5},{id:`u_dots`,name:`Dot Detail`,type:`float`,min:0,max:1,default:1},{id:`u_line`,name:`Line Thickness`,type:`float`,min:.005,max:.05,default:.016},{id:`u_color_motif`,name:`Motif Color`,type:`color`,default:[.97,.95,.92,1]},{id:`u_color_accent`,name:`Accent Color`,type:`color`,default:[.12,.05,.05,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.62,.1,.12,1]}]},Nu=e({default:()=>Pu}),Pu={id:`palazzo_checker`,name:`Palazzo Checker`,category:`Architecture`,added:`2026-06-12`,description:`Worn palazzo floor — alternating marble slabs, every slab carrying its own veining at its own angle, centuries of footfall dulling the traffic lanes and hairline joints catching the dirt.`,shader:`
     float hash_pcz(vec2 p) {
       return fract(sin(dot(p, vec2(269.3, 151.9))) * 43913.7331);
     }
@@ -10992,7 +11214,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_slabs`,name:`Checker Scale`,type:`float`,min:1,max:6,default:3},{id:`u_wear`,name:`Foot Wear`,type:`float`,min:0,max:1,default:.5},{id:`u_light_color`,name:`Light Marble`,type:`color`,default:[.88,.86,.81,1]},{id:`u_dark_color`,name:`Dark Marble`,type:`color`,default:[.16,.17,.18,1]}]},Cu=e({default:()=>wu}),wu={id:`palm_fronds_artisan`,name:`Palm Fronds`,category:`Natural`,added:`2026-04-15`,description:`Fan-like radial leaf structures found in tropical palm trees.`,shader:`
+  `,uniforms:[{id:`u_slabs`,name:`Checker Scale`,type:`float`,min:1,max:6,default:3},{id:`u_wear`,name:`Foot Wear`,type:`float`,min:0,max:1,default:.5},{id:`u_light_color`,name:`Light Marble`,type:`color`,default:[.88,.86,.81,1]},{id:`u_dark_color`,name:`Dark Marble`,type:`color`,default:[.16,.17,.18,1]}]},Fu=e({default:()=>Iu}),Iu={id:`palm_fronds_artisan`,name:`Palm Fronds`,category:`Natural`,added:`2026-04-15`,description:`Fan-like radial leaf structures found in tropical palm trees.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float a = atan(uv.y, uv.x);
@@ -11003,7 +11225,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Frond Length`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Palm Leaf`,type:`color`,default:[.1,.6,.2,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[0,0,0,1]}]},Tu=e({default:()=>Eu}),Eu={id:`paper_tear_artisan`,name:`Aggressive Tear`,category:`Abstract`,added:`2026-04-15`,description:`High-intensity directional shreds and jagged ruptures mimicking ripped metal or heavy cardstock.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Frond Length`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Palm Leaf`,type:`color`,default:[.1,.6,.2,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[0,0,0,1]}]},Lu=e({default:()=>Ru}),Ru={id:`paper_tear_artisan`,name:`Aggressive Tear`,category:`Abstract`,added:`2026-04-15`,description:`High-intensity directional shreds and jagged ruptures mimicking ripped metal or heavy cardstock.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 4; i++) {
@@ -11023,13 +11245,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Shred Scale`,type:`float`,min:1,max:10,default:3},{id:`u_intensity`,name:`Aggression`,type:`float`,min:.1,max:5,default:2},{id:`u_primary_color`,name:`Top Layer`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Deep Tear`,type:`color`,default:[.95,.95,.95,1]}]},Du=e({default:()=>Ou}),Ou={id:`pcb_traces_v3_artisan`,name:`Pro PCB Logic`,category:`Technology`,added:`2026-04-16`,description:`Triple-layer circuit logic with advanced bus-routing and microscopic trace detail.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Shred Scale`,type:`float`,min:1,max:10,default:3},{id:`u_intensity`,name:`Aggression`,type:`float`,min:.1,max:5,default:2},{id:`u_primary_color`,name:`Top Layer`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Deep Tear`,type:`color`,default:[.95,.95,.95,1]}]},zu=e({default:()=>Bu}),Bu={id:`pcb_traces_v3_artisan`,name:`Pro PCB Logic`,category:`Technology`,added:`2026-04-16`,description:`Triple-layer circuit logic with advanced bus-routing and microscopic trace detail.`,shader:`
     vec4 generate() {
       float lines = sin(v_uv.x * 400.0) * sin(v_uv.y * 400.0);
       float mask = step(0.1, abs(lines));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Trace Copper`,type:`color`,default:[1,.6,.1,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[0,.15,.05,1]}]},ku=e({default:()=>Au}),Au={id:`peacock_eyes_artisan`,name:`Peacock Eyes`,category:`Natural`,added:`2026-04-15`,description:`Ornate organic pattern mimicking the "eyes" found in peacock feathers.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Trace Copper`,type:`color`,default:[1,.6,.1,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[0,.15,.05,1]}]},Vu=e({default:()=>Hu}),Hu={id:`peacock_eyes_artisan`,name:`Peacock Eyes`,category:`Natural`,added:`2026-04-15`,description:`Ornate organic pattern mimicking the "eyes" found in peacock feathers.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv * u_scale) - 0.5;
       float d = length(uv);
@@ -11039,7 +11261,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = mix(col, vec4(0.0, 1.0, 1.0, 1.0), smoothstep(0.1, 0.05, d));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Eye Count`,type:`float`,min:2,max:20,default:6},{id:`u_primary_color`,name:`Eye Border`,type:`color`,default:[.1,.8,.3,1]},{id:`u_secondary_color`,name:`Feather Base`,type:`color`,default:[.05,.2,.05,1]}]},ju=e({default:()=>Mu}),Mu={id:`pearl_flake_paint`,name:`Pearl Flake Paint`,category:`Racing`,added:`2026-04-30`,description:`Iridescent pearl automotive paint with hue-shifting colour across the surface and fine mica flake shimmer.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Eye Count`,type:`float`,min:2,max:20,default:6},{id:`u_primary_color`,name:`Eye Border`,type:`color`,default:[.1,.8,.3,1]},{id:`u_secondary_color`,name:`Feather Base`,type:`color`,default:[.05,.2,.05,1]}]},Uu=e({default:()=>Wu}),Wu={id:`pearl_flake_paint`,name:`Pearl Flake Paint`,category:`Racing`,added:`2026-04-30`,description:`Iridescent pearl automotive paint with hue-shifting colour across the surface and fine mica flake shimmer.`,shader:`
 
     // Hue rotation applied to an RGB colour
     vec3 rotateHue(vec3 col, float shift) {
@@ -11107,12 +11329,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.95,.93,.9,1]},{id:`u_shift_amount`,name:`Colour Shift`,type:`float`,min:0,max:1,default:.4},{id:`u_flake_density`,name:`Mica Density`,type:`float`,min:100,max:1e3,default:400}]},Nu=e({default:()=>Pu}),Pu={id:`peat_moss_artisan`,name:`Peat Moss`,category:`Natural`,added:`2026-04-16`,description:`Dense organic clumpy sprawl mimicking professional landscape and high-fidelity vegetation.`,shader:`
+  `,uniforms:[{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.95,.93,.9,1]},{id:`u_shift_amount`,name:`Colour Shift`,type:`float`,min:0,max:1,default:.4},{id:`u_flake_density`,name:`Mica Density`,type:`float`,min:100,max:1e3,default:400}]},Gu=e({default:()=>Ku}),Ku={id:`peat_moss_artisan`,name:`Peat Moss`,category:`Natural`,added:`2026-04-16`,description:`Dense organic clumpy sprawl mimicking professional landscape and high-fidelity vegetation.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * u_scale + noise(v_uv * 10.0));
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Moss Density`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Moss High`,type:`color`,default:[.3,.4,.2,1]},{id:`u_secondary_color`,name:`Moss Deep`,type:`color`,default:[.1,.15,.05,1]}]},Fu=e({default:()=>Iu}),Iu={id:`pebbledash_render`,name:`Pebbledash Render`,category:`Architecture`,added:`2026-06-12`,description:`Pebbledashed facade — rounded beach pebbles thrown dense into wet render, each stone a lit dome with its own cast shadow, mortar showing in the gaps and bald patches where stones have shed.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Moss Density`,type:`float`,min:20,max:200,default:80},{id:`u_primary_color`,name:`Moss High`,type:`color`,default:[.3,.4,.2,1]},{id:`u_secondary_color`,name:`Moss Deep`,type:`color`,default:[.1,.15,.05,1]}]},qu=e({default:()=>Ju}),Ju={id:`pebbledash_render`,name:`Pebbledash Render`,category:`Architecture`,added:`2026-06-12`,description:`Pebbledashed facade — rounded beach pebbles thrown dense into wet render, each stone a lit dome with its own cast shadow, mortar showing in the gaps and bald patches where stones have shed.`,shader:`
     float hash_pbd(vec2 p) {
       return fract(sin(dot(p, vec2(187.1, 297.7))) * 44087.5119);
     }
@@ -11206,7 +11428,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Pebble Density`,type:`float`,min:8,max:36,default:18},{id:`u_shedding`,name:`Shed Patches`,type:`float`,min:0,max:1,default:.3},{id:`u_mortar_color`,name:`Render`,type:`color`,default:[.69,.65,.58,1]}]},Lu=e({default:()=>Ru}),Ru={id:`penrose_tiling_artisan`,name:`Penrose Mesh`,category:`Abstract`,added:`2026-04-16`,description:`Aperiodic, non-repeating tiling lines mimicking complex mathematical quasicrystal structures.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Pebble Density`,type:`float`,min:8,max:36,default:18},{id:`u_shedding`,name:`Shed Patches`,type:`float`,min:0,max:1,default:.3},{id:`u_mortar_color`,name:`Render`,type:`color`,default:[.69,.65,.58,1]}]},Yu=e({default:()=>Xu}),Xu={id:`penrose_tiling_artisan`,name:`Penrose Mesh`,category:`Abstract`,added:`2026-04-16`,description:`Aperiodic, non-repeating tiling lines mimicking complex mathematical quasicrystal structures.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float a = 0.62831853; // 2pi/10
@@ -11217,7 +11439,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, clamp(d, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Penrose Detail`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Tiling Line`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Void Space`,type:`color`,default:[.05,.05,.1,1]}]},zu=e({default:()=>Bu}),Bu={id:`perforated_leather`,name:`Perforated Leather`,category:`Industrial`,added:`2026-05-01`,description:`Smooth leather with a regular diamond punched-hole pattern over a contrasting backing, as used in racing seats and steering wheel grips.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Penrose Detail`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Tiling Line`,type:`color`,default:[1,.8,0,1]},{id:`u_secondary_color`,name:`Void Space`,type:`color`,default:[.05,.05,.1,1]}]},Zu=e({default:()=>Qu}),Qu={id:`perforated_leather`,name:`Perforated Leather`,category:`Industrial`,added:`2026-05-01`,description:`Smooth leather with a regular diamond punched-hole pattern over a contrasting backing, as used in racing seats and steering wheel grips.`,shader:`
 
     // Fine leather grain — long micro scratches aligned roughly horizontally
     float leatherGrain(vec2 uv) {
@@ -11278,7 +11500,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_hole_density`,name:`Hole Density`,type:`float`,min:4,max:30,default:14},{id:`u_hole_size`,name:`Hole Size`,type:`float`,min:.2,max:.7,default:.45},{id:`u_leather_color`,name:`Leather Color`,type:`color`,default:[.12,.1,.08,1]},{id:`u_backing_color`,name:`Backing Color`,type:`color`,default:[.85,.05,.05,1]}]},Vu=e({default:()=>Hu}),Hu={id:`perforated_sheet`,name:`Perforated Sheet`,category:`Industrial`,added:`2026-04-30`,description:`CNC-perforated aluminium sheet with round punched-through holes and chamfer highlights on hole rims.`,shader:`
+  `,uniforms:[{id:`u_hole_density`,name:`Hole Density`,type:`float`,min:4,max:30,default:14},{id:`u_hole_size`,name:`Hole Size`,type:`float`,min:.2,max:.7,default:.45},{id:`u_leather_color`,name:`Leather Color`,type:`color`,default:[.12,.1,.08,1]},{id:`u_backing_color`,name:`Backing Color`,type:`color`,default:[.85,.05,.05,1]}]},$u=e({default:()=>ed}),ed={id:`perforated_sheet`,name:`Perforated Sheet`,category:`Industrial`,added:`2026-04-30`,description:`CNC-perforated aluminium sheet with round punched-through holes and chamfer highlights on hole rims.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
 
     float noise(vec2 p) {
@@ -11331,7 +11553,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, alpha);
     }
-  `,uniforms:[{id:`u_density`,name:`Hole Density`,type:`float`,min:2,max:40,default:16},{id:`u_hole_size`,name:`Hole Size`,type:`float`,min:.2,max:.85,default:.55},{id:`u_metal_color`,name:`Metal Color`,type:`color`,default:[.78,.8,.82,1]}]},Uu=e({default:()=>Wu}),Wu={id:`petri_dish_colonies`,name:`Petri Dish Colonies`,category:`Organic`,added:`2026-07-07`,description:`Bacterial colonies blooming on agar — irregular discs with growth rings and satellite spots.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Hole Density`,type:`float`,min:2,max:40,default:16},{id:`u_hole_size`,name:`Hole Size`,type:`float`,min:.2,max:.85,default:.55},{id:`u_metal_color`,name:`Metal Color`,type:`color`,default:[.78,.8,.82,1]}]},td=e({default:()=>nd}),nd={id:`petri_dish_colonies`,name:`Petri Dish Colonies`,category:`Organic`,added:`2026-07-07`,description:`Bacterial colonies blooming on agar — irregular discs with growth rings and satellite spots.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // agar: translucent amber with soft depth
@@ -11369,12 +11591,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Colony Density`,type:`float`,min:2,max:12,default:5},{id:`u_sparse`,name:`Empty Agar`,type:`float`,min:0,max:.8,default:.3},{id:`u_secondary_color`,name:`Agar`,type:`color`,default:[.75,.62,.35,1]},{id:`u_primary_color`,name:`Colony A`,type:`color`,default:[.92,.88,.75,1]},{id:`u_accent_color`,name:`Colony B`,type:`color`,default:[.75,.35,.25,1]}],variants:[{name:`Lab Bench`,uniforms:{u_secondary_color:[.75,.62,.35,1],u_primary_color:[.92,.88,.75,1],u_accent_color:[.75,.35,.25,1],u_sparse:.3}},{name:`Blood Agar`,uniforms:{u_secondary_color:[.45,.12,.12,1],u_primary_color:[.85,.8,.7,1],u_accent_color:[.6,.55,.3,1],u_sparse:.4}},{name:`Bioluminescent`,uniforms:{u_secondary_color:[.03,.05,.08,1],u_primary_color:[.2,.9,.7,1],u_accent_color:[.15,.5,.9,1],u_sparse:.25}}]},Gu=e({default:()=>Ku}),Ku={id:`petrified_wood_artisan`,name:`Petrified Wood`,category:`Geology`,added:`2026-04-16`,description:`Fossilized wood grain with vibrant mineral staining and crystalized structures.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Colony Density`,type:`float`,min:2,max:12,default:5},{id:`u_sparse`,name:`Empty Agar`,type:`float`,min:0,max:.8,default:.3},{id:`u_secondary_color`,name:`Agar`,type:`color`,default:[.75,.62,.35,1]},{id:`u_primary_color`,name:`Colony A`,type:`color`,default:[.92,.88,.75,1]},{id:`u_accent_color`,name:`Colony B`,type:`color`,default:[.75,.35,.25,1]}],variants:[{name:`Lab Bench`,uniforms:{u_secondary_color:[.75,.62,.35,1],u_primary_color:[.92,.88,.75,1],u_accent_color:[.75,.35,.25,1],u_sparse:.3}},{name:`Blood Agar`,uniforms:{u_secondary_color:[.45,.12,.12,1],u_primary_color:[.85,.8,.7,1],u_accent_color:[.6,.55,.3,1],u_sparse:.4}},{name:`Bioluminescent`,uniforms:{u_secondary_color:[.03,.05,.08,1],u_primary_color:[.2,.9,.7,1],u_accent_color:[.15,.5,.9,1],u_sparse:.25}}]},rd=e({default:()=>id}),id={id:`petrified_wood_artisan`,name:`Petrified Wood`,category:`Geology`,added:`2026-04-16`,description:`Fossilized wood grain with vibrant mineral staining and crystalized structures.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 10.0 + noise(v_uv * 5.0) * 2.0);
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Chert High`,type:`color`,default:[.8,.4,.2,1]},{id:`u_secondary_color`,name:`Silt Deep`,type:`color`,default:[.4,.2,.1,1]}]},qu=e({default:()=>Ju}),Ju={id:`phyllotaxis_spiral`,name:`Phyllotaxis Spiral`,category:`Geometric`,added:`2026-07-07`,description:`Sunflower-seed dot spiral — golden-angle phyllotaxis radiating from the center.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Chert High`,type:`color`,default:[.8,.4,.2,1]},{id:`u_secondary_color`,name:`Silt Deep`,type:`color`,default:[.4,.2,.1,1]}]},ad=e({default:()=>od}),od={id:`phyllotaxis_spiral`,name:`Phyllotaxis Spiral`,category:`Geometric`,added:`2026-07-07`,description:`Sunflower-seed dot spiral — golden-angle phyllotaxis radiating from the center.`,shader:`
     vec4 generate() {
       vec2 p = (v_uv - 0.5) * u_scale;
       float c = 0.08; // vogel spacing constant
@@ -11402,7 +11624,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb *= 0.92 + 0.08 * smoothstep(0.0, 1.8, r);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:3},{id:`u_dot`,name:`Seed Size`,type:`float`,min:.01,max:.08,default:.035},{id:`u_primary_color`,name:`Seeds`,type:`color`,default:[.85,.7,.3,1]},{id:`u_accent_color`,name:`Center Seeds`,type:`color`,default:[.35,.22,.1,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.1,.08,1]}],variants:[{name:`Sunflower Head`,uniforms:{u_primary_color:[.85,.7,.3,1],u_accent_color:[.35,.22,.1,1],u_secondary_color:[.12,.1,.08,1]}},{name:`Silver Bloom`,uniforms:{u_primary_color:[.8,.82,.86,1],u_accent_color:[.3,.32,.38,1],u_secondary_color:[.06,.06,.08,1]}},{name:`Coral Rosette`,uniforms:{u_primary_color:[.95,.5,.4,1],u_accent_color:[.6,.15,.25,1],u_secondary_color:[.98,.94,.88,1]}}]},Yu=e({default:()=>Xu}),Xu={id:`pinball_playfield`,name:`Pinball Playfield`,category:`Retro`,added:`2026-06-11`,description:`Silkscreened 70s pinball playfield art — pop-bumper ring targets, rollover stars and lane arrows keylined in black over ball-worn ivory lacquer.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:3},{id:`u_dot`,name:`Seed Size`,type:`float`,min:.01,max:.08,default:.035},{id:`u_primary_color`,name:`Seeds`,type:`color`,default:[.85,.7,.3,1]},{id:`u_accent_color`,name:`Center Seeds`,type:`color`,default:[.35,.22,.1,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.1,.08,1]}],variants:[{name:`Sunflower Head`,uniforms:{u_primary_color:[.85,.7,.3,1],u_accent_color:[.35,.22,.1,1],u_secondary_color:[.12,.1,.08,1]}},{name:`Silver Bloom`,uniforms:{u_primary_color:[.8,.82,.86,1],u_accent_color:[.3,.32,.38,1],u_secondary_color:[.06,.06,.08,1]}},{name:`Coral Rosette`,uniforms:{u_primary_color:[.95,.5,.4,1],u_accent_color:[.6,.15,.25,1],u_secondary_color:[.98,.94,.88,1]}}]},sd=e({default:()=>cd}),cd={id:`pinball_playfield`,name:`Pinball Playfield`,category:`Retro`,added:`2026-06-11`,description:`Silkscreened 70s pinball playfield art — pop-bumper ring targets, rollover stars and lane arrows keylined in black over ball-worn ivory lacquer.`,shader:`
     mat2 rot2_pp(float a) {
       float c = cos(a); float s = sin(a);
       return mat2(c, -s, s, c);
@@ -11491,14 +11713,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Insert Density`,type:`float`,min:2,max:10,default:4},{id:`u_wear`,name:`Ball Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_accent_color`,name:`Screen Ink`,type:`color`,default:[.85,.12,.12,1]}]},Zu=e({default:()=>Qu}),Qu={id:`pine_bark_artisan`,name:`Pine Bark`,category:`Natural`,added:`2026-04-16`,description:`Rough, vertical flaky ridges found on mature pine trees.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Insert Density`,type:`float`,min:2,max:10,default:4},{id:`u_wear`,name:`Ball Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_accent_color`,name:`Screen Ink`,type:`color`,default:[.85,.12,.12,1]}]},ld=e({default:()=>ud}),ud={id:`pine_bark_artisan`,name:`Pine Bark`,category:`Natural`,added:`2026-04-16`,description:`Rough, vertical flaky ridges found on mature pine trees.`,shader:`
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
       float h = hash(vec2(y, y));
       float bark = step(0.5, fract(v_uv.x * 2.0 + h));
       return mix(u_secondary_color, u_primary_color, bark);
     }
-  `,uniforms:[{id:`u_scale`,name:`Bark Detail`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Bark High`,type:`color`,default:[.3,.2,.15,1]},{id:`u_secondary_color`,name:`Bark Crevice`,type:`color`,default:[.15,.1,.08,1]}]},$u=e({default:()=>ed}),ed={id:`pinecone_scales`,name:`Pinecone Scales`,category:`Natural`,added:`2026-07-07`,description:`Woody diamond scales in staggered rows — each with a raised umbo catching the light.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Bark Detail`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Bark High`,type:`color`,default:[.3,.2,.15,1]},{id:`u_secondary_color`,name:`Bark Crevice`,type:`color`,default:[.15,.1,.08,1]}]},dd=e({default:()=>fd}),fd={id:`pinecone_scales`,name:`Pinecone Scales`,category:`Natural`,added:`2026-07-07`,description:`Woody diamond scales in staggered rows — each with a raised umbo catching the light.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // staggered rows
@@ -11521,14 +11743,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, wood, scale_);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:4,max:30,default:11},{id:`u_primary_color`,name:`Scale Wood`,type:`color`,default:[.45,.3,.17,1]},{id:`u_accent_color`,name:`Umbo`,type:`color`,default:[.75,.6,.4,1]},{id:`u_secondary_color`,name:`Shadow Gap`,type:`color`,default:[.12,.08,.05,1]}],variants:[{name:`Forest Floor`,uniforms:{u_primary_color:[.45,.3,.17,1],u_accent_color:[.75,.6,.4,1],u_secondary_color:[.12,.08,.05,1]}},{name:`Charred`,uniforms:{u_primary_color:[.18,.15,.13,1],u_accent_color:[.5,.35,.25,1],u_secondary_color:[.04,.03,.03,1]}},{name:`Gilded Craft`,uniforms:{u_primary_color:[.7,.55,.25,1],u_accent_color:[.95,.85,.5,1],u_secondary_color:[.25,.16,.06,1]}}]},td=e({default:()=>nd}),nd={id:`piston_top_artisan`,name:`Piston Head`,category:`Racing`,added:`2026-04-16`,description:`Concentric rings of machined high-performance aluminum with heat seasoning.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:4,max:30,default:11},{id:`u_primary_color`,name:`Scale Wood`,type:`color`,default:[.45,.3,.17,1]},{id:`u_accent_color`,name:`Umbo`,type:`color`,default:[.75,.6,.4,1]},{id:`u_secondary_color`,name:`Shadow Gap`,type:`color`,default:[.12,.08,.05,1]}],variants:[{name:`Forest Floor`,uniforms:{u_primary_color:[.45,.3,.17,1],u_accent_color:[.75,.6,.4,1],u_secondary_color:[.12,.08,.05,1]}},{name:`Charred`,uniforms:{u_primary_color:[.18,.15,.13,1],u_accent_color:[.5,.35,.25,1],u_secondary_color:[.04,.03,.03,1]}},{name:`Gilded Craft`,uniforms:{u_primary_color:[.7,.55,.25,1],u_accent_color:[.95,.85,.5,1],u_secondary_color:[.25,.16,.06,1]}}]},pd=e({default:()=>md}),md={id:`piston_top_artisan`,name:`Piston Head`,category:`Racing`,added:`2026-04-16`,description:`Concentric rings of machined high-performance aluminum with heat seasoning.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5);
       float rings = sin(d * u_scale);
       float mask = smoothstep(-0.5, 0.5, rings);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Ring Density`,type:`float`,min:100,max:1e3,default:500},{id:`u_primary_color`,name:`Alloy High`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Alloy Deep`,type:`color`,default:[.6,.6,.65,1]}]},rd=e({default:()=>id}),id={id:`pit_board_letters`,name:`Pit Board Letters`,category:`Heritage`,added:`2026-06-12`,description:`A pit-board grid of blocky sign letterforms — chalk-white segment glyphs slotted into a matte black board with rail lines, finger smudges and rain-streaked paint.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Ring Density`,type:`float`,min:100,max:1e3,default:500},{id:`u_primary_color`,name:`Alloy High`,type:`color`,default:[.8,.8,.85,1]},{id:`u_secondary_color`,name:`Alloy Deep`,type:`color`,default:[.6,.6,.65,1]}]},hd=e({default:()=>gd}),gd={id:`pit_board_letters`,name:`Pit Board Letters`,category:`Heritage`,added:`2026-06-12`,description:`A pit-board grid of blocky sign letterforms — chalk-white segment glyphs slotted into a matte black board with rail lines, finger smudges and rain-streaked paint.`,shader:`
     // one blocky pseudo-glyph built from segment bars, picked by seed
     float glyph_hrt15(vec2 q, float seed) {
       // q in -1..1 within the glyph slot; seven-bar vocabulary
@@ -11613,13 +11835,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_columns`,name:`Board Columns`,type:`float`,min:3,max:10,default:5},{id:`u_board_color`,name:`Board Colour`,type:`color`,default:[.09,.09,.1,1]},{id:`u_letter_color`,name:`Letter Colour`,type:`color`,default:[.93,.92,.88,1]}]},ad=e({default:()=>od}),od={id:`pixel_art_canvas_artisan`,name:`Pixel Grid`,category:`Abstract`,added:`2026-04-16`,description:`Large-block quantized color grid mimicking retro 8-bit digital canvases.`,shader:`
+  `,uniforms:[{id:`u_columns`,name:`Board Columns`,type:`float`,min:3,max:10,default:5},{id:`u_board_color`,name:`Board Colour`,type:`color`,default:[.09,.09,.1,1]},{id:`u_letter_color`,name:`Letter Colour`,type:`color`,default:[.93,.92,.88,1]}]},_d=e({default:()=>vd}),vd={id:`pixel_art_canvas_artisan`,name:`Pixel Grid`,category:`Abstract`,added:`2026-04-16`,description:`Large-block quantized color grid mimicking retro 8-bit digital canvases.`,shader:`
     vec4 generate() {
       vec2 uv = floor(v_uv * u_scale);
       float n = hash(uv);
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pixel Size`,type:`float`,min:8,max:128,default:32},{id:`u_primary_color`,name:`Pixel High`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Pixel Dark`,type:`color`,default:[.5,.5,.5,1]}]},sd=e({default:()=>cd}),cd={id:`plaid_tartan_artisan`,name:`Plaid Tartan`,category:`Abstract`,added:`2026-04-15`,description:`Multi-colored interlocking textile grid found in classic Scottish kilts.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pixel Size`,type:`float`,min:8,max:128,default:32},{id:`u_primary_color`,name:`Pixel High`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Pixel Dark`,type:`color`,default:[.5,.5,.5,1]}]},yd=e({default:()=>bd}),bd={id:`plaid_tartan_artisan`,name:`Plaid Tartan`,category:`Abstract`,added:`2026-04-15`,description:`Multi-colored interlocking textile grid found in classic Scottish kilts.`,shader:`
     vec4 generate() {
       float s = max(u_softness, 0.0005);
       float t = 1.0 - u_band;
@@ -11638,7 +11860,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color = mix(color, u_accent_color, acc * 0.85);
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,0,0,1],u_secondary_color:[0,.2,.1,1],u_accent_color:[.95,.9,.3,1],u_band:.3,u_accent_width:0}},{name:`Royal Stewart`,uniforms:{u_primary_color:[.08,.1,.3,1],u_secondary_color:[.6,.07,.1,1],u_accent_color:[.95,.85,.25,1],u_band:.28,u_accent_width:.02}},{name:`Blackwatch`,uniforms:{u_primary_color:[.05,.22,.12,1],u_secondary_color:[.05,.12,.2,1],u_accent_color:[.08,.08,.1,1],u_band:.35,u_accent_width:.025}},{name:`Grey Flannel`,uniforms:{u_primary_color:[.2,.2,.22,1],u_secondary_color:[.45,.45,.47,1],u_accent_color:[.7,.15,.15,1],u_band:.3,u_accent_width:.015}}],uniforms:[{id:`u_scale`,name:`Grid Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_band`,name:`Band Width`,type:`float`,min:.05,max:.6,default:.3},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.008},{id:`u_accent_width`,name:`Overcheck Width`,type:`float`,min:0,max:.1,default:0},{id:`u_primary_color`,name:`Stripe`,type:`color`,default:[1,0,0,1]},{id:`u_secondary_color`,name:`Base Wool`,type:`color`,default:[0,.2,.1,1]},{id:`u_accent_color`,name:`Overcheck`,type:`color`,default:[.95,.9,.3,1]}]},ld=e({default:()=>ud}),ud={id:`planet_rings`,name:`Planet Rings`,category:`Cosmos`,added:`2026-06-11`,description:`Saturn-style ice rings seen edge-on across the panel — banded ringlets, a dark Cassini gap, grainy particle shimmer, and a shadowed limb.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,0,0,1],u_secondary_color:[0,.2,.1,1],u_accent_color:[.95,.9,.3,1],u_band:.3,u_accent_width:0}},{name:`Royal Stewart`,uniforms:{u_primary_color:[.08,.1,.3,1],u_secondary_color:[.6,.07,.1,1],u_accent_color:[.95,.85,.25,1],u_band:.28,u_accent_width:.02}},{name:`Blackwatch`,uniforms:{u_primary_color:[.05,.22,.12,1],u_secondary_color:[.05,.12,.2,1],u_accent_color:[.08,.08,.1,1],u_band:.35,u_accent_width:.025}},{name:`Grey Flannel`,uniforms:{u_primary_color:[.2,.2,.22,1],u_secondary_color:[.45,.45,.47,1],u_accent_color:[.7,.15,.15,1],u_band:.3,u_accent_width:.015}}],uniforms:[{id:`u_scale`,name:`Grid Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_band`,name:`Band Width`,type:`float`,min:.05,max:.6,default:.3},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.1,default:.008},{id:`u_accent_width`,name:`Overcheck Width`,type:`float`,min:0,max:.1,default:0},{id:`u_primary_color`,name:`Stripe`,type:`color`,default:[1,0,0,1]},{id:`u_secondary_color`,name:`Base Wool`,type:`color`,default:[0,.2,.1,1]},{id:`u_accent_color`,name:`Overcheck`,type:`color`,default:[.95,.9,.3,1]}]},xd=e({default:()=>Sd}),Sd={id:`planet_rings`,name:`Planet Rings`,category:`Cosmos`,added:`2026-06-11`,description:`Saturn-style ice rings seen edge-on across the panel — banded ringlets, a dark Cassini gap, grainy particle shimmer, and a shadowed limb.`,shader:`
     // Layered 1D value noise along the ring radius (drives ringlet banding)
     float ringNoise_prn(float x) {
       float v = 0.0;
@@ -11717,7 +11939,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ring_scale`,name:`Ring Bands`,type:`float`,min:.5,max:4,default:1},{id:`u_tilt`,name:`Ring Bow`,type:`float`,min:0,max:1,default:.4},{id:`u_ring_color`,name:`Ice Colour`,type:`color`,default:[.86,.78,.62,1]}]},dd=e({default:()=>fd}),fd={id:`plant_cells_artisan`,name:`Plant Cells`,category:`Natural`,added:`2026-04-15`,description:`Geometric hexagonal-ish stacked cells mimicking biological plant structures.`,shader:`
+  `,uniforms:[{id:`u_ring_scale`,name:`Ring Bands`,type:`float`,min:.5,max:4,default:1},{id:`u_tilt`,name:`Ring Bow`,type:`float`,min:0,max:1,default:.4},{id:`u_ring_color`,name:`Ice Colour`,type:`color`,default:[.86,.78,.62,1]}]},Cd=e({default:()=>wd}),wd={id:`plant_cells_artisan`,name:`Plant Cells`,category:`Natural`,added:`2026-04-15`,description:`Geometric hexagonal-ish stacked cells mimicking biological plant structures.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -11735,14 +11957,36 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float cell = smoothstep(0.05, 0.1, abs(m_dist - 0.2));
       return mix(u_secondary_color, u_primary_color, cell);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Magnification`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Chlorophyll`,type:`color`,default:[.2,.5,.1,1]},{id:`u_secondary_color`,name:`Cell Wall`,type:`color`,default:[.1,.2,.05,1]}]},pd=e({default:()=>md}),md={id:`plasma_core_artisan`,name:`Plasma Core`,category:`Abstract`,added:`2026-04-16`,description:`Pulsing radial energy patterns mimicking high-energy physics experiment cores.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Magnification`,type:`float`,min:2,max:15,default:8},{id:`u_primary_color`,name:`Chlorophyll`,type:`color`,default:[.2,.5,.1,1]},{id:`u_secondary_color`,name:`Cell Wall`,type:`color`,default:[.1,.2,.05,1]}]},Td=e({default:()=>Ed}),Ed={id:`plasma_core_artisan`,name:`Plasma Core`,category:`Abstract`,added:`2026-04-16`,description:`Pulsing radial energy patterns mimicking high-energy physics experiment cores.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5);
       float pulse = sin(d * u_scale - 1.5708);
       float mask = smoothstep(0.2, 0.5, pulse * (1.0 - d));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pulse Speed`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Plasma Glow`,type:`color`,default:[1,.4,1,1]},{id:`u_secondary_color`,name:`Plasma Void`,type:`color`,default:[.1,0,.1,1]}]},hd=e({default:()=>gd}),gd={id:`pleated_fabric`,name:`Pleated Fabric`,category:`Industrial`,added:`2026-05-01`,description:`Accordion-pleated fabric with lit faces, shadowed valleys, and specular fold edges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pulse Speed`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Plasma Glow`,type:`color`,default:[1,.4,1,1]},{id:`u_secondary_color`,name:`Plasma Void`,type:`color`,default:[.1,0,.1,1]}]},Dd=e({default:()=>Od}),Od={id:`plasma_flow`,name:`Plasma Flow`,category:`Abstract`,added:`2026-07-09`,description:`Double domain-warped filaments of molten plasma — sharp white-orange threads snaking through a charcoal field, mostly dark with rationed heat.`,shader:`
+    vec4 generate() {
+      vec2 uv = v_uv;
+      float w1x = fbm(uv * 3.0 + 11.0);
+      float w1y = fbm(uv * 3.0 + 47.0);
+      vec2 q = uv + vec2(w1x, w1y) * u_warp * 0.25;
+      float f1 = fbm(q * 2.5);
+      vec2 q2 = q + vec2(f1, -f1) * u_warp * 0.15;
+      float f = fbm(q2 * 2.5) * 0.5 + 0.5;
+
+      float band = abs(sin(f * 6.2831853 * u_bands + uv.x * 2.2));
+      float fil = pow(1.0 - band, 5.0);
+      float body = clamp(f * 0.9 + 0.05, 0.0, 1.0);
+      float heat = clamp(fil * (0.35 + body) * u_heat, 0.0, 1.0);
+
+      vec3 col = mix(vec3(0.055, 0.039, 0.047), vec3(0.157, 0.086, 0.071), body);
+      vec3 hot = mix(vec3(0.55, 0.12, 0.03), vec3(1.0, 0.42, 0.05), smoothstep(0.3, 0.7, heat));
+      hot = mix(hot, vec3(1.0, 0.84, 0.51), smoothstep(0.7, 1.0, heat));
+      col += hot * pow(heat, 0.7);
+
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_warp`,name:`Warp Strength`,type:`float`,min:0,max:3,default:1.5},{id:`u_bands`,name:`Filament Bands`,type:`float`,min:1,max:6,default:3},{id:`u_heat`,name:`Heat`,type:`float`,min:.3,max:2,default:1}]},kd=e({default:()=>Ad}),Ad={id:`pleated_fabric`,name:`Pleated Fabric`,category:`Industrial`,added:`2026-05-01`,description:`Accordion-pleated fabric with lit faces, shadowed valleys, and specular fold edges.`,shader:`
     // Map a value into a sawtooth that folds into a triangle wave (accordion pleat shape)
     float pleatProfile(float x) {
       // x in [0,1] per pleat â€” returns height in [0,1]
@@ -11801,7 +12045,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_pleat_count`,type:`float`,default:12,min:4,max:30,name:`Pleat Count`},{id:`u_fabric_color`,type:`color`,default:[.15,.15,.18,1],name:`Fabric Colour`},{id:`u_depth`,type:`float`,default:1,min:.2,max:2,name:`Fold Depth`}]},_d=e({default:()=>vd}),vd={id:`polaroid_fade`,name:`Polaroid Fade`,category:`Retro`,added:`2026-06-11`,description:`Instant photos pinned in a grid — chalky white frames with fat bottoms, each window holding a sun-bleached chemical sunset drowning in cyan shadows and grain.`,shader:`
+  `,uniforms:[{id:`u_pleat_count`,type:`float`,default:12,min:4,max:30,name:`Pleat Count`},{id:`u_fabric_color`,type:`color`,default:[.15,.15,.18,1],name:`Fabric Colour`},{id:`u_depth`,type:`float`,default:1,min:.2,max:2,name:`Fold Depth`}]},jd=e({default:()=>Md}),Md={id:`polaroid_fade`,name:`Polaroid Fade`,category:`Retro`,added:`2026-06-11`,description:`Instant photos pinned in a grid — chalky white frames with fat bottoms, each window holding a sun-bleached chemical sunset drowning in cyan shadows and grain.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_tiles;
       vec2 cell = floor(uv);
@@ -11869,14 +12113,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_tiles`,name:`Prints Across`,type:`float`,min:1,max:5,default:2},{id:`u_fade`,name:`Chemical Fade`,type:`float`,min:0,max:1,default:.55},{id:`u_tint`,name:`Age Tint`,type:`color`,default:[1,.88,.7,1]}]},yd=e({default:()=>bd}),bd={id:`polka_dot_artisan`,name:`Pro Polka Dots`,category:`Organic`,added:`2026-04-15`,description:`Precision uniform polka dots with adjustable spacing and edge softness.`,shader:`
+  `,uniforms:[{id:`u_tiles`,name:`Prints Across`,type:`float`,min:1,max:5,default:2},{id:`u_fade`,name:`Chemical Fade`,type:`float`,min:0,max:1,default:.55},{id:`u_tint`,name:`Age Tint`,type:`color`,default:[1,.88,.7,1]}]},Nd=e({default:()=>Pd}),Pd={id:`polka_dot_artisan`,name:`Pro Polka Dots`,category:`Organic`,added:`2026-04-15`,description:`Precision uniform polka dots with adjustable spacing and edge softness.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv * u_scale) - 0.5;
       float d = length(uv);
       float mask = smoothstep(u_radius, u_radius - 0.02, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Dot Count`,type:`float`,min:2,max:50,default:10},{id:`u_radius`,name:`Dot Size`,type:`float`,min:.1,max:.5,default:.3},{id:`u_primary_color`,name:`Dot Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Base Color`,type:`color`,default:[.05,.05,.1,1]}]},xd=e({default:()=>Sd}),Sd={id:`pollen_grains`,name:`Pollen Grains`,category:`Organic`,added:`2026-07-07`,description:`Electron-microscope pollen — spiked spheres with dimpled surfaces in false color.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Dot Count`,type:`float`,min:2,max:50,default:10},{id:`u_radius`,name:`Dot Size`,type:`float`,min:.1,max:.5,default:.3},{id:`u_primary_color`,name:`Dot Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Base Color`,type:`color`,default:[.05,.05,.1,1]}]},Fd=e({default:()=>Id}),Id={id:`pollen_grains`,name:`Pollen Grains`,category:`Organic`,added:`2026-07-07`,description:`Electron-microscope pollen — spiked spheres with dimpled surfaces in false color.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -11915,7 +12159,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:2,max:10,default:4},{id:`u_spikes`,name:`Spikiness`,type:`float`,min:0,max:1,default:.7},{id:`u_glow`,name:`Edge Glow`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Grain`,type:`color`,default:[.85,.7,.25,1]},{id:`u_accent_color`,name:`Rim Light`,type:`color`,default:[.95,.9,.6,1]},{id:`u_secondary_color`,name:`Backdrop`,type:`color`,default:[.1,.09,.07,1]}],variants:[{name:`Golden SEM`,uniforms:{u_primary_color:[.85,.7,.25,1],u_accent_color:[.95,.9,.6,1],u_secondary_color:[.1,.09,.07,1],u_spikes:.7}},{name:`False Teal`,uniforms:{u_primary_color:[.2,.65,.65,1],u_accent_color:[.6,.95,.9,1],u_secondary_color:[.04,.08,.1,1],u_spikes:.9}},{name:`Rose Micro`,uniforms:{u_primary_color:[.85,.45,.55,1],u_accent_color:[1,.8,.85,1],u_secondary_color:[.12,.06,.09,1],u_spikes:.4}}]},Cd=e({default:()=>wd}),wd={id:`powder_coat`,name:`Powder Coat`,category:`Industrial`,added:`2026-05-13`,description:`Powder coat finish with characteristic orange-peel micro-texture. Common on roll cages, wheel centres, and suspension components.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:2,max:10,default:4},{id:`u_spikes`,name:`Spikiness`,type:`float`,min:0,max:1,default:.7},{id:`u_glow`,name:`Edge Glow`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Grain`,type:`color`,default:[.85,.7,.25,1]},{id:`u_accent_color`,name:`Rim Light`,type:`color`,default:[.95,.9,.6,1]},{id:`u_secondary_color`,name:`Backdrop`,type:`color`,default:[.1,.09,.07,1]}],variants:[{name:`Golden SEM`,uniforms:{u_primary_color:[.85,.7,.25,1],u_accent_color:[.95,.9,.6,1],u_secondary_color:[.1,.09,.07,1],u_spikes:.7}},{name:`False Teal`,uniforms:{u_primary_color:[.2,.65,.65,1],u_accent_color:[.6,.95,.9,1],u_secondary_color:[.04,.08,.1,1],u_spikes:.9}},{name:`Rose Micro`,uniforms:{u_primary_color:[.85,.45,.55,1],u_accent_color:[1,.8,.85,1],u_secondary_color:[.12,.06,.09,1],u_spikes:.4}}]},Ld=e({default:()=>Rd}),Rd={id:`powder_coat`,name:`Powder Coat`,category:`Industrial`,added:`2026-05-13`,description:`Powder coat finish with characteristic orange-peel micro-texture. Common on roll cages, wheel centres, and suspension components.`,shader:`
     float hash_pc(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise_pc(vec2 p) {
       vec2 i = floor(p), f = fract(p);
@@ -11959,7 +12203,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
-  `,uniforms:[{id:`u_coat_color`,name:`Coat Colour`,type:`color`,default:[.08,.08,.09,1]},{id:`u_peel_scale`,name:`Peel Scale`,type:`float`,default:60,min:10,max:150},{id:`u_depth`,name:`Texture Depth`,type:`float`,default:.6,min:0,max:1},{id:`u_gloss`,name:`Gloss Level`,type:`float`,default:.4,min:0,max:1}]},Td=e({default:()=>Ed}),Ed={id:`pressed_tin_ceiling`,name:`Pressed Tin Ceiling`,category:`Architecture`,added:`2026-06-12`,description:`Embossed tin ceiling panels — repeating petal rosettes inside beaded square frames, generations of paint pooling in the recesses and rubbing thin on the high relief.`,shader:`
+  `,uniforms:[{id:`u_coat_color`,name:`Coat Colour`,type:`color`,default:[.08,.08,.09,1]},{id:`u_peel_scale`,name:`Peel Scale`,type:`float`,default:60,min:10,max:150},{id:`u_depth`,name:`Texture Depth`,type:`float`,default:.6,min:0,max:1},{id:`u_gloss`,name:`Gloss Level`,type:`float`,default:.4,min:0,max:1}]},zd=e({default:()=>Bd}),Bd={id:`pressed_tin_ceiling`,name:`Pressed Tin Ceiling`,category:`Architecture`,added:`2026-06-12`,description:`Embossed tin ceiling panels — repeating petal rosettes inside beaded square frames, generations of paint pooling in the recesses and rubbing thin on the high relief.`,shader:`
     float hash_ptc(vec2 p) {
       return fract(sin(dot(p, vec2(157.3, 269.1))) * 41927.6151);
     }
@@ -12043,7 +12287,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_panel_count`,name:`Panels`,type:`float`,min:1,max:8,default:3},{id:`u_petals`,name:`Petals`,type:`float`,min:5,max:16,default:8},{id:`u_grime`,name:`Age & Grime`,type:`float`,min:0,max:1,default:.5},{id:`u_paint_color`,name:`Paint`,type:`color`,default:[.91,.89,.83,1]}]},Dd=e({default:()=>Od}),Od={id:`prism_shards_artisan`,name:`Prism Shards`,category:`Abstract`,added:`2026-04-15`,description:`Sharp refracted geometric light cells with internal color shifts across the spectrum.`,shader:`
+  `,uniforms:[{id:`u_panel_count`,name:`Panels`,type:`float`,min:1,max:8,default:3},{id:`u_petals`,name:`Petals`,type:`float`,min:5,max:16,default:8},{id:`u_grime`,name:`Age & Grime`,type:`float`,min:0,max:1,default:.5},{id:`u_paint_color`,name:`Paint`,type:`color`,default:[.91,.89,.83,1]}]},Vd=e({default:()=>Hd}),Hd={id:`prism_shards_artisan`,name:`Prism Shards`,category:`Abstract`,added:`2026-04-15`,description:`Sharp refracted geometric light cells with internal color shifts across the spectrum.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -12065,7 +12309,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 color = vec3(0.5) + 0.5 * cos(vec3(0,2,4) + m_point.x * 6.28);
       return vec4(color, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Refraction Density`,type:`float`,min:2,max:15,default:8}]},kd=e({default:()=>Ad}),Ad={id:`prismatic_flip`,name:`Prismatic Flip Paint`,category:`Racing`,added:`2026-05-13`,description:`Colour-shifting flip paint that sweeps through the spectrum across the surface — as seen on modern motorsport liveries and special-edition road cars.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Refraction Density`,type:`float`,min:2,max:15,default:8}]},Ud=e({default:()=>Wd}),Wd={id:`prismatic_flip`,name:`Prismatic Flip Paint`,category:`Racing`,added:`2026-05-13`,description:`Colour-shifting flip paint that sweeps through the spectrum across the surface — as seen on modern motorsport liveries and special-edition road cars.`,shader:`
     float hash_pf(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise_pf(vec2 p) {
       vec2 i = floor(p), f = fract(p);
@@ -12106,7 +12350,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_base_hue`,name:`Base Hue`,type:`float`,default:0,min:0,max:1},{id:`u_range`,name:`Hue Range`,type:`float`,default:.55,min:.05,max:2},{id:`u_direction`,name:`Direction`,type:`float`,default:.3,min:0,max:1},{id:`u_saturation`,name:`Saturation`,type:`float`,default:.88,min:.1,max:1},{id:`u_brightness`,name:`Brightness`,type:`float`,default:.88,min:.2,max:1},{id:`u_turbulence`,name:`Turbulence`,type:`float`,default:.28,min:0,max:1}]},jd=e({default:()=>Md}),Md={id:`prototype_swirl_camo`,name:`Prototype Swirl Camo`,category:`Racing`,added:`2026-07-07`,description:`Manufacturer test-mule disguise — dizzying warped black and white swirl camouflage.`,shader:`
+  `,uniforms:[{id:`u_base_hue`,name:`Base Hue`,type:`float`,default:0,min:0,max:1},{id:`u_range`,name:`Hue Range`,type:`float`,default:.55,min:.05,max:2},{id:`u_direction`,name:`Direction`,type:`float`,default:.3,min:0,max:1},{id:`u_saturation`,name:`Saturation`,type:`float`,default:.88,min:.1,max:1},{id:`u_brightness`,name:`Brightness`,type:`float`,default:.88,min:.2,max:1},{id:`u_turbulence`,name:`Turbulence`,type:`float`,default:.28,min:0,max:1}]},Gd=e({default:()=>Kd}),Kd={id:`prototype_swirl_camo`,name:`Prototype Swirl Camo`,category:`Racing`,added:`2026-07-07`,description:`Manufacturer test-mule disguise — dizzying warped black and white swirl camouflage.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 warp = vec2(snoise(uv * 0.35), snoise(uv * 0.35 + vec2(5.2, 1.3)));
@@ -12119,14 +12363,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float blotch = smoothstep(0.45, 0.55, snoise(q * 0.25 + vec2(17.0, 8.0)));
       return mix(col, u_accent_color, blotch * u_blotch);
     }
-  `,uniforms:[{id:`u_scale`,name:`Swirl Scale`,type:`float`,min:2,max:20,default:7},{id:`u_warp`,name:`Warp Amount`,type:`float`,min:0,max:4,default:1.8},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_blotch`,name:`Third Tone`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Swirl A`,type:`color`,default:[.95,.95,.95,1]},{id:`u_secondary_color`,name:`Swirl B`,type:`color`,default:[.06,.06,.07,1]},{id:`u_accent_color`,name:`Blotch`,type:`color`,default:[.45,.45,.48,1]}],variants:[{name:`Spy Shots`,uniforms:{u_primary_color:[.95,.95,.95,1],u_secondary_color:[.06,.06,.07,1],u_accent_color:[.45,.45,.48,1],u_blotch:.4,u_warp:1.8}},{name:`Blue Mule`,uniforms:{u_primary_color:[.85,.9,.95,1],u_secondary_color:[.05,.12,.3,1],u_accent_color:[.2,.45,.75,1],u_blotch:.55,u_warp:2.4}},{name:`Heat Haze`,uniforms:{u_primary_color:[.98,.55,.15,1],u_secondary_color:[.12,.05,.04,1],u_accent_color:[.7,.2,.1,1],u_blotch:.3,u_warp:3}}]},Nd=e({default:()=>Pd}),Pd={id:`pulsar_radial_artisan`,name:`Pulsar Radial`,category:`Abstract`,added:`2026-04-16`,description:`High-frequency radial pulses mimicking deep-space electromagnetic emissions.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Swirl Scale`,type:`float`,min:2,max:20,default:7},{id:`u_warp`,name:`Warp Amount`,type:`float`,min:0,max:4,default:1.8},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.05,default:.004},{id:`u_blotch`,name:`Third Tone`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Swirl A`,type:`color`,default:[.95,.95,.95,1]},{id:`u_secondary_color`,name:`Swirl B`,type:`color`,default:[.06,.06,.07,1]},{id:`u_accent_color`,name:`Blotch`,type:`color`,default:[.45,.45,.48,1]}],variants:[{name:`Spy Shots`,uniforms:{u_primary_color:[.95,.95,.95,1],u_secondary_color:[.06,.06,.07,1],u_accent_color:[.45,.45,.48,1],u_blotch:.4,u_warp:1.8}},{name:`Blue Mule`,uniforms:{u_primary_color:[.85,.9,.95,1],u_secondary_color:[.05,.12,.3,1],u_accent_color:[.2,.45,.75,1],u_blotch:.55,u_warp:2.4}},{name:`Heat Haze`,uniforms:{u_primary_color:[.98,.55,.15,1],u_secondary_color:[.12,.05,.04,1],u_accent_color:[.7,.2,.1,1],u_blotch:.3,u_warp:3}}]},qd=e({default:()=>Jd}),Jd={id:`pulsar_radial_artisan`,name:`Pulsar Radial`,category:`Abstract`,added:`2026-04-16`,description:`High-frequency radial pulses mimicking deep-space electromagnetic emissions.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5);
       float pulse = sin(d * u_scale);
       float mask = step(0.5, pulse);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pulse Freq`,type:`float`,min:50,max:500,default:200},{id:`u_primary_color`,name:`Pulsar Beam`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Space Void`,type:`color`,default:[0,0,0,1]}]},Fd=e({default:()=>Id}),Id={id:`punch_card`,name:`Punch Card`,category:`Retro`,added:`2026-06-11`,description:`Mainframe Hollerith card stock — manila fibre ruled into twelve punch rows, rectangular chads stamped clean through with bevelled lips and faint printed digit marks.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pulse Freq`,type:`float`,min:50,max:500,default:200},{id:`u_primary_color`,name:`Pulsar Beam`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Space Void`,type:`color`,default:[0,0,0,1]}]},Yd=e({default:()=>Xd}),Xd={id:`punch_card`,name:`Punch Card`,category:`Retro`,added:`2026-06-11`,description:`Mainframe Hollerith card stock — manila fibre ruled into twelve punch rows, rectangular chads stamped clean through with bevelled lips and faint printed digit marks.`,shader:`
     // rounded-rectangle signed distance
     float rrect_pc(vec2 p, vec2 b, float r) {
       vec2 q = abs(p) - b + r;
@@ -12193,7 +12437,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_columns`,name:`Card Columns`,type:`float`,min:10,max:60,default:26},{id:`u_punch_density`,name:`Data Density`,type:`float`,min:0,max:1,default:.55},{id:`u_card_color`,name:`Card Stock`,type:`color`,default:[.87,.8,.62,1]}]},Ld=e({default:()=>Rd}),Rd={id:`pyrite_cubes`,name:`Pyrite Cubes`,category:`Geology`,added:`2026-06-12`,description:`Fool's gold — interlocked brassy pyrite cubes with mirror-flat striated faces, jammed into a dark slate matrix.`,shader:`
+  `,uniforms:[{id:`u_columns`,name:`Card Columns`,type:`float`,min:10,max:60,default:26},{id:`u_punch_density`,name:`Data Density`,type:`float`,min:0,max:1,default:.55},{id:`u_card_color`,name:`Card Stock`,type:`color`,default:[.87,.8,.62,1]}]},Zd=e({default:()=>Qd}),Qd={id:`pyrite_cubes`,name:`Pyrite Cubes`,category:`Geology`,added:`2026-06-12`,description:`Fool's gold — interlocked brassy pyrite cubes with mirror-flat striated faces, jammed into a dark slate matrix.`,shader:`
     vec2 hash2_pyr(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -12277,18 +12521,18 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_cube_scale`,name:`Cube Scale`,type:`float`,min:2,max:20,default:7},{id:`u_matrix_width`,name:`Matrix Width`,type:`float`,min:0,max:1,default:.35},{id:`u_brass_color`,name:`Brass Color`,type:`color`,default:[.83,.65,.28,1]}]},zd=e({default:()=>Bd}),Bd={id:`quantum_foam_artisan`,name:`Quantum Foam`,category:`Abstract`,added:`2026-04-15`,description:`Abstract probability interference and grain noise mimicking fluctuations at the Planck scale.`,shader:`
+  `,uniforms:[{id:`u_cube_scale`,name:`Cube Scale`,type:`float`,min:2,max:20,default:7},{id:`u_matrix_width`,name:`Matrix Width`,type:`float`,min:0,max:1,default:.35},{id:`u_brass_color`,name:`Brass Color`,type:`color`,default:[.83,.65,.28,1]}]},$d=e({default:()=>ef}),ef={id:`quantum_foam_artisan`,name:`Quantum Foam`,category:`Abstract`,added:`2026-04-15`,description:`Abstract probability interference and grain noise mimicking fluctuations at the Planck scale.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * u_scale) * hash(v_uv * u_scale * 1.1);
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_scale`,name:`Planck Resolution`,type:`float`,min:100,max:1e3,default:500},{id:`u_primary_color`,name:`Fluctuation`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Vacuum`,type:`color`,default:[0,0,.05,1]}]},Vd=e({default:()=>Hd}),Hd={id:`quartz_crystal_artisan`,name:`Quartz Plane`,category:`Geology`,added:`2026-04-16`,description:`Sharp geometric crystalline planes and internal mineral prisms.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Planck Resolution`,type:`float`,min:100,max:1e3,default:500},{id:`u_primary_color`,name:`Fluctuation`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Vacuum`,type:`color`,default:[0,0,.05,1]}]},tf=e({default:()=>nf}),nf={id:`quartz_crystal_artisan`,name:`Quartz Plane`,category:`Geology`,added:`2026-04-16`,description:`Sharp geometric crystalline planes and internal mineral prisms.`,shader:`
     vec4 generate() {
       float d = abs(v_uv.x - 0.5) + abs(v_uv.y - 0.5);
       float mask = step(0.4, fract(d * u_scale));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Crystal Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Quartz Face`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Prism Core`,type:`color`,default:[.8,.8,.9,1]}]},Ud=e({default:()=>Wd}),Wd={id:`quatrefoil`,name:`Quatrefoil Trellis`,category:`Geometric`,added:`2026-07-07`,description:`Moroccan lattice of four-lobed clover outlines — the interior-design classic.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crystal Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Quartz Face`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Prism Core`,type:`color`,default:[.8,.8,.9,1]}]},rf=e({default:()=>af}),af={id:`quatrefoil`,name:`Quatrefoil Trellis`,category:`Geometric`,added:`2026-07-07`,description:`Moroccan lattice of four-lobed clover outlines — the interior-design classic.`,shader:`
     float quat(vec2 f, float lobe) {
       // union of four circles centered on the cell axes
       float d = min(
@@ -12316,7 +12560,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb, line);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Trellis Density`,type:`float`,min:2,max:20,default:7},{id:`u_line`,name:`Line Weight`,type:`float`,min:.01,max:.08,default:.03},{id:`u_fill`,name:`Lobe Fill`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Lattice`,type:`color`,default:[.85,.72,.4,1]},{id:`u_accent_color`,name:`Lobe Fill`,type:`color`,default:[.18,.3,.35,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.2,.24,1]}],variants:[{name:`Brass on Teal`,uniforms:{u_primary_color:[.85,.72,.4,1],u_accent_color:[.18,.3,.35,1],u_secondary_color:[.12,.2,.24,1],u_fill:0}},{name:`Porcelain`,uniforms:{u_primary_color:[.2,.35,.6,1],u_accent_color:[.85,.9,.95,1],u_secondary_color:[.94,.94,.92,1],u_fill:.4}},{name:`Noir Foil`,uniforms:{u_primary_color:[.8,.8,.83,1],u_accent_color:[.2,.2,.24,1],u_secondary_color:[.08,.08,.1,1],u_fill:.7}}]},Gd=e({default:()=>Kd}),Kd={id:`race_tape`,name:`Race Tape Repair`,category:`Racing`,added:`2026-07-07`,description:`Strips of 100-mph tape slapped across the bodywork — battle damage patched in the pits.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Trellis Density`,type:`float`,min:2,max:20,default:7},{id:`u_line`,name:`Line Weight`,type:`float`,min:.01,max:.08,default:.03},{id:`u_fill`,name:`Lobe Fill`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Lattice`,type:`color`,default:[.85,.72,.4,1]},{id:`u_accent_color`,name:`Lobe Fill`,type:`color`,default:[.18,.3,.35,1]},{id:`u_secondary_color`,name:`Ground`,type:`color`,default:[.12,.2,.24,1]}],variants:[{name:`Brass on Teal`,uniforms:{u_primary_color:[.85,.72,.4,1],u_accent_color:[.18,.3,.35,1],u_secondary_color:[.12,.2,.24,1],u_fill:0}},{name:`Porcelain`,uniforms:{u_primary_color:[.2,.35,.6,1],u_accent_color:[.85,.9,.95,1],u_secondary_color:[.94,.94,.92,1],u_fill:.4}},{name:`Noir Foil`,uniforms:{u_primary_color:[.8,.8,.83,1],u_accent_color:[.2,.2,.24,1],u_secondary_color:[.08,.08,.1,1],u_fill:.7}}]},of=e({default:()=>sf}),sf={id:`race_tape`,name:`Race Tape Repair`,category:`Racing`,added:`2026-07-07`,description:`Strips of 100-mph tape slapped across the bodywork — battle damage patched in the pits.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -12345,7 +12589,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Coverage Scale`,type:`float`,min:1,max:8,default:3},{id:`u_opacity_tape`,name:`Tape Opacity`,type:`float`,min:.4,max:1,default:.95},{id:`u_primary_color`,name:`Tape`,type:`color`,default:[.75,.75,.76,1]},{id:`u_secondary_color`,name:`Bodywork`,type:`color`,default:[.85,.1,.1,1]}],variants:[{name:`Silver on Red`,uniforms:{u_primary_color:[.75,.75,.76,1],u_secondary_color:[.85,.1,.1,1],u_opacity_tape:.95}},{name:`Black on White`,uniforms:{u_primary_color:[.12,.12,.13,1],u_secondary_color:[.93,.93,.9,1],u_opacity_tape:.95}},{name:`Blue Painters`,uniforms:{u_primary_color:[.15,.35,.75,1],u_secondary_color:[.2,.2,.22,1],u_opacity_tape:.9}}]},qd=e({default:()=>Jd}),Jd={id:`racing_livery_stripe`,name:`Racing Livery Stripe`,category:`Racing`,added:`2026-05-01`,description:`Dual-tone diagonal speed stripe with gradient fade and crisp edges â€” a classic motorsport livery element.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Coverage Scale`,type:`float`,min:1,max:8,default:3},{id:`u_opacity_tape`,name:`Tape Opacity`,type:`float`,min:.4,max:1,default:.95},{id:`u_primary_color`,name:`Tape`,type:`color`,default:[.75,.75,.76,1]},{id:`u_secondary_color`,name:`Bodywork`,type:`color`,default:[.85,.1,.1,1]}],variants:[{name:`Silver on Red`,uniforms:{u_primary_color:[.75,.75,.76,1],u_secondary_color:[.85,.1,.1,1],u_opacity_tape:.95}},{name:`Black on White`,uniforms:{u_primary_color:[.12,.12,.13,1],u_secondary_color:[.93,.93,.9,1],u_opacity_tape:.95}},{name:`Blue Painters`,uniforms:{u_primary_color:[.15,.35,.75,1],u_secondary_color:[.2,.2,.22,1],u_opacity_tape:.9}}]},cf=e({default:()=>lf}),lf={id:`racing_livery_stripe`,name:`Racing Livery Stripe`,category:`Racing`,added:`2026-05-01`,description:`Dual-tone diagonal speed stripe with gradient fade and crisp edges â€” a classic motorsport livery element.`,shader:`
     // Signed distance to an infinite angled stripe centred on the canvas
     float stripeSDist(vec2 uv, float angle) {
       // Direction perpendicular to stripe edge
@@ -12391,13 +12635,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_stripe_color`,type:`color`,default:[.9,.1,.1,1],name:`Stripe Colour`},{id:`u_bg_color`,type:`color`,default:[.05,.05,.05,1],name:`Background Colour`},{id:`u_stripe_width`,type:`float`,default:.45,min:.1,max:.9,name:`Stripe Width`},{id:`u_angle`,type:`float`,default:.3,min:-1,max:1,name:`Stripe Angle`}]},Yd=e({default:()=>Xd}),Xd={id:`radial_gradient_artisan`,name:`Master Radial`,category:`Abstract`,added:`2026-04-15`,description:`Focus-aligned radial gradient transition.`,shader:`
+  `,uniforms:[{id:`u_stripe_color`,type:`color`,default:[.9,.1,.1,1],name:`Stripe Colour`},{id:`u_bg_color`,type:`color`,default:[.05,.05,.05,1],name:`Background Colour`},{id:`u_stripe_width`,type:`float`,default:.45,min:.1,max:.9,name:`Stripe Width`},{id:`u_angle`,type:`float`,default:.3,min:-1,max:1,name:`Stripe Angle`}]},uf=e({default:()=>df}),df={id:`radial_gradient_artisan`,name:`Master Radial`,category:`Abstract`,added:`2026-04-15`,description:`Focus-aligned radial gradient transition.`,shader:`
     vec4 generate() {
       float d = length(v_uv - 0.5) * 2.0;
       float mask = smoothstep(0.0, 1.0, d);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Center Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Outer Color`,type:`color`,default:[0,0,0,1]}]},Zd=e({default:()=>Qd}),Qd={id:`radiolarian_skeletons_artisan`,name:`Radiolarian Skeletons`,category:`Organic`,added:`2026-05-13`,description:`Intricate, symmetrical, perforated silica shells based on microscopic marine zooplankton.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Center Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Outer Color`,type:`color`,default:[0,0,0,1]}]},ff=e({default:()=>pf}),pf={id:`radiolarian_skeletons_artisan`,name:`Radiolarian Skeletons`,category:`Organic`,added:`2026-05-13`,description:`Intricate, symmetrical, perforated silica shells based on microscopic marine zooplankton.`,shader:`
     vec2 random2( vec2 p ) {
         return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
@@ -12432,7 +12676,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return mix(u_fluid_bg, silicaColor, silicaMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Plankton Scale`,type:`float`,min:2,max:20,default:5},{id:`u_fluid_bg`,name:`Marine Fluid`,type:`color`,default:[.05,.15,.2,1]},{id:`u_silica_shadow`,name:`Silica Core`,type:`color`,default:[.7,.75,.8,1]},{id:`u_silica_highlight`,name:`Silica Edge`,type:`color`,default:[.95,.95,1,1]}]},$d=e({default:()=>ef}),ef={id:`rain_on_glass`,name:`Rain on Glass`,category:`Natural`,added:`2026-04-30`,description:`Rainwater on a tinted glass windshield — beaded droplets with meniscus rim highlights and wavy vertical rivulets.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Plankton Scale`,type:`float`,min:2,max:20,default:5},{id:`u_fluid_bg`,name:`Marine Fluid`,type:`color`,default:[.05,.15,.2,1]},{id:`u_silica_shadow`,name:`Silica Core`,type:`color`,default:[.7,.75,.8,1]},{id:`u_silica_highlight`,name:`Silica Edge`,type:`color`,default:[.95,.95,1,1]}]},mf=e({default:()=>hf}),hf={id:`rain_on_glass`,name:`Rain on Glass`,category:`Natural`,added:`2026-04-30`,description:`Rainwater on a tinted glass windshield — beaded droplets with meniscus rim highlights and wavy vertical rivulets.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     float hash1(float n) { return fract(sin(n) * 43758.5453123); }
 
@@ -12545,7 +12789,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_glass_color.a * u_opacity);
     }
-  `,uniforms:[{id:`u_glass_color`,name:`Glass Tint`,type:`color`,default:[.1,.13,.16,1]},{id:`u_drop_density`,name:`Drop Density`,type:`float`,min:2,max:20,default:8},{id:`u_rivulet_count`,name:`Rivulet Count`,type:`float`,min:2,max:20,default:8},{id:`u_wetness`,name:`Wetness`,type:`float`,min:0,max:1,default:.7}]},tf=e({default:()=>nf}),nf={id:`rainbow_eucalyptus`,name:`Rainbow Eucalyptus`,category:`Natural`,added:`2026-07-07`,description:`Peeling bark ribbons in impossible colors — the rainbow eucalyptus trunk up close.`,shader:`
+  `,uniforms:[{id:`u_glass_color`,name:`Glass Tint`,type:`color`,default:[.1,.13,.16,1]},{id:`u_drop_density`,name:`Drop Density`,type:`float`,min:2,max:20,default:8},{id:`u_rivulet_count`,name:`Rivulet Count`,type:`float`,min:2,max:20,default:8},{id:`u_wetness`,name:`Wetness`,type:`float`,min:0,max:1,default:.7}]},gf=e({default:()=>_f}),_f={id:`rainbow_eucalyptus`,name:`Rainbow Eucalyptus`,category:`Natural`,added:`2026-07-07`,description:`Peeling bark ribbons in impossible colors — the rainbow eucalyptus trunk up close.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // vertical ribbons with jittered edges
@@ -12568,7 +12812,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, u_secondary_color.rgb * (0.85 + 0.15 * snoise(uv * 6.0)), old * u_oldbark);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Trunk Scale`,type:`float`,min:1,max:8,default:3},{id:`u_wobble`,name:`Ribbon Wobble`,type:`float`,min:0,max:2,default:.8},{id:`u_oldbark`,name:`Old Bark`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Fresh Green`,type:`color`,default:[.35,.68,.3,1]},{id:`u_accent_color`,name:`Teal Blue`,type:`color`,default:[.15,.5,.55,1]},{id:`u_pop_color`,name:`Sunset Orange`,type:`color`,default:[.85,.45,.25,1]},{id:`u_secondary_color`,name:`Old Bark`,type:`color`,default:[.55,.5,.45,1]}],variants:[{name:`Mindanao`,uniforms:{u_primary_color:[.35,.68,.3,1],u_accent_color:[.15,.5,.55,1],u_pop_color:[.85,.45,.25,1],u_secondary_color:[.55,.5,.45,1],u_oldbark:.4}},{name:`Violet Grove`,uniforms:{u_primary_color:[.5,.3,.7,1],u_accent_color:[.2,.4,.75,1],u_pop_color:[.85,.35,.5,1],u_secondary_color:[.5,.48,.52,1],u_oldbark:.3}},{name:`Autumn Peel`,uniforms:{u_primary_color:[.75,.55,.2,1],u_accent_color:[.6,.3,.15,1],u_pop_color:[.85,.65,.35,1],u_secondary_color:[.45,.4,.35,1],u_oldbark:.6}}]},rf=e({default:()=>af}),af={id:`reaction_diffusion_artisan`,name:`Reaction Diffusion`,category:`Abstract`,added:`2026-04-15`,description:`Organic biological growth and coral-like patterns mimicking chemical morphogenesis.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Trunk Scale`,type:`float`,min:1,max:8,default:3},{id:`u_wobble`,name:`Ribbon Wobble`,type:`float`,min:0,max:2,default:.8},{id:`u_oldbark`,name:`Old Bark`,type:`float`,min:0,max:1,default:.4},{id:`u_primary_color`,name:`Fresh Green`,type:`color`,default:[.35,.68,.3,1]},{id:`u_accent_color`,name:`Teal Blue`,type:`color`,default:[.15,.5,.55,1]},{id:`u_pop_color`,name:`Sunset Orange`,type:`color`,default:[.85,.45,.25,1]},{id:`u_secondary_color`,name:`Old Bark`,type:`color`,default:[.55,.5,.45,1]}],variants:[{name:`Mindanao`,uniforms:{u_primary_color:[.35,.68,.3,1],u_accent_color:[.15,.5,.55,1],u_pop_color:[.85,.45,.25,1],u_secondary_color:[.55,.5,.45,1],u_oldbark:.4}},{name:`Violet Grove`,uniforms:{u_primary_color:[.5,.3,.7,1],u_accent_color:[.2,.4,.75,1],u_pop_color:[.85,.35,.5,1],u_secondary_color:[.5,.48,.52,1],u_oldbark:.3}},{name:`Autumn Peel`,uniforms:{u_primary_color:[.75,.55,.2,1],u_accent_color:[.6,.3,.15,1],u_pop_color:[.85,.65,.35,1],u_secondary_color:[.45,.4,.35,1],u_oldbark:.6}}]},vf=e({default:()=>yf}),yf={id:`reaction_diffusion_artisan`,name:`Reaction Diffusion`,category:`Abstract`,added:`2026-04-15`,description:`Organic biological growth and coral-like patterns mimicking chemical morphogenesis.`,shader:`
     float noise(vec2 p) {
       vec2 i = floor(p); vec2 f = fract(p);
       return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
@@ -12579,7 +12823,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.5, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Growth Scale`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Organism`,type:`color`,default:[.8,.4,.2,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[.1,.05,0,1]}]},of=e({default:()=>sf}),sf={id:`realistic_viper_artisan`,name:`Realistic Viper`,category:`Natural`,added:`2026-04-15`,description:`Small, diamond-shaped high-fidelity interlocking scales mimicking viper skin.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Growth Scale`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Organism`,type:`color`,default:[.8,.4,.2,1]},{id:`u_secondary_color`,name:`Substrate`,type:`color`,default:[.1,.05,0,1]}]},bf=e({default:()=>xf}),xf={id:`realistic_viper_artisan`,name:`Realistic Viper`,category:`Natural`,added:`2026-04-15`,description:`Small, diamond-shaped high-fidelity interlocking scales mimicking viper skin.`,shader:`
     vec4 generate() {
       mat2 m = mat2(0.707, -0.707, 0.707, 0.707);
       vec2 uv = m * v_uv * u_scale;
@@ -12587,7 +12831,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = mod(gv.x + gv.y, 2.0);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:80,default:40},{id:`u_primary_color`,name:`Scales`,type:`color`,default:[.1,.15,.05,1]},{id:`u_secondary_color`,name:`Skin Deep`,type:`color`,default:[0,.05,0,1]}]},cf=e({default:()=>lf}),lf={id:`rebar_lattice`,name:`Rebar Lattice`,category:`Industrial`,added:`2026-07-07`,description:`Ribbed reinforcement bars tied in a crossing grid, rust blooming along the ridges.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:80,default:40},{id:`u_primary_color`,name:`Scales`,type:`color`,default:[.1,.15,.05,1]},{id:`u_secondary_color`,name:`Skin Deep`,type:`color`,default:[0,.05,0,1]}]},Sf=e({default:()=>Cf}),Cf={id:`rebar_lattice`,name:`Rebar Lattice`,category:`Industrial`,added:`2026-07-07`,description:`Ribbed reinforcement bars tied in a crossing grid, rust blooming along the ridges.`,shader:`
     float rod(float x) {
       // cylindrical shading profile across a rod, 0 outside
       float d = abs(x);
@@ -12614,7 +12858,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (vShade > 0.0) col = steel * vShade * vRib;
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grid Density`,type:`float`,min:2,max:20,default:7},{id:`u_thickness`,name:`Bar Thickness`,type:`float`,min:.08,max:.4,default:.18},{id:`u_rust`,name:`Rust`,type:`float`,min:0,max:1,default:.55},{id:`u_primary_color`,name:`Steel`,type:`color`,default:[.45,.44,.43,1]},{id:`u_accent_color`,name:`Rust`,type:`color`,default:[.55,.28,.12,1]},{id:`u_secondary_color`,name:`Backdrop`,type:`color`,default:[.14,.14,.15,1]}],variants:[{name:`Job Site`,uniforms:{u_primary_color:[.45,.44,.43,1],u_accent_color:[.55,.28,.12,1],u_secondary_color:[.14,.14,.15,1],u_rust:.55}},{name:`Fresh Steel`,uniforms:{u_primary_color:[.55,.56,.6,1],u_accent_color:[.35,.3,.25,1],u_secondary_color:[.2,.2,.22,1],u_rust:.15}},{name:`Deep Corrosion`,uniforms:{u_primary_color:[.4,.32,.26,1],u_accent_color:[.5,.2,.08,1],u_secondary_color:[.1,.09,.08,1],u_rust:.95}}]},uf=e({default:()=>df}),df={id:`rhodochrosite_bands`,name:`Rhodochrosite Bands`,category:`Geology`,added:`2026-06-12`,description:`Rose-pink rhodochrosite with scalloped white lace banding — stalactitic arcs of raspberry and cream stacked in wavy layers.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grid Density`,type:`float`,min:2,max:20,default:7},{id:`u_thickness`,name:`Bar Thickness`,type:`float`,min:.08,max:.4,default:.18},{id:`u_rust`,name:`Rust`,type:`float`,min:0,max:1,default:.55},{id:`u_primary_color`,name:`Steel`,type:`color`,default:[.45,.44,.43,1]},{id:`u_accent_color`,name:`Rust`,type:`color`,default:[.55,.28,.12,1]},{id:`u_secondary_color`,name:`Backdrop`,type:`color`,default:[.14,.14,.15,1]}],variants:[{name:`Job Site`,uniforms:{u_primary_color:[.45,.44,.43,1],u_accent_color:[.55,.28,.12,1],u_secondary_color:[.14,.14,.15,1],u_rust:.55}},{name:`Fresh Steel`,uniforms:{u_primary_color:[.55,.56,.6,1],u_accent_color:[.35,.3,.25,1],u_secondary_color:[.2,.2,.22,1],u_rust:.15}},{name:`Deep Corrosion`,uniforms:{u_primary_color:[.4,.32,.26,1],u_accent_color:[.5,.2,.08,1],u_secondary_color:[.1,.09,.08,1],u_rust:.95}}]},wf=e({default:()=>Tf}),Tf={id:`rhodochrosite_bands`,name:`Rhodochrosite Bands`,category:`Geology`,added:`2026-06-12`,description:`Rose-pink rhodochrosite with scalloped white lace banding — stalactitic arcs of raspberry and cream stacked in wavy layers.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -12672,7 +12916,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_band_count`,name:`Band Count`,type:`float`,min:3,max:25,default:9},{id:`u_scallop_freq`,name:`Scallop Count`,type:`float`,min:1,max:12,default:4},{id:`u_scallop_depth`,name:`Scallop Depth`,type:`float`,min:0,max:1,default:.5},{id:`u_pink_color`,name:`Rose Pink`,type:`color`,default:[.92,.45,.55,1]}]},ff=e({default:()=>pf}),pf={id:`rice_terraces`,name:`Rice Terraces`,category:`Natural`,added:`2026-07-07`,description:`Stepped paddy fields hugging the hillside — green tiers, mirror water, mud bund edges.`,shader:`
+  `,uniforms:[{id:`u_band_count`,name:`Band Count`,type:`float`,min:3,max:25,default:9},{id:`u_scallop_freq`,name:`Scallop Count`,type:`float`,min:1,max:12,default:4},{id:`u_scallop_depth`,name:`Scallop Depth`,type:`float`,min:0,max:1,default:.5},{id:`u_pink_color`,name:`Rose Pink`,type:`color`,default:[.92,.45,.55,1]}]},Ef=e({default:()=>Df}),Df={id:`rice_terraces`,name:`Rice Terraces`,category:`Natural`,added:`2026-07-07`,description:`Stepped paddy fields hugging the hillside — green tiers, mirror water, mud bund edges.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // hillside elevation
@@ -12696,7 +12940,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, u_secondary_color.rgb, smoothstep(0.7, 1.0, h) * 0.15);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Hill Scale`,type:`float`,min:1,max:8,default:3},{id:`u_tiers`,name:`Terrace Count`,type:`float`,min:6,max:40,default:18},{id:`u_primary_color`,name:`Young Rice`,type:`color`,default:[.35,.6,.2,1]},{id:`u_accent_color`,name:`Mature Rice`,type:`color`,default:[.6,.68,.25,1]},{id:`u_secondary_color`,name:`Sky Water`,type:`color`,default:[.65,.75,.8,1]}],variants:[{name:`Growing Season`,uniforms:{u_primary_color:[.35,.6,.2,1],u_accent_color:[.6,.68,.25,1],u_secondary_color:[.65,.75,.8,1],u_tiers:18}},{name:`Harvest Gold`,uniforms:{u_primary_color:[.75,.6,.25,1],u_accent_color:[.85,.72,.35,1],u_secondary_color:[.7,.72,.7,1],u_tiers:22}},{name:`Flood Mirror`,uniforms:{u_primary_color:[.3,.4,.3,1],u_accent_color:[.4,.5,.35,1],u_secondary_color:[.85,.7,.5,1],u_tiers:14}}]},mf=e({default:()=>hf}),hf={id:`ridgeline_terrain`,name:`Ridgeline Terrain`,category:`Technology`,added:`2026-07-07`,description:`Stacked mountain ridgelines — the Unknown Pleasures wireframe landscape, row after row.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Hill Scale`,type:`float`,min:1,max:8,default:3},{id:`u_tiers`,name:`Terrace Count`,type:`float`,min:6,max:40,default:18},{id:`u_primary_color`,name:`Young Rice`,type:`color`,default:[.35,.6,.2,1]},{id:`u_accent_color`,name:`Mature Rice`,type:`color`,default:[.6,.68,.25,1]},{id:`u_secondary_color`,name:`Sky Water`,type:`color`,default:[.65,.75,.8,1]}],variants:[{name:`Growing Season`,uniforms:{u_primary_color:[.35,.6,.2,1],u_accent_color:[.6,.68,.25,1],u_secondary_color:[.65,.75,.8,1],u_tiers:18}},{name:`Harvest Gold`,uniforms:{u_primary_color:[.75,.6,.25,1],u_accent_color:[.85,.72,.35,1],u_secondary_color:[.7,.72,.7,1],u_tiers:22}},{name:`Flood Mirror`,uniforms:{u_primary_color:[.3,.4,.3,1],u_accent_color:[.4,.5,.35,1],u_secondary_color:[.85,.7,.5,1],u_tiers:14}}]},Of=e({default:()=>kf}),kf={id:`ridgeline_terrain`,name:`Ridgeline Terrain`,category:`Technology`,added:`2026-07-07`,description:`Stacked mountain ridgelines — the Unknown Pleasures wireframe landscape, row after row.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float rows = u_scale;
@@ -12721,14 +12965,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += u_primary_color.rgb * bestGlow * bestGlow * 0.4;
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Row Density`,type:`float`,min:4,max:30,default:12},{id:`u_peak`,name:`Peak Height`,type:`float`,min:.2,max:2.5,default:1.1},{id:`u_width`,name:`Line Weight`,type:`float`,min:.01,max:.12,default:.035},{id:`u_primary_color`,name:`Ridge Line`,type:`color`,default:[.95,.95,.97,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Pulsar`,uniforms:{u_primary_color:[.95,.95,.97,1],u_secondary_color:[.04,.04,.05,1],u_peak:1.1}},{name:`Synth Sunset`,uniforms:{u_primary_color:[1,.35,.55,1],u_secondary_color:[.08,.02,.12,1],u_peak:1.6}},{name:`Radar Green`,uniforms:{u_primary_color:[.2,.95,.4,1],u_secondary_color:[.01,.06,.02,1],u_peak:.8}}]},gf=e({default:()=>_f}),_f={id:`rim_spoke_carbon_artisan`,name:`Spoke Carbon`,category:`Racing`,added:`2026-04-16`,description:`Multi-layered carbon strands optimized for high-strength wheel spokes.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Row Density`,type:`float`,min:4,max:30,default:12},{id:`u_peak`,name:`Peak Height`,type:`float`,min:.2,max:2.5,default:1.1},{id:`u_width`,name:`Line Weight`,type:`float`,min:.01,max:.12,default:.035},{id:`u_primary_color`,name:`Ridge Line`,type:`color`,default:[.95,.95,.97,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.04,.04,.05,1]}],variants:[{name:`Pulsar`,uniforms:{u_primary_color:[.95,.95,.97,1],u_secondary_color:[.04,.04,.05,1],u_peak:1.1}},{name:`Synth Sunset`,uniforms:{u_primary_color:[1,.35,.55,1],u_secondary_color:[.08,.02,.12,1],u_peak:1.6}},{name:`Radar Green`,uniforms:{u_primary_color:[.2,.95,.4,1],u_secondary_color:[.01,.06,.02,1],u_peak:.8}}]},Af=e({default:()=>jf}),jf={id:`rim_spoke_carbon_artisan`,name:`Spoke Carbon`,category:`Racing`,added:`2026-04-16`,description:`Multi-layered carbon strands optimized for high-strength wheel spokes.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float lines = sin(uv.x + uv.y) * sin(uv.x - uv.y);
       float mask = smoothstep(-0.5, 0.5, lines);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Wave Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Fiber Top`,type:`color`,default:[.2,.2,.22,1]},{id:`u_secondary_color`,name:`Resin Base`,type:`color`,default:[.1,.1,.12,1]}]},vf=e({default:()=>yf}),yf={id:`rising_sun_rays`,name:`Rising Sun Rays`,category:`Heritage`,added:`2026-06-12`,description:`A radiating sunburst — bold rays fanning from a low sun disc, hand-cut vinyl edges, halo keyline round the disc, and sun-fade strongest at the ray tips.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wave Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Fiber Top`,type:`color`,default:[.2,.2,.22,1]},{id:`u_secondary_color`,name:`Resin Base`,type:`color`,default:[.1,.1,.12,1]}]},Mf=e({default:()=>Nf}),Nf={id:`rising_sun_rays`,name:`Rising Sun Rays`,category:`Heritage`,added:`2026-06-12`,description:`A radiating sunburst — bold rays fanning from a low sun disc, hand-cut vinyl edges, halo keyline round the disc, and sun-fade strongest at the ray tips.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -12794,7 +13038,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ray_count`,name:`Ray Count`,type:`float`,min:6,max:24,default:12},{id:`u_fade`,name:`Tip Fade`,type:`float`,min:0,max:1,default:.45},{id:`u_field_color`,name:`Field Colour`,type:`color`,default:[.93,.89,.79,1]},{id:`u_ray_color`,name:`Ray Colour`,type:`color`,default:[.8,.16,.1,1]}]},bf=e({default:()=>xf}),xf={id:`risograph_grain`,name:`Risograph Grain`,category:`Retro`,added:`2026-06-11`,description:`Two-drum riso zine print — fluorescent pink and federal blue soy inks overprinting off-register, every shape dissolving into gritty stochastic grain on toothy paper.`,shader:`
+  `,uniforms:[{id:`u_ray_count`,name:`Ray Count`,type:`float`,min:6,max:24,default:12},{id:`u_fade`,name:`Tip Fade`,type:`float`,min:0,max:1,default:.45},{id:`u_field_color`,name:`Field Colour`,type:`color`,default:[.93,.89,.79,1]},{id:`u_ray_color`,name:`Ray Colour`,type:`color`,default:[.8,.16,.1,1]}]},Pf=e({default:()=>Ff}),Ff={id:`risograph_grain`,name:`Risograph Grain`,category:`Retro`,added:`2026-06-11`,description:`Two-drum riso zine print — fluorescent pink and federal blue soy inks overprinting off-register, every shape dissolving into gritty stochastic grain on toothy paper.`,shader:`
     // ink coverage artwork for one drum: blobby discs + screened bands
     float inkart_rg(vec2 uv, float seed) {
       float n = fbm(uv * 2.2 + seed) * 0.5 + 0.5;
@@ -12846,7 +13090,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grain`,name:`Grain Strength`,type:`float`,min:0,max:1,default:.65},{id:`u_misreg`,name:`Misregistration`,type:`float`,min:0,max:.02,default:.006},{id:`u_ink_a`,name:`Drum 1 Ink`,type:`color`,default:[1,.3,.55,1]},{id:`u_ink_b`,name:`Drum 2 Ink`,type:`color`,default:[.15,.35,.85,1]}]},Sf=e({default:()=>Cf}),Cf={id:`river_cobble_artisan`,name:`River Cobble`,category:`Natural`,added:`2026-04-15`,description:`Smooth, irregular organic stone clusters mimicking riverbed masonry.`,shader:`
+  `,uniforms:[{id:`u_grain`,name:`Grain Strength`,type:`float`,min:0,max:1,default:.65},{id:`u_misreg`,name:`Misregistration`,type:`float`,min:0,max:.02,default:.006},{id:`u_ink_a`,name:`Drum 1 Ink`,type:`color`,default:[1,.3,.55,1]},{id:`u_ink_b`,name:`Drum 2 Ink`,type:`color`,default:[.15,.35,.85,1]}]},If=e({default:()=>Lf}),Lf={id:`river_cobble_artisan`,name:`River Cobble`,category:`Natural`,added:`2026-04-15`,description:`Smooth, irregular organic stone clusters mimicking riverbed masonry.`,shader:`
     vec2 random2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -12864,7 +13108,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.45, 0.4, m_dist);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Stone Grey`,type:`color`,default:[.6,.6,.65,1]},{id:`u_secondary_color`,name:`Joint`,type:`color`,default:[.1,.1,.1,1]}]},wf=e({default:()=>Tf}),Tf={id:`river_stone_artisan`,name:`River Stones`,category:`Natural`,added:`2026-04-16`,description:`Smooth rounded pebble shapes mimicking naturally eroded riverbed stones.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Stone Grey`,type:`color`,default:[.6,.6,.65,1]},{id:`u_secondary_color`,name:`Joint`,type:`color`,default:[.1,.1,.1,1]}]},Rf=e({default:()=>zf}),zf={id:`river_stone_artisan`,name:`River Stones`,category:`Natural`,added:`2026-04-16`,description:`Smooth rounded pebble shapes mimicking naturally eroded riverbed stones.`,shader:`
     vec2 rand(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -12882,14 +13126,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.38, m_dist);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Stone Size`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Pebble Surface`,type:`color`,default:[.5,.5,.5,1]},{id:`u_secondary_color`,name:`Joint Sediment`,type:`color`,default:[.3,.3,.3,1]}]},Ef=e({default:()=>Df}),Df={id:`rivet_lines_pro`,name:`Panel Rivets`,category:`Industrial`,added:`2026-04-15`,description:`Structural rivet seams for automotive panels.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Stone Size`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Pebble Surface`,type:`color`,default:[.5,.5,.5,1]},{id:`u_secondary_color`,name:`Joint Sediment`,type:`color`,default:[.3,.3,.3,1]}]},Bf=e({default:()=>Vf}),Vf={id:`rivet_lines_pro`,name:`Panel Rivets`,category:`Industrial`,added:`2026-04-15`,description:`Structural rivet seams for automotive panels.`,shader:`
     vec4 generate() {
       vec2 g = fract(v_uv * u_scale) - 0.5;
       float d = length(g);
       float mask = step(0.3, d) * step(d, 0.35);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Rivet Spacing`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Rivet`,type:`color`,default:[.6,.6,.6,1]},{id:`u_secondary_color`,name:`Panel`,type:`color`,default:[.35,.35,.35,1]}]},Of=e({default:()=>kf}),kf={id:`rivet_plate_elite`,name:`Rivet Plate Elite`,category:`Industrial`,added:`2026-04-15`,description:`Overlapping heavy armor sections with structural corner rivets.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Rivet Spacing`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Rivet`,type:`color`,default:[.6,.6,.6,1]},{id:`u_secondary_color`,name:`Panel`,type:`color`,default:[.35,.35,.35,1]}]},Hf=e({default:()=>Uf}),Uf={id:`rivet_plate_elite`,name:`Rivet Plate Elite`,category:`Industrial`,added:`2026-04-15`,description:`Overlapping heavy armor sections with structural corner rivets.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
@@ -12902,7 +13146,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = max(plate * 0.5, rivet);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Plate Count`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Armor Steel`,type:`color`,default:[.5,.5,.55,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.1,.1,.12,1]}]},Af=e({default:()=>jf}),jf={id:`rocket_plume`,name:`Rocket Plume`,category:`Cosmos`,added:`2026-06-11`,description:`A roaring engine exhaust column stacked with glowing mach diamonds — violet-blue core, white shock discs, and ragged orange combustion fringe.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Plate Count`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Armor Steel`,type:`color`,default:[.5,.5,.55,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.1,.1,.12,1]}]},Wf=e({default:()=>Gf}),Gf={id:`rocket_plume`,name:`Rocket Plume`,category:`Cosmos`,added:`2026-06-11`,description:`A roaring engine exhaust column stacked with glowing mach diamonds — violet-blue core, white shock discs, and ragged orange combustion fringe.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv);
       // Plume axis runs vertically down the tile centre
@@ -12968,7 +13212,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_plume_width`,name:`Plume Width`,type:`float`,min:.1,max:.5,default:.22},{id:`u_diamond_count`,name:`Mach Diamonds`,type:`float`,min:2,max:10,default:5},{id:`u_diamond_glow`,name:`Diamond Glow`,type:`float`,min:.2,max:2,default:1},{id:`u_core_color`,name:`Core Colour`,type:`color`,default:[.45,.55,1,1]}]},Mf=e({default:()=>Nf}),Nf={id:`roll_cage_foam_artisan`,name:`Roll Cage Foam`,category:`Racing`,added:`2026-04-16`,description:`Dense, pitted cellular protective foam found on professional roll cage padding.`,shader:`
+  `,uniforms:[{id:`u_plume_width`,name:`Plume Width`,type:`float`,min:.1,max:.5,default:.22},{id:`u_diamond_count`,name:`Mach Diamonds`,type:`float`,min:2,max:10,default:5},{id:`u_diamond_glow`,name:`Diamond Glow`,type:`float`,min:.2,max:2,default:1},{id:`u_core_color`,name:`Core Colour`,type:`color`,default:[.45,.55,1,1]}]},Kf=e({default:()=>qf}),qf={id:`roll_cage_foam_artisan`,name:`Roll Cage Foam`,category:`Racing`,added:`2026-04-16`,description:`Dense, pitted cellular protective foam found on professional roll cage padding.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -12985,7 +13229,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return mix(u_secondary_color, u_primary_color, smoothstep(0.2, 0.4, m_dist));
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Foam Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Pore Shade`,type:`color`,default:[.05,.05,.05,1]}]},Pf=e({default:()=>Ff}),Ff={id:`roof_shingles_artisan`,name:`Scalloped Shingles`,category:`Industrial`,added:`2026-04-15`,description:`Overlapping curved roofing tiles used in architectural design.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Density`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Foam Body`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Pore Shade`,type:`color`,default:[.05,.05,.05,1]}]},Jf=e({default:()=>Yf}),Yf={id:`roof_shingles_artisan`,name:`Scalloped Shingles`,category:`Industrial`,added:`2026-04-15`,description:`Overlapping curved roofing tiles used in architectural design.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -12994,7 +13238,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(d, 0.5);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Tile Rows`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Shingle`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Rim`,type:`color`,default:[.4,.4,.45,1]}]},If=e({default:()=>Lf}),Lf={id:`root_system_artisan`,name:`Root System`,category:`Natural`,added:`2026-04-16`,description:`Branching procedural line networks found in organic root systems and neural pathways.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tile Rows`,type:`float`,min:5,max:30,default:15},{id:`u_primary_color`,name:`Shingle`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Rim`,type:`color`,default:[.4,.4,.45,1]}]},Xf=e({default:()=>Zf}),Zf={id:`root_system_artisan`,name:`Root System`,category:`Natural`,added:`2026-04-16`,description:`Branching procedural line networks found in organic root systems and neural pathways.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float d = 1.0;
@@ -13007,7 +13251,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.1, 0.0, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Branching`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Root Fiber`,type:`color`,default:[.5,.4,.3,1]},{id:`u_secondary_color`,name:`Soil Deep`,type:`color`,default:[.1,.08,.05,1]}]},Rf=e({default:()=>zf}),zf={id:`rose_gold_brushed`,name:`Rose Gold Brushed`,category:`Industrial`,added:`2026-05-01`,description:`Directional brushed rose gold metal with warm pink-gold grain streaks and a subtle specular sheen band.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Branching`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Root Fiber`,type:`color`,default:[.5,.4,.3,1]},{id:`u_secondary_color`,name:`Soil Deep`,type:`color`,default:[.1,.08,.05,1]}]},Qf=e({default:()=>$f}),$f={id:`rose_gold_brushed`,name:`Rose Gold Brushed`,category:`Industrial`,added:`2026-05-01`,description:`Directional brushed rose gold metal with warm pink-gold grain streaks and a subtle specular sheen band.`,shader:`
     float hash11(float p) { return fract(sin(p * 127.1) * 43758.5453); }
 
     float brushNoise(float y, float grain) {
@@ -13041,7 +13285,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(sheenCol, 1.0);
     }
-  `,uniforms:[{id:`u_grain`,name:`Grain Density`,type:`float`,min:5,max:100,default:40},{id:`u_sheen`,name:`Sheen Intensity`,type:`float`,min:0,max:1,default:.6},{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.88,.65,.55,1]}]},Bf=e({default:()=>Vf}),Vf={id:`rubber_compound`,name:`Rubber Compound`,category:`Racing`,added:`2026-05-01`,description:`Fresh vulcanised racing tyre rubber — near-black carbon grain, subtle mould-release sheen, and low-frequency press flow marks.`,shader:`
+  `,uniforms:[{id:`u_grain`,name:`Grain Density`,type:`float`,min:5,max:100,default:40},{id:`u_sheen`,name:`Sheen Intensity`,type:`float`,min:0,max:1,default:.6},{id:`u_base_color`,name:`Base Color`,type:`color`,default:[.88,.65,.55,1]}]},ep=e({default:()=>tp}),tp={id:`rubber_compound`,name:`Rubber Compound`,category:`Racing`,added:`2026-05-01`,description:`Fresh vulcanised racing tyre rubber — near-black carbon grain, subtle mould-release sheen, and low-frequency press flow marks.`,shader:`
     // --- helpers BEFORE generate() ---
 
     float hash1_rb(vec2 p) {
@@ -13115,7 +13359,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_compound_color`,name:`Rubber Color`,type:`color`,default:[.06,.05,.04,1]},{id:`u_grain`,name:`Surface Grain`,type:`float`,min:5,max:50,default:20},{id:`u_sheen`,name:`Rubber Gloss`,type:`float`,min:0,max:1,default:.4}]},Hf=e({default:()=>Uf}),Uf={id:`runway_markings`,name:`Runway Markings`,category:`Industrial`,added:`2026-07-07`,description:`Airport tarmac — centerline dashes, threshold piano keys, and rubber-scuffed asphalt.`,shader:`
+  `,uniforms:[{id:`u_compound_color`,name:`Rubber Color`,type:`color`,default:[.06,.05,.04,1]},{id:`u_grain`,name:`Surface Grain`,type:`float`,min:5,max:50,default:20},{id:`u_sheen`,name:`Rubber Gloss`,type:`float`,min:0,max:1,default:.4}]},np=e({default:()=>rp}),rp={id:`runway_markings`,name:`Runway Markings`,category:`Industrial`,added:`2026-07-07`,description:`Airport tarmac — centerline dashes, threshold piano keys, and rubber-scuffed asphalt.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // asphalt with rubber scuff streaks along y
@@ -13141,14 +13385,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       mark.rgb *= 0.85 + 0.15 * hash(floor(uv * 7.0));
       return mix(col, mark, paint * flake);
     }
-  `,uniforms:[{id:`u_scale`,name:`Marking Scale`,type:`float`,min:2,max:14,default:5},{id:`u_wear`,name:`Wear`,type:`float`,min:0,max:1,default:.45},{id:`u_primary_color`,name:`Paint`,type:`color`,default:[.92,.92,.88,1]},{id:`u_secondary_color`,name:`Tarmac`,type:`color`,default:[.16,.16,.17,1]}],variants:[{name:`Runway 27`,uniforms:{u_primary_color:[.92,.92,.88,1],u_secondary_color:[.16,.16,.17,1],u_wear:.45}},{name:`Taxiway Gold`,uniforms:{u_primary_color:[.95,.75,.1,1],u_secondary_color:[.2,.2,.21,1],u_wear:.3}},{name:`Abandoned Strip`,uniforms:{u_primary_color:[.7,.68,.6,1],u_secondary_color:[.24,.23,.2,1],u_wear:.9}}]},Wf=e({default:()=>Gf}),Gf={id:`safety_harness_artisan`,name:`Safety Harness`,category:`Racing`,added:`2026-04-16`,description:`Heavy-duty nylon web weave found in 5-point and 6-point racing harnesses.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Marking Scale`,type:`float`,min:2,max:14,default:5},{id:`u_wear`,name:`Wear`,type:`float`,min:0,max:1,default:.45},{id:`u_primary_color`,name:`Paint`,type:`color`,default:[.92,.92,.88,1]},{id:`u_secondary_color`,name:`Tarmac`,type:`color`,default:[.16,.16,.17,1]}],variants:[{name:`Runway 27`,uniforms:{u_primary_color:[.92,.92,.88,1],u_secondary_color:[.16,.16,.17,1],u_wear:.45}},{name:`Taxiway Gold`,uniforms:{u_primary_color:[.95,.75,.1,1],u_secondary_color:[.2,.2,.21,1],u_wear:.3}},{name:`Abandoned Strip`,uniforms:{u_primary_color:[.7,.68,.6,1],u_secondary_color:[.24,.23,.2,1],u_wear:.9}}]},ip=e({default:()=>ap}),ap={id:`safety_harness_artisan`,name:`Safety Harness`,category:`Racing`,added:`2026-04-16`,description:`Heavy-duty nylon web weave found in 5-point and 6-point racing harnesses.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * 40.0;
       float lines = sin(uv.x) * sin(uv.y * 5.0);
       float mask = smoothstep(-0.5, 0.5, lines);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Nylon Web`,type:`color`,default:[.5,0,0,1]},{id:`u_secondary_color`,name:`Weave Gap`,type:`color`,default:[.1,0,0,1]}]},Kf=e({default:()=>qf}),qf={id:`sakura_petals`,name:`Sakura Petals`,category:`Natural`,added:`2026-06-11`,description:`Scattered cherry-blossom petals drifting across the surface at three depths, each petal a softly notched teardrop with its own size, tilt and tint.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Nylon Web`,type:`color`,default:[.5,0,0,1]},{id:`u_secondary_color`,name:`Weave Gap`,type:`color`,default:[.1,0,0,1]}]},op=e({default:()=>sp}),sp={id:`sakura_petals`,name:`Sakura Petals`,category:`Natural`,added:`2026-06-11`,description:`Scattered cherry-blossom petals drifting across the surface at three depths, each petal a softly notched teardrop with its own size, tilt and tint.`,shader:`
 
     vec2 rot2(vec2 q, float a) {
       float c = cos(a);
@@ -13203,7 +13447,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color = petalLayer(color, v_uv * s, 1.0, 1.0);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Spring Pink`,uniforms:{u_color_petal:[.99,.78,.85,1],u_color_accent:[.88,.45,.62,1],u_color_bg:[1,.96,.96,1]}},{name:`White Blossom`,uniforms:{u_color_petal:[.99,.98,.97,1],u_color_accent:[.82,.76,.8,1],u_color_bg:[.66,.78,.82,1]}},{name:`Night Bloom`,uniforms:{u_color_petal:[.85,.55,.75,1],u_color_accent:[.55,.25,.5,1],u_color_bg:[.05,.04,.1,1]}},{name:`Autumn Gold`,uniforms:{u_color_petal:[.94,.72,.3,1],u_color_accent:[.72,.4,.12,1],u_color_bg:[.16,.09,.06,1]}}],uniforms:[{id:`u_density`,name:`Petal Density`,type:`float`,min:2,max:14,default:6},{id:`u_var`,name:`Size Variation`,type:`float`,min:0,max:1,default:.55},{id:`u_chaos`,name:`Rotation Chaos`,type:`float`,min:0,max:1,default:1},{id:`u_color_petal`,name:`Petal Color`,type:`color`,default:[.99,.78,.85,1]},{id:`u_color_accent`,name:`Petal Accent`,type:`color`,default:[.88,.45,.62,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[1,.96,.96,1]}]},Jf=e({default:()=>Yf}),Yf={id:`salt_crystal_natural`,name:`Salt Crystal`,category:`Natural`,added:`2026-05-01`,description:`Cubic salt crystal formations of varying size seen from above, white and translucent on a dark substrate.`,shader:`
+  `,variants:[{name:`Spring Pink`,uniforms:{u_color_petal:[.99,.78,.85,1],u_color_accent:[.88,.45,.62,1],u_color_bg:[1,.96,.96,1]}},{name:`White Blossom`,uniforms:{u_color_petal:[.99,.98,.97,1],u_color_accent:[.82,.76,.8,1],u_color_bg:[.66,.78,.82,1]}},{name:`Night Bloom`,uniforms:{u_color_petal:[.85,.55,.75,1],u_color_accent:[.55,.25,.5,1],u_color_bg:[.05,.04,.1,1]}},{name:`Autumn Gold`,uniforms:{u_color_petal:[.94,.72,.3,1],u_color_accent:[.72,.4,.12,1],u_color_bg:[.16,.09,.06,1]}}],uniforms:[{id:`u_density`,name:`Petal Density`,type:`float`,min:2,max:14,default:6},{id:`u_var`,name:`Size Variation`,type:`float`,min:0,max:1,default:.55},{id:`u_chaos`,name:`Rotation Chaos`,type:`float`,min:0,max:1,default:1},{id:`u_color_petal`,name:`Petal Color`,type:`color`,default:[.99,.78,.85,1]},{id:`u_color_accent`,name:`Petal Accent`,type:`color`,default:[.88,.45,.62,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[1,.96,.96,1]}]},cp=e({default:()=>lp}),lp={id:`salt_crystal_natural`,name:`Salt Crystal`,category:`Natural`,added:`2026-05-01`,description:`Cubic salt crystal formations of varying size seen from above, white and translucent on a dark substrate.`,shader:`
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float hash11(float p) { return fract(sin(p * 311.7) * 43758.5453); }
 
@@ -13266,7 +13510,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Crystal Density`,type:`float`,min:4,max:30,default:14},{id:`u_crystal_color`,name:`Crystal Color`,type:`color`,default:[.92,.93,.95,1]},{id:`u_background`,name:`Background`,type:`color`,default:[.08,.06,.08,1]}]},Xf=e({default:()=>Zf}),Zf={id:`salt_flat_patina`,name:`Salt Flat Patina`,category:`Heritage`,added:`2026-06-12`,description:`Sun-bleached land-speed racer paint — chalky faded colour breaking into bare primer islands, white salt crust caked along every wear edge, rust freckles and dried mineral runs.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Crystal Density`,type:`float`,min:4,max:30,default:14},{id:`u_crystal_color`,name:`Crystal Color`,type:`color`,default:[.92,.93,.95,1]},{id:`u_background`,name:`Background`,type:`color`,default:[.08,.06,.08,1]}]},up=e({default:()=>dp}),dp={id:`salt_flat_patina`,name:`Salt Flat Patina`,category:`Heritage`,added:`2026-06-12`,description:`Sun-bleached land-speed racer paint — chalky faded colour breaking into bare primer islands, white salt crust caked along every wear edge, rust freckles and dried mineral runs.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -13326,13 +13570,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_wear_level`,name:`Paint Wear`,type:`float`,min:.15,max:.75,default:.42},{id:`u_salt_amount`,name:`Salt Crust`,type:`float`,min:0,max:1.5,default:.9},{id:`u_paint_color`,name:`Original Paint`,type:`color`,default:[.78,.33,.12,1]}]},Qf=e({default:()=>$f}),$f={id:`sand_dunes_artisan`,name:`Sand Dunes`,category:`Natural`,added:`2026-04-15`,description:`Rippling wave-like ridges found in vast desert wastelands and oceanic floors.`,shader:`
+  `,uniforms:[{id:`u_wear_level`,name:`Paint Wear`,type:`float`,min:.15,max:.75,default:.42},{id:`u_salt_amount`,name:`Salt Crust`,type:`float`,min:0,max:1.5,default:.9},{id:`u_paint_color`,name:`Original Paint`,type:`color`,default:[.78,.33,.12,1]}]},fp=e({default:()=>pp}),pp={id:`sand_dunes_artisan`,name:`Sand Dunes`,category:`Natural`,added:`2026-04-15`,description:`Rippling wave-like ridges found in vast desert wastelands and oceanic floors.`,shader:`
     vec4 generate() {
       float waves = sin(v_uv.x * 20.0 * u_scale + sin(v_uv.y * 10.0));
       float mask = smoothstep(-0.5, 0.5, waves);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Dune Frequency`,type:`float`,min:.5,max:3,default:1},{id:`u_primary_color`,name:`Sunlight`,type:`color`,default:[.9,.7,.4,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[.4,.3,.15,1]}]},ep=e({default:()=>tp}),tp={id:`sandblasted_steel`,name:`Sandblasted Steel`,category:`Industrial`,added:`2026-05-01`,description:`Bead-blasted aluminium or steel with uniform isotropic micro-crater texture and soft satin sheen.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Dune Frequency`,type:`float`,min:.5,max:3,default:1},{id:`u_primary_color`,name:`Sunlight`,type:`color`,default:[.9,.7,.4,1]},{id:`u_secondary_color`,name:`Shadow`,type:`color`,default:[.4,.3,.15,1]}]},mp=e({default:()=>hp}),hp={id:`sandblasted_steel`,name:`Sandblasted Steel`,category:`Industrial`,added:`2026-05-01`,description:`Bead-blasted aluminium or steel with uniform isotropic micro-crater texture and soft satin sheen.`,shader:`
     // --- helpers BEFORE generate() ---
 
     // Isotropic 2D hash — uses both x and y, no directional bias
@@ -13400,14 +13644,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_metal_color`,name:`Metal Color`,type:`color`,default:[.72,.72,.72,1]},{id:`u_grit`,name:`Grit Size`,type:`float`,min:20,max:200,default:80},{id:`u_sheen`,name:`Surface Sheen`,type:`float`,min:0,max:1,default:.3}]},np=e({default:()=>rp}),rp={id:`sandstone_layers_artisan`,name:`Sandstone Strata`,category:`Geology`,added:`2026-04-16`,description:`Fine horizontal layers and sediments found in weathered sandstone walls.`,shader:`
+  `,uniforms:[{id:`u_metal_color`,name:`Metal Color`,type:`color`,default:[.72,.72,.72,1]},{id:`u_grit`,name:`Grit Size`,type:`float`,min:20,max:200,default:80},{id:`u_sheen`,name:`Surface Sheen`,type:`float`,min:0,max:1,default:.3}]},gp=e({default:()=>_p}),_p={id:`sandstone_layers_artisan`,name:`Sandstone Strata`,category:`Geology`,added:`2026-04-16`,description:`Fine horizontal layers and sediments found in weathered sandstone walls.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = v_uv.y * u_scale;
       float strata = hash(floor(y));
       return mix(u_secondary_color, u_primary_color, strata);
     }
-  `,uniforms:[{id:`u_scale`,name:`Strata Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Sediment High`,type:`color`,default:[.8,.6,.4,1]},{id:`u_secondary_color`,name:`Sediment Deep`,type:`color`,default:[.6,.4,.3,1]}]},ip=e({default:()=>ap}),ap={id:`sari_brocade`,name:`Sari Zari Brocade`,category:`Textile`,added:`2026-06-12`,description:`Banarasi sari brocade: gold zari paisleys and floral buti woven into lustrous silk, with metallic thread glints, supplementary-weft ridges and anisotropic silk sheen.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Strata Density`,type:`float`,min:20,max:200,default:100},{id:`u_primary_color`,name:`Sediment High`,type:`color`,default:[.8,.6,.4,1]},{id:`u_secondary_color`,name:`Sediment Deep`,type:`color`,default:[.6,.4,.3,1]}]},vp=e({default:()=>yp}),yp={id:`sari_brocade`,name:`Sari Zari Brocade`,category:`Textile`,added:`2026-06-12`,description:`Banarasi sari brocade: gold zari paisleys and floral buti woven into lustrous silk, with metallic thread glints, supplementary-weft ridges and anisotropic silk sheen.`,shader:`
     // teardrop / paisley distance: circle pulled into a curved tail
     float paisley_sar(vec2 p) {
       // bend space so the drop curls
@@ -13480,7 +13724,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_repeats`,name:`Paisley Repeats`,type:`float`,min:2,max:10,default:4},{id:`u_glint`,name:`Zari Glint`,type:`float`,min:0,max:1,default:.6},{id:`u_silk_color`,name:`Silk Color`,type:`color`,default:[.45,.06,.14,1]}]},op=e({default:()=>sp}),sp={id:`sashiko_stitch`,name:`Sashiko Stitch`,category:`Textile`,added:`2026-06-12`,description:`Japanese sashiko: white cotton running stitches laid in a stepped diamond grid over mottled hand-dyed indigo, each stitch a raised dash with pucker shadow.`,shader:`
+  `,uniforms:[{id:`u_repeats`,name:`Paisley Repeats`,type:`float`,min:2,max:10,default:4},{id:`u_glint`,name:`Zari Glint`,type:`float`,min:0,max:1,default:.6},{id:`u_silk_color`,name:`Silk Color`,type:`color`,default:[.45,.06,.14,1]}]},bp=e({default:()=>xp}),xp={id:`sashiko_stitch`,name:`Sashiko Stitch`,category:`Textile`,added:`2026-06-12`,description:`Japanese sashiko: white cotton running stitches laid in a stepped diamond grid over mottled hand-dyed indigo, each stitch a raised dash with pucker shadow.`,shader:`
     // Running stitch along a line: t = position along line, d = distance from line
     float stitch_ssk(float t, float d, float wobble) {
       float seg = fract(t);
@@ -13553,7 +13797,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grid`,name:`Stitch Grid`,type:`float`,min:3,max:16,default:7},{id:`u_diamonds`,name:`Diagonal Layers`,type:`float`,min:0,max:1,default:1}]},cp=e({default:()=>lp}),lp={id:`satellite_array`,name:`Satellite Array`,category:`Cosmos`,added:`2026-06-11`,description:`Orbital hardware skin — deep-blue photovoltaic cells in gridded panels, silver bus bars, kapton gold foil seams, and the odd sun-flash glint.`,shader:`
+  `,uniforms:[{id:`u_grid`,name:`Stitch Grid`,type:`float`,min:3,max:16,default:7},{id:`u_diamonds`,name:`Diagonal Layers`,type:`float`,min:0,max:1,default:1}]},Sp=e({default:()=>Cp}),Cp={id:`satellite_array`,name:`Satellite Array`,category:`Cosmos`,added:`2026-06-11`,description:`Orbital hardware skin — deep-blue photovoltaic cells in gridded panels, silver bus bars, kapton gold foil seams, and the odd sun-flash glint.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv);
 
@@ -13634,7 +13878,59 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_panel_count`,name:`Panel Count`,type:`float`,min:1,max:6,default:3},{id:`u_glint`,name:`Sun Glint`,type:`float`,min:0,max:2,default:1},{id:`u_foil`,name:`Kapton Seam`,type:`float`,min:0,max:1,default:.6},{id:`u_cell_color`,name:`Cell Colour`,type:`color`,default:[.07,.14,.38,1]}]},up=e({default:()=>dp}),dp={id:`sea_foam_lace`,name:`Sea Foam Lace`,category:`Ocean`,added:`2026-06-11`,description:`Frothy white lacework left by a receding wave — bubble webs, pinholes and torn foam edges over wet green glass.`,shader:`
+  `,uniforms:[{id:`u_panel_count`,name:`Panel Count`,type:`float`,min:1,max:6,default:3},{id:`u_glint`,name:`Sun Glint`,type:`float`,min:0,max:2,default:1},{id:`u_foil`,name:`Kapton Seam`,type:`float`,min:0,max:1,default:.6},{id:`u_cell_color`,name:`Cell Colour`,type:`color`,default:[.07,.14,.38,1]}]},wp=e({default:()=>Tp}),Tp={id:`scanline_glitch`,name:`Scanline Glitch`,category:`Technology`,added:`2026-07-09`,description:`A paused transmission tearing apart — displaced row bands, chromatic channel splits, hot cyan and magenta slivers, and bit-noise that intensifies toward one edge.`,shader:`
+    vec3 base_sg(vec2 uv) {
+      float tone = fbm(vec2(uv.x * 5.0, 2.7)) * 0.5 + 0.5;
+      float lum = 0.12 + tone * 0.22 + uv.y * 0.03;
+      return lum * vec3(0.92, 1.0, 1.22);
+    }
+
+    vec4 generate() {
+      vec2 uv = v_uv;
+      // glitch power grows toward the right edge — the fade direction
+      float inten = pow(clamp((uv.x - 0.05) / 0.95, 0.0, 1.0), 1.2) * u_power;
+
+      // two scales of row bands, each with its own displacement
+      float b1 = floor(uv.y * 23.0);
+      float b2 = floor(uv.y * 89.0);
+      float shift = (hash(vec2(b1, 1.7)) - 0.5) * 0.15 * step(0.25, hash(vec2(b1, 3.3)));
+      shift += (hash(vec2(b2, 5.1)) - 0.5) * 0.05 * step(0.6, hash(vec2(b2, 7.7)));
+      shift *= (0.25 + inten);
+
+      // chromatic tear: R and B channels pull apart
+      float k = (hash(vec2(b1, 9.9)) - 0.5) * 0.04 * step(0.45, hash(vec2(b1, 11.3))) * (0.3 + inten);
+      vec3 col;
+      col.r = base_sg(vec2(fract(uv.x + shift + k), uv.y)).r;
+      col.g = base_sg(vec2(fract(uv.x + shift), uv.y)).g;
+      col.b = base_sg(vec2(fract(uv.x + shift - k), uv.y)).b;
+
+      // luminance jump per band
+      col *= mix(1.0, 0.55 + hash(vec2(b1, 13.1)) * 1.05, step(0.72, hash(vec2(b1, 15.7))));
+
+      // hot slivers
+      float sb = floor(uv.y * 150.0);
+      if (hash(vec2(sb, 21.0)) > 0.965) {
+        float x0 = hash(vec2(sb, 23.0)) * 0.7;
+        float x1 = x0 + 0.13 + hash(vec2(sb, 25.0)) * 0.55;
+        if (uv.x > x0 && uv.x < x1) {
+          vec3 hcol = hash(vec2(sb, 27.0)) < 0.6 ? vec3(0.0, 1.0, 0.9) : vec3(1.0, 0.157, 0.63);
+          col = hcol * (0.5 + 0.5 * inten);
+        }
+      }
+
+      // bit-noise blocks, denser toward the hot edge
+      vec2 cell = floor(uv * 256.0);
+      vec2 blk = floor(uv * 32.0);
+      if (hash(cell) < inten * 0.16) {
+        col = hash(blk + 31.0) < 0.45 ? vec3(0.67, 0.92, 1.0) : col * 0.25;
+      }
+
+      // scanlines
+      col *= 1.0 - step(0.75, fract(uv.y * 300.0)) * 0.22;
+
+      return vec4(col, 1.0);
+    }
+  `,uniforms:[{id:`u_power`,name:`Glitch Power`,type:`float`,min:0,max:2,default:1}]},Ep=e({default:()=>Dp}),Dp={id:`sea_foam_lace`,name:`Sea Foam Lace`,category:`Ocean`,added:`2026-06-11`,description:`Frothy white lacework left by a receding wave — bubble webs, pinholes and torn foam edges over wet green glass.`,shader:`
     // Lace filament field: bright threads where noise crosses zero, two scales
     float lace_sfl(vec2 p, float seed) {
       float a = 1.0 - abs(snoise(p + seed));
@@ -13695,7 +13991,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Lace Scale`,type:`float`,min:2,max:14,default:6},{id:`u_coverage`,name:`Foam Coverage`,type:`float`,min:.1,max:1,default:.55},{id:`u_foam_color`,name:`Foam Color`,type:`color`,default:[.96,.98,.97,1]},{id:`u_sea_color`,name:`Sea Color`,type:`color`,default:[.05,.3,.28,1]}]},fp=e({default:()=>pp}),pp={id:`sea_glass`,name:`Sea Glass`,category:`Ocean`,added:`2026-07-07`,description:`Tumbled frosted glass pebbles in beach pastels, scattered on wet sand.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Lace Scale`,type:`float`,min:2,max:14,default:6},{id:`u_coverage`,name:`Foam Coverage`,type:`float`,min:.1,max:1,default:.55},{id:`u_foam_color`,name:`Foam Color`,type:`color`,default:[.96,.98,.97,1]},{id:`u_sea_color`,name:`Sea Color`,type:`color`,default:[.05,.3,.28,1]}]},Op=e({default:()=>kp}),kp={id:`sea_glass`,name:`Sea Glass`,category:`Ocean`,added:`2026-07-07`,description:`Tumbled frosted glass pebbles in beach pastels, scattered on wet sand.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // wet sand base with fine speckle
@@ -13733,7 +14029,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, glass, pebble);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Pebble Density`,type:`float`,min:2,max:14,default:6},{id:`u_gap`,name:`Spacing`,type:`float`,min:.02,max:.3,default:.1},{id:`u_secondary_color`,name:`Wet Sand`,type:`color`,default:[.72,.65,.52,1]},{id:`u_primary_color`,name:`Seafoam Glass`,type:`color`,default:[.6,.85,.75,1]},{id:`u_pop_color`,name:`Bottle Blue`,type:`color`,default:[.55,.75,.85,1]},{id:`u_accent_color`,name:`Rare Amber`,type:`color`,default:[.85,.7,.45,1]}],variants:[{name:`Beachcomber`,uniforms:{u_secondary_color:[.72,.65,.52,1],u_primary_color:[.6,.85,.75,1],u_pop_color:[.55,.75,.85,1],u_accent_color:[.85,.7,.45,1]}},{name:`Cobalt Finds`,uniforms:{u_secondary_color:[.55,.52,.48,1],u_primary_color:[.3,.45,.8,1],u_pop_color:[.5,.65,.9,1],u_accent_color:[.75,.8,.88,1]}},{name:`Rose Quartz Tide`,uniforms:{u_secondary_color:[.78,.72,.68,1],u_primary_color:[.9,.7,.75,1],u_pop_color:[.85,.8,.85,1],u_accent_color:[.95,.85,.7,1]}}]},mp=e({default:()=>hp}),hp={id:`sea_urchin_shell`,name:`Sea Urchin Shell`,category:`Ocean`,added:`2026-06-11`,description:`A bleached urchin test seen from above — five-fold sectors, beaded tubercle rows and pinprick pore pairs radiating from the apex.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pebble Density`,type:`float`,min:2,max:14,default:6},{id:`u_gap`,name:`Spacing`,type:`float`,min:.02,max:.3,default:.1},{id:`u_secondary_color`,name:`Wet Sand`,type:`color`,default:[.72,.65,.52,1]},{id:`u_primary_color`,name:`Seafoam Glass`,type:`color`,default:[.6,.85,.75,1]},{id:`u_pop_color`,name:`Bottle Blue`,type:`color`,default:[.55,.75,.85,1]},{id:`u_accent_color`,name:`Rare Amber`,type:`color`,default:[.85,.7,.45,1]}],variants:[{name:`Beachcomber`,uniforms:{u_secondary_color:[.72,.65,.52,1],u_primary_color:[.6,.85,.75,1],u_pop_color:[.55,.75,.85,1],u_accent_color:[.85,.7,.45,1]}},{name:`Cobalt Finds`,uniforms:{u_secondary_color:[.55,.52,.48,1],u_primary_color:[.3,.45,.8,1],u_pop_color:[.5,.65,.9,1],u_accent_color:[.75,.8,.88,1]}},{name:`Rose Quartz Tide`,uniforms:{u_secondary_color:[.78,.72,.68,1],u_primary_color:[.9,.7,.75,1],u_pop_color:[.85,.8,.85,1],u_accent_color:[.95,.85,.7,1]}}]},Ap=e({default:()=>jp}),jp={id:`sea_urchin_shell`,name:`Sea Urchin Shell`,category:`Ocean`,added:`2026-06-11`,description:`A bleached urchin test seen from above — five-fold sectors, beaded tubercle rows and pinprick pore pairs radiating from the apex.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float r = length(uv) * 2.0;
@@ -13801,7 +14097,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_plate_rows`,name:`Plate Rows`,type:`float`,min:4,max:16,default:8},{id:`u_bump_size`,name:`Tubercle Size`,type:`float`,min:.3,max:1.5,default:.8},{id:`u_shell_color`,name:`Shell Color`,type:`color`,default:[.58,.42,.52,1]}]},gp=e({default:()=>_p}),_p={id:`seat_perforation_artisan`,name:`Seat Perforation`,category:`Racing`,added:`2026-04-16`,description:`Grid of fine ventilation holes found in professional bucket seats and luxury automotive leather.`,shader:`
+  `,uniforms:[{id:`u_plate_rows`,name:`Plate Rows`,type:`float`,min:4,max:16,default:8},{id:`u_bump_size`,name:`Tubercle Size`,type:`float`,min:.3,max:1.5,default:.8},{id:`u_shell_color`,name:`Shell Color`,type:`color`,default:[.58,.42,.52,1]}]},Mp=e({default:()=>Np}),Np={id:`seat_perforation_artisan`,name:`Seat Perforation`,category:`Racing`,added:`2026-04-16`,description:`Grid of fine ventilation holes found in professional bucket seats and luxury automotive leather.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv) - 0.5;
@@ -13809,7 +14105,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.3, 0.28, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Hole Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Punch Hold`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Leather Surface`,type:`color`,default:[.1,.1,.1,1]}]},vp=e({default:()=>yp}),yp={id:`seigaiha_wave`,name:`Seigaiha Waves`,category:`Geometric`,added:`2026-06-11`,description:`The classic Japanese seigaiha wave pattern: staggered overlapping fans of crisp concentric semicircle arcs, like a stylized sea.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Hole Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Punch Hold`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Leather Surface`,type:`color`,default:[.1,.1,.1,1]}]},Pp=e({default:()=>Fp}),Fp={id:`seigaiha_wave`,name:`Seigaiha Waves`,category:`Geometric`,added:`2026-06-11`,description:`The classic Japanese seigaiha wave pattern: staggered overlapping fans of crisp concentric semicircle arcs, like a stylized sea.`,shader:`
 
     vec4 generate() {
       // Cell width 1.0, rows every 0.5 with alternate rows offset by half
@@ -13852,7 +14148,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 color = mix(u_color_bg, u_color_line, line);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Indigo`,uniforms:{u_color_line:[.93,.96,.98,1],u_color_bg:[.1,.2,.42,1]}},{name:`Gold on Black`,uniforms:{u_color_line:[.85,.68,.25,1],u_color_bg:[.05,.05,.06,1]}},{name:`Sakura Pink`,uniforms:{u_color_line:[1,.96,.97,1],u_color_bg:[.91,.55,.67,1]}},{name:`Mono`,uniforms:{u_color_line:[.12,.12,.13,1],u_color_bg:[.93,.93,.92,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:2,max:16,default:6},{id:`u_rings`,name:`Rings Per Fan`,type:`float`,min:2,max:10,default:5},{id:`u_line`,name:`Line Thickness`,type:`float`,min:.06,max:.9,default:.36},{id:`u_color_line`,name:`Line Color`,type:`color`,default:[.93,.96,.98,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.1,.2,.42,1]}]},bp=e({default:()=>xp}),xp={id:`septarian_nodule`,name:`Septarian Nodule`,category:`Geology`,added:`2026-06-12`,description:`Dragon stone — brown mudstone polygons split by wide yellow calcite veins with bright crystalline cores and a fine secondary crack web.`,shader:`
+  `,variants:[{name:`Indigo`,uniforms:{u_color_line:[.93,.96,.98,1],u_color_bg:[.1,.2,.42,1]}},{name:`Gold on Black`,uniforms:{u_color_line:[.85,.68,.25,1],u_color_bg:[.05,.05,.06,1]}},{name:`Sakura Pink`,uniforms:{u_color_line:[1,.96,.97,1],u_color_bg:[.91,.55,.67,1]}},{name:`Mono`,uniforms:{u_color_line:[.12,.12,.13,1],u_color_bg:[.93,.93,.92,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:2,max:16,default:6},{id:`u_rings`,name:`Rings Per Fan`,type:`float`,min:2,max:10,default:5},{id:`u_line`,name:`Line Thickness`,type:`float`,min:.06,max:.9,default:.36},{id:`u_color_line`,name:`Line Color`,type:`color`,default:[.93,.96,.98,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.1,.2,.42,1]}]},Ip=e({default:()=>Lp}),Lp={id:`septarian_nodule`,name:`Septarian Nodule`,category:`Geology`,added:`2026-06-12`,description:`Dragon stone — brown mudstone polygons split by wide yellow calcite veins with bright crystalline cores and a fine secondary crack web.`,shader:`
     vec2 hash2_sep(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -13930,7 +14226,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_cell_scale`,name:`Polygon Scale`,type:`float`,min:2,max:14,default:5},{id:`u_vein_width`,name:`Vein Width`,type:`float`,min:.1,max:1,default:.45},{id:`u_vein_color`,name:`Calcite Color`,type:`color`,default:[.88,.68,.22,1]}]},Sp=e({default:()=>Cp}),Cp={id:`serpentinite`,name:`Serpentinite`,category:`Geology`,added:`2026-06-12`,description:`Waxy serpentinite — mottled green-black scales threaded by pale chrysotile veins, with slickenside streaks and a greasy polish.`,shader:`
+  `,uniforms:[{id:`u_cell_scale`,name:`Polygon Scale`,type:`float`,min:2,max:14,default:5},{id:`u_vein_width`,name:`Vein Width`,type:`float`,min:.1,max:1,default:.45},{id:`u_vein_color`,name:`Calcite Color`,type:`color`,default:[.88,.68,.22,1]}]},Rp=e({default:()=>zp}),zp={id:`serpentinite`,name:`Serpentinite`,category:`Geology`,added:`2026-06-12`,description:`Waxy serpentinite — mottled green-black scales threaded by pale chrysotile veins, with slickenside streaks and a greasy polish.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -13981,7 +14277,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_vein_scale`,name:`Vein Scale`,type:`float`,min:2,max:14,default:5},{id:`u_vein_strength`,name:`Vein Strength`,type:`float`,min:0,max:1.5,default:.9},{id:`u_waxiness`,name:`Waxy Lustre`,type:`float`,min:0,max:2,default:1},{id:`u_green_color`,name:`Serpentine Green`,type:`color`,default:[.22,.42,.28,1]}]},wp=e({default:()=>Tp}),Tp={id:`server_rack_mesh_artisan`,name:`Server Mesh`,category:`Industrial`,added:`2026-04-16`,description:`Industrial perforated metal mesh found on high-density enterprise server racks.`,shader:`
+  `,uniforms:[{id:`u_vein_scale`,name:`Vein Scale`,type:`float`,min:2,max:14,default:5},{id:`u_vein_strength`,name:`Vein Strength`,type:`float`,min:0,max:1.5,default:.9},{id:`u_waxiness`,name:`Waxy Lustre`,type:`float`,min:0,max:2,default:1},{id:`u_green_color`,name:`Serpentine Green`,type:`color`,default:[.22,.42,.28,1]}]},Bp=e({default:()=>Vp}),Vp={id:`server_rack_mesh_artisan`,name:`Server Mesh`,category:`Industrial`,added:`2026-04-16`,description:`Industrial perforated metal mesh found on high-density enterprise server racks.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -13990,7 +14286,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.45, 0.42, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Mesh Zoom`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Steel Rack`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[0,0,0,1]}]},Ep=e({default:()=>Dp}),Dp={id:`seven_segment`,name:`Seven Segment`,category:`Technology`,added:`2026-07-07`,description:`A wall of LED digit displays — glowing segments with faint unlit ghosts behind.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Mesh Zoom`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Steel Rack`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[0,0,0,1]}]},Hp=e({default:()=>Up}),Up={id:`seven_segment`,name:`Seven Segment`,category:`Technology`,added:`2026-07-07`,description:`A wall of LED digit displays — glowing segments with faint unlit ghosts behind.`,shader:`
     float seg(vec2 p, vec2 c, vec2 halfSize) {
       vec2 d = abs(p - c) - halfSize;
       return smoothstep(0.015, 0.0, max(d.x, d.y));
@@ -14031,7 +14327,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb += u_primary_color.rgb * lit * 0.5; // bloom
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Digit Density`,type:`float`,min:3,max:24,default:9},{id:`u_duty`,name:`Segments Lit`,type:`float`,min:.1,max:1,default:.6},{id:`u_primary_color`,name:`LED`,type:`color`,default:[1,.25,.1,1]},{id:`u_secondary_color`,name:`Panel`,type:`color`,default:[.05,.03,.03,1]}],variants:[{name:`Red LED`,uniforms:{u_primary_color:[1,.25,.1,1],u_secondary_color:[.05,.03,.03,1],u_duty:.6}},{name:`Pit Board Green`,uniforms:{u_primary_color:[.3,1,.3,1],u_secondary_color:[.02,.05,.02,1],u_duty:.55}},{name:`Ice Blue`,uniforms:{u_primary_color:[.4,.8,1,1],u_secondary_color:[.02,.03,.06,1],u_duty:.75}}]},Op=e({default:()=>kp}),kp={id:`seventies_rainbow_arcs`,name:`70s Rainbow Arcs`,category:`Retro`,added:`2026-07-07`,description:`Supergraphic rainbow bands sweeping in quarter-circles from alternating corners.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Digit Density`,type:`float`,min:3,max:24,default:9},{id:`u_duty`,name:`Segments Lit`,type:`float`,min:.1,max:1,default:.6},{id:`u_primary_color`,name:`LED`,type:`color`,default:[1,.25,.1,1]},{id:`u_secondary_color`,name:`Panel`,type:`color`,default:[.05,.03,.03,1]}],variants:[{name:`Red LED`,uniforms:{u_primary_color:[1,.25,.1,1],u_secondary_color:[.05,.03,.03,1],u_duty:.6}},{name:`Pit Board Green`,uniforms:{u_primary_color:[.3,1,.3,1],u_secondary_color:[.02,.05,.02,1],u_duty:.55}},{name:`Ice Blue`,uniforms:{u_primary_color:[.4,.8,1,1],u_secondary_color:[.02,.03,.06,1],u_duty:.75}}]},Wp=e({default:()=>Gp}),Gp={id:`seventies_rainbow_arcs`,name:`70s Rainbow Arcs`,category:`Retro`,added:`2026-07-07`,description:`Supergraphic rainbow bands sweeping in quarter-circles from alternating corners.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -14056,7 +14352,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       outc *= 1.0 - seam * u_seams * 0.25;
       return vec4(outc, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Arc Density`,type:`float`,min:1,max:8,default:2},{id:`u_bands`,name:`Band Count`,type:`float`,min:3,max:12,default:6},{id:`u_seams`,name:`Seam Lines`,type:`float`,min:0,max:1,default:.4},{id:`u_secondary_color`,name:`Field`,type:`color`,default:[.94,.9,.8,1]},{id:`u_primary_color`,name:`Inner Band`,type:`color`,default:[.85,.25,.15,1]},{id:`u_accent_color`,name:`Middle Band`,type:`color`,default:[.9,.6,.15,1]},{id:`u_pop_color`,name:`Outer Band`,type:`color`,default:[.35,.45,.3,1]}],variants:[{name:`Harvest Kitchen`,uniforms:{u_secondary_color:[.94,.9,.8,1],u_primary_color:[.85,.25,.15,1],u_accent_color:[.9,.6,.15,1],u_pop_color:[.35,.45,.3,1],u_bands:6}},{name:`Roller Disco`,uniforms:{u_secondary_color:[.1,.08,.16,1],u_primary_color:[.95,.35,.65,1],u_accent_color:[.5,.35,.85,1],u_pop_color:[.2,.75,.85,1],u_bands:8}},{name:`Sunroom`,uniforms:{u_secondary_color:[.97,.95,.9,1],u_primary_color:[.95,.75,.3,1],u_accent_color:[.9,.55,.35,1],u_pop_color:[.75,.4,.45,1],u_bands:5}}]},Ap=e({default:()=>jp}),jp={id:`shark_denticles`,name:`Shark Denticles`,category:`Ocean`,added:`2026-06-11`,description:`Overlapping rows of ridged dermal denticles — microscopic shark-skin armor combed in one drag-cutting direction.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Arc Density`,type:`float`,min:1,max:8,default:2},{id:`u_bands`,name:`Band Count`,type:`float`,min:3,max:12,default:6},{id:`u_seams`,name:`Seam Lines`,type:`float`,min:0,max:1,default:.4},{id:`u_secondary_color`,name:`Field`,type:`color`,default:[.94,.9,.8,1]},{id:`u_primary_color`,name:`Inner Band`,type:`color`,default:[.85,.25,.15,1]},{id:`u_accent_color`,name:`Middle Band`,type:`color`,default:[.9,.6,.15,1]},{id:`u_pop_color`,name:`Outer Band`,type:`color`,default:[.35,.45,.3,1]}],variants:[{name:`Harvest Kitchen`,uniforms:{u_secondary_color:[.94,.9,.8,1],u_primary_color:[.85,.25,.15,1],u_accent_color:[.9,.6,.15,1],u_pop_color:[.35,.45,.3,1],u_bands:6}},{name:`Roller Disco`,uniforms:{u_secondary_color:[.1,.08,.16,1],u_primary_color:[.95,.35,.65,1],u_accent_color:[.5,.35,.85,1],u_pop_color:[.2,.75,.85,1],u_bands:8}},{name:`Sunroom`,uniforms:{u_secondary_color:[.97,.95,.9,1],u_primary_color:[.95,.75,.3,1],u_accent_color:[.9,.55,.35,1],u_pop_color:[.75,.4,.45,1],u_bands:5}}]},Kp=e({default:()=>qp}),qp={id:`shark_denticles`,name:`Shark Denticles`,category:`Ocean`,added:`2026-06-11`,description:`Overlapping rows of ridged dermal denticles — microscopic shark-skin armor combed in one drag-cutting direction.`,shader:`
     // Signed shape of one denticle: tri-ridged teardrop pointing +x
     // Returns vec2(mask, ridge_height)
     vec2 denticle_shd(vec2 p, float ridge_amt) {
@@ -14129,7 +14425,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Denticle Density`,type:`float`,min:6,max:40,default:18},{id:`u_ridges`,name:`Ridge Strength`,type:`float`,min:0,max:1,default:.7},{id:`u_skin_color`,name:`Skin Color`,type:`color`,default:[.42,.5,.58,1]}]},Mp=e({default:()=>Np}),Np={id:`shibori_dye`,name:`Shibori Indigo`,category:`Textile`,added:`2026-06-12`,description:`Japanese shibori: bound-resist kumo circles blooming white out of deep indigo, crossed by accordion pleat lines where the folded cloth resisted the vat.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Denticle Density`,type:`float`,min:6,max:40,default:18},{id:`u_ridges`,name:`Ridge Strength`,type:`float`,min:0,max:1,default:.7},{id:`u_skin_color`,name:`Skin Color`,type:`color`,default:[.42,.5,.58,1]}]},Jp=e({default:()=>Yp}),Yp={id:`shibori_dye`,name:`Shibori Indigo`,category:`Textile`,added:`2026-06-12`,description:`Japanese shibori: bound-resist kumo circles blooming white out of deep indigo, crossed by accordion pleat lines where the folded cloth resisted the vat.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -14188,12 +14484,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_circles`,name:`Circle Repeats`,type:`float`,min:1,max:8,default:3},{id:`u_pleats`,name:`Pleat Lines`,type:`float`,min:4,max:30,default:12}]},Pp=e({default:()=>Fp}),Fp={id:`shift_boot_leather_artisan`,name:`Shift Boot Leather`,category:`Racing`,added:`2026-04-16`,description:`Organic crumpled leather folds and distressed textures found in shift boots and gaiters.`,shader:`
+  `,uniforms:[{id:`u_circles`,name:`Circle Repeats`,type:`float`,min:1,max:8,default:3},{id:`u_pleats`,name:`Pleat Lines`,type:`float`,min:4,max:30,default:12}]},Xp=e({default:()=>Zp}),Zp={id:`shift_boot_leather_artisan`,name:`Shift Boot Leather`,category:`Racing`,added:`2026-04-16`,description:`Organic crumpled leather folds and distressed textures found in shift boots and gaiters.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 10.0 + noise(v_uv * 5.0) * 2.0);
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Leather High`,type:`color`,default:[.12,.1,.08,1]},{id:`u_secondary_color`,name:`Fold Shadow`,type:`color`,default:[.05,.04,.03,1]}]},Ip=e({default:()=>Lp}),Lp={id:`shipwreck_hull`,name:`Shipwreck Hull`,category:`Ocean`,added:`2026-06-11`,description:`Riveted wreck plating decades under salt water — weeping rust streaks, blistered paint and creeping barnacle colonies.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Leather High`,type:`color`,default:[.12,.1,.08,1]},{id:`u_secondary_color`,name:`Fold Shadow`,type:`color`,default:[.05,.04,.03,1]}]},Qp=e({default:()=>$p}),$p={id:`shipwreck_hull`,name:`Shipwreck Hull`,category:`Ocean`,added:`2026-06-11`,description:`Riveted wreck plating decades under salt water — weeping rust streaks, blistered paint and creeping barnacle colonies.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -14267,7 +14563,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_plates`,name:`Plate Scale`,type:`float`,min:2,max:10,default:4},{id:`u_rust`,name:`Rust Amount`,type:`float`,min:0,max:1,default:.55},{id:`u_growth`,name:`Marine Growth`,type:`float`,min:0,max:1,default:.5},{id:`u_hull_color`,name:`Hull Paint`,type:`color`,default:[.13,.2,.24,1]}]},Rp=e({default:()=>zp}),zp={id:`shoji_screen`,name:`Shoji Screen`,category:`Architecture`,added:`2026-06-12`,description:`Backlit shoji — washi paper glowing with diffuse daylight, long paper fibres visible in the sheet, a hinoki kumiko lattice in front with a finer inner subdivision and soft light bleeding around every bar.`,shader:`
+  `,uniforms:[{id:`u_plates`,name:`Plate Scale`,type:`float`,min:2,max:10,default:4},{id:`u_rust`,name:`Rust Amount`,type:`float`,min:0,max:1,default:.55},{id:`u_growth`,name:`Marine Growth`,type:`float`,min:0,max:1,default:.5},{id:`u_hull_color`,name:`Hull Paint`,type:`color`,default:[.13,.2,.24,1]}]},em=e({default:()=>tm}),tm={id:`shoji_screen`,name:`Shoji Screen`,category:`Architecture`,added:`2026-06-12`,description:`Backlit shoji — washi paper glowing with diffuse daylight, long paper fibres visible in the sheet, a hinoki kumiko lattice in front with a finer inner subdivision and soft light bleeding around every bar.`,shader:`
     float hash_shj(vec2 p) {
       return fract(sin(dot(p, vec2(143.9, 289.3))) * 36911.4159);
     }
@@ -14349,7 +14645,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_panes`,name:`Panes`,type:`float`,min:1,max:6,default:2},{id:`u_backlight`,name:`Backlight`,type:`float`,min:.4,max:1.6,default:1},{id:`u_paper_color`,name:`Washi`,type:`color`,default:[.96,.92,.82,1]},{id:`u_wood_color`,name:`Kumiko`,type:`color`,default:[.42,.3,.2,1]}]},Bp=e({default:()=>Vp}),Vp={id:`sierpinski_carpet_artisan`,name:`Fractal Carpet`,category:`Abstract`,added:`2026-04-16`,description:`Recursive square fractal grid structures found in high-performance digital logic layouts.`,shader:`
+  `,uniforms:[{id:`u_panes`,name:`Panes`,type:`float`,min:1,max:6,default:2},{id:`u_backlight`,name:`Backlight`,type:`float`,min:.4,max:1.6,default:1},{id:`u_paper_color`,name:`Washi`,type:`color`,default:[.96,.92,.82,1]},{id:`u_wood_color`,name:`Kumiko`,type:`color`,default:[.42,.3,.2,1]}]},nm=e({default:()=>rm}),rm={id:`sierpinski_carpet_artisan`,name:`Fractal Carpet`,category:`Abstract`,added:`2026-04-16`,description:`Recursive square fractal grid structures found in high-performance digital logic layouts.`,shader:`
     vec4 generate() {
         vec2 uv = v_uv;
         float mask = 0.0;
@@ -14363,7 +14659,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         }
         return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Logic High`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Deep Silicon`,type:`color`,default:[0,.05,.1,1]}]},Hp=e({default:()=>Up}),Up={id:`sierpinski_mesh_artisan`,name:`Fractal Mesh`,category:`Abstract`,added:`2026-04-16`,description:`Recursive Sierpinski triangle fractal structures found in high-performance lightweight parts.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Logic High`,type:`color`,default:[0,1,1,1]},{id:`u_secondary_color`,name:`Deep Silicon`,type:`color`,default:[0,.05,.1,1]}]},im=e({default:()=>am}),am={id:`sierpinski_mesh_artisan`,name:`Fractal Mesh`,category:`Abstract`,added:`2026-04-16`,description:`Recursive Sierpinski triangle fractal structures found in high-performance lightweight parts.`,shader:`
     vec4 generate() {
         vec2 uv = v_uv;
         float mask = 0.0;
@@ -14377,7 +14673,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         }
         return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Fractal Web`,type:`color`,default:[0,1,.5,1]},{id:`u_secondary_color`,name:`Fractal Hole`,type:`color`,default:[0,.1,.05,1]}]},Wp=e({default:()=>Gp}),Gp={id:`single_rivet_line_artisan`,name:`Single Rivet Row`,category:`Industrial`,added:`2026-04-16`,description:`A single linear row of industrial rivets for precision panel seams.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Fractal Web`,type:`color`,default:[0,1,.5,1]},{id:`u_secondary_color`,name:`Fractal Hole`,type:`color`,default:[0,.1,.05,1]}]},om=e({default:()=>sm}),sm={id:`single_rivet_line_artisan`,name:`Single Rivet Row`,category:`Industrial`,added:`2026-04-16`,description:`A single linear row of industrial rivets for precision panel seams.`,shader:`
     vec4 generate() {
       // Create a vertical center mask
       float rowMask = step(0.45, v_uv.y) * step(v_uv.y, 0.55);
@@ -14392,13 +14688,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 col = mix(u_secondary_color, u_primary_color, rivet);
       return mix(col, vec4(0.0, 0.0, 0.0, 1.0), (shadow - rivet) * 0.5);
     }
-  `,uniforms:[{id:`u_scale`,name:`Rivet Count`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rivet Head`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.3,.3,.32,1]}]},Kp=e({default:()=>qp}),qp={id:`skeletal_mesh_artisan`,name:`Skeletal Mesh`,category:`Abstract`,added:`2026-04-15`,description:`Periodic rib-like line patterns with organic jitter found in anatomical structures.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Rivet Count`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rivet Head`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.3,.3,.32,1]}]},cm=e({default:()=>lm}),lm={id:`skeletal_mesh_artisan`,name:`Skeletal Mesh`,category:`Abstract`,added:`2026-04-15`,description:`Periodic rib-like line patterns with organic jitter found in anatomical structures.`,shader:`
     vec4 generate() {
       float ribs = sin(v_uv.y * 50.0 * u_scale + sin(v_uv.x * 20.0));
       float mask = smoothstep(0.0, 0.1, ribs);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Rib Frequency`,type:`float`,min:.1,max:2,default:1},{id:`u_primary_color`,name:`Bone`,type:`color`,default:[.9,.9,.85,1]},{id:`u_secondary_color`,name:`Marrow`,type:`color`,default:[.1,.05,.05,1]}]},Jp=e({default:()=>Yp}),Yp={id:`slate_rock_natural`,name:`Slate Rock`,category:`Natural`,added:`2026-05-01`,description:`Dark layered slate with parallel cleavage planes, fine horizontal grain, and occasional crossing fracture lines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Rib Frequency`,type:`float`,min:.1,max:2,default:1},{id:`u_primary_color`,name:`Bone`,type:`color`,default:[.9,.9,.85,1]},{id:`u_secondary_color`,name:`Marrow`,type:`color`,default:[.1,.05,.05,1]}]},um=e({default:()=>dm}),dm={id:`slate_rock_natural`,name:`Slate Rock`,category:`Natural`,added:`2026-05-01`,description:`Dark layered slate with parallel cleavage planes, fine horizontal grain, and occasional crossing fracture lines.`,shader:`
     float hash11(float p)  { return fract(sin(p * 127.1) * 43758.5453); }
     float hash21(vec2 p)   { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
@@ -14457,7 +14753,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(baseCol, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_layer_freq`,name:`Layer Frequency`,type:`float`,min:4,max:40,default:16},{id:`u_base_color`,name:`Slate Color`,type:`color`,default:[.22,.24,.27,1]},{id:`u_fracture`,name:`Fracture Density`,type:`float`,min:0,max:1,default:.4}]},Xp=e({default:()=>Zp}),Zp={id:`slot_reels`,name:`Slot Reels`,category:`Retro`,added:`2026-06-11`,description:`One-armed-bandit reel strips behind glass — cherries, BAR plates, lucky sevens and gold bells on cream stock, each drum rounding away into chrome dividers.`,shader:`
+  `,uniforms:[{id:`u_layer_freq`,name:`Layer Frequency`,type:`float`,min:4,max:40,default:16},{id:`u_base_color`,name:`Slate Color`,type:`color`,default:[.22,.24,.27,1]},{id:`u_fracture`,name:`Fracture Density`,type:`float`,min:0,max:1,default:.4}]},fm=e({default:()=>pm}),pm={id:`slot_reels`,name:`Slot Reels`,category:`Retro`,added:`2026-06-11`,description:`One-armed-bandit reel strips behind glass — cherries, BAR plates, lucky sevens and gold bells on cream stock, each drum rounding away into chrome dividers.`,shader:`
     // distance from point to line segment
     float seg_sr(vec2 p, vec2 a, vec2 b) {
       vec2 pa = p - a; vec2 ba = b - a;
@@ -14553,7 +14849,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_reel_count`,name:`Reels`,type:`float`,min:2,max:6,default:3},{id:`u_shade`,name:`Drum Curvature`,type:`float`,min:0,max:1,default:.6},{id:`u_accent_color`,name:`Gold Trim`,type:`color`,default:[.85,.65,.2,1]}]},Qp=e({default:()=>$p}),$p={id:`smpte_bars`,name:`SMPTE Bars`,category:`Retro`,added:`2026-06-11`,description:`The broadcast test card itself — 75% colour bars over castellations, -I/+Q chroma patches and the PLUGE strip, softened by a breath of analogue transmission noise.`,shader:`
+  `,uniforms:[{id:`u_reel_count`,name:`Reels`,type:`float`,min:2,max:6,default:3},{id:`u_shade`,name:`Drum Curvature`,type:`float`,min:0,max:1,default:.6},{id:`u_accent_color`,name:`Gold Trim`,type:`color`,default:[.85,.65,.2,1]}]},mm=e({default:()=>hm}),hm={id:`smpte_bars`,name:`SMPTE Bars`,category:`Retro`,added:`2026-06-11`,description:`The broadcast test card itself — 75% colour bars over castellations, -I/+Q chroma patches and the PLUGE strip, softened by a breath of analogue transmission noise.`,shader:`
     vec3 topbar_sb(float i, float lvl) {
       if (i < 0.5) return vec3(lvl);                 // grey
       if (i < 1.5) return vec3(lvl, lvl, 0.0);       // yellow
@@ -14624,7 +14920,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_bar_level`,name:`Bar Level`,type:`float`,min:.5,max:1,default:.75},{id:`u_softness`,name:`Analogue Softness`,type:`float`,min:0,max:1,default:.4},{id:`u_signal_noise`,name:`Signal Noise`,type:`float`,min:0,max:.3,default:.06}]},em=e({default:()=>tm}),tm={id:`snake_skin_artisan`,name:`Snake Skin`,category:`Natural`,added:`2026-04-15`,description:`Precisely interlocking reptilian scales with organic variance.`,shader:`
+  `,uniforms:[{id:`u_bar_level`,name:`Bar Level`,type:`float`,min:.5,max:1,default:.75},{id:`u_softness`,name:`Analogue Softness`,type:`float`,min:0,max:1,default:.4},{id:`u_signal_noise`,name:`Signal Noise`,type:`float`,min:0,max:.3,default:.06}]},gm=e({default:()=>_m}),_m={id:`snake_skin_artisan`,name:`Snake Skin`,category:`Natural`,added:`2026-04-15`,description:`Precisely interlocking reptilian scales with organic variance.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -14635,7 +14931,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Scale Color`,type:`color`,default:[.2,.4,.1,1]},{id:`u_secondary_color`,name:`Underlayer`,type:`color`,default:[.05,.1,.02,1]}]},nm=e({default:()=>rm}),rm={id:`snake_skin_v2_artisan`,name:`Viper Scales`,category:`Natural`,added:`2026-04-16`,description:`Interlocking diamond scales found in aggressive predatory reptilian hide.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Density`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Scale Color`,type:`color`,default:[.2,.4,.1,1]},{id:`u_secondary_color`,name:`Underlayer`,type:`color`,default:[.05,.1,.02,1]}]},vm=e({default:()=>ym}),ym={id:`snake_skin_v2_artisan`,name:`Viper Scales`,category:`Natural`,added:`2026-04-16`,description:`Interlocking diamond scales found in aggressive predatory reptilian hide.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -14644,7 +14940,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.48, 0.46, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Dorsal Scale`,type:`color`,default:[.1,.2,.1,1]},{id:`u_secondary_color`,name:`Inter-scale`,type:`color`,default:[0,0,0,1]}]},im=e({default:()=>am}),am={id:`snowflake_obsidian`,name:`Snowflake Obsidian`,category:`Geology`,added:`2026-06-12`,description:`Jet-black volcanic glass dotted with grey radial cristobalite rosettes — feathery snowflake spherulites on a glossy dark field.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale Zoom`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Dorsal Scale`,type:`color`,default:[.1,.2,.1,1]},{id:`u_secondary_color`,name:`Inter-scale`,type:`color`,default:[0,0,0,1]}]},bm=e({default:()=>xm}),xm={id:`snowflake_obsidian`,name:`Snowflake Obsidian`,category:`Geology`,added:`2026-06-12`,description:`Jet-black volcanic glass dotted with grey radial cristobalite rosettes — feathery snowflake spherulites on a glossy dark field.`,shader:`
     vec2 hash2_sfo(vec2 p) {
       return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
     }
@@ -14721,7 +15017,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rosette_scale`,name:`Rosette Scale`,type:`float`,min:2,max:14,default:5},{id:`u_rosette_density`,name:`Rosette Density`,type:`float`,min:.1,max:1,default:.45},{id:`u_rosette_color`,name:`Snowflake Grey`,type:`color`,default:[.62,.63,.6,1]}]},om=e({default:()=>sm}),sm={id:`soap_bubble_abstract`,name:`Soap Bubble`,category:`Abstract`,added:`2026-05-01`,description:`Iridescent soap film with thin-film interference hues, Newton ring bands, and a dark background.`,shader:`
+  `,uniforms:[{id:`u_rosette_scale`,name:`Rosette Scale`,type:`float`,min:2,max:14,default:5},{id:`u_rosette_density`,name:`Rosette Density`,type:`float`,min:.1,max:1,default:.45},{id:`u_rosette_color`,name:`Snowflake Grey`,type:`color`,default:[.62,.63,.6,1]}]},Sm=e({default:()=>Cm}),Cm={id:`soap_bubble_abstract`,name:`Soap Bubble`,category:`Abstract`,added:`2026-05-01`,description:`Iridescent soap film with thin-film interference hues, Newton ring bands, and a dark background.`,shader:`
     float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
     float smoothNoise(vec2 p) {
@@ -14785,7 +15081,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(finalCol, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_bubble_size`,name:`Bubble Size`,type:`float`,min:.5,max:3,default:1.2},{id:`u_iridescence`,name:`Iridescence`,type:`float`,min:.5,max:3,default:1.8},{id:`u_background`,name:`Background Color`,type:`color`,default:[.02,.02,.04,1]}]},cm=e({default:()=>lm}),lm={id:`solar_flare_pro`,name:`Solar Flare`,category:`Abstract`,added:`2026-04-15`,description:`Static plasma energy flux with high-intensity radiation centers.`,shader:`
+  `,uniforms:[{id:`u_bubble_size`,name:`Bubble Size`,type:`float`,min:.5,max:3,default:1.2},{id:`u_iridescence`,name:`Iridescence`,type:`float`,min:.5,max:3,default:1.8},{id:`u_background`,name:`Background Color`,type:`color`,default:[.02,.02,.04,1]}]},wm=e({default:()=>Tm}),Tm={id:`solar_flare_pro`,name:`Solar Flare`,category:`Abstract`,added:`2026-04-15`,description:`Static plasma energy flux with high-intensity radiation centers.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // Removed time dependency
@@ -14793,7 +15089,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float flare = pow(n, 3.0) * 2.0;
       return mix(u_secondary_color, u_primary_color, flare);
     }
-  `,uniforms:[{id:`u_scale`,name:`Flare Scale`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Plasma Heat`,type:`color`,default:[1,.8,.2,1]},{id:`u_secondary_color`,name:`Corona`,type:`color`,default:[.5,.1,0,1]}]},um=e({default:()=>dm}),dm={id:`solar_flares_v2_artisan`,name:`Solar Corona`,category:`Natural`,added:`2026-04-15`,description:`Abstract high-energy atmospheric flares and plasma smears from a stellar corona.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Flare Scale`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Plasma Heat`,type:`color`,default:[1,.8,.2,1]},{id:`u_secondary_color`,name:`Corona`,type:`color`,default:[.5,.1,0,1]}]},Em=e({default:()=>Dm}),Dm={id:`solar_flares_v2_artisan`,name:`Solar Corona`,category:`Natural`,added:`2026-04-15`,description:`Abstract high-energy atmospheric flares and plasma smears from a stellar corona.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * 2.0;
       float d = length(uv);
@@ -14802,7 +15098,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.5, 0.8, d + n * 0.2);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Core`,type:`color`,default:[1,.9,.3,1]},{id:`u_secondary_color`,name:`Ejection`,type:`color`,default:[.8,.2,0,0]}]},fm=e({default:()=>pm}),pm={id:`sonar_ping`,name:`Sonar Ping`,category:`Ocean`,added:`2026-06-11`,description:`A submarine sonar scope mid-sweep: phosphor range rings, bearing spokes, a fading sweep wedge, and hot contact blips.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Core`,type:`color`,default:[1,.9,.3,1]},{id:`u_secondary_color`,name:`Ejection`,type:`color`,default:[.8,.2,0,0]}]},Om=e({default:()=>km}),km={id:`sonar_ping`,name:`Sonar Ping`,category:`Ocean`,added:`2026-06-11`,description:`A submarine sonar scope mid-sweep: phosphor range rings, bearing spokes, a fading sweep wedge, and hot contact blips.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float r = length(uv) * 2.0;          // 0 centre → 1 scope edge
@@ -14866,7 +15162,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rings`,name:`Range Rings`,type:`float`,min:2,max:10,default:5},{id:`u_sweep`,name:`Sweep Bearing`,type:`float`,min:0,max:1,default:.62},{id:`u_contacts`,name:`Contact Density`,type:`float`,min:0,max:1,default:.55},{id:`u_screen_color`,name:`Phosphor Color`,type:`color`,default:[.2,1,.45,1]}]},mm=e({default:()=>hm}),hm={id:`sound_wave_eq`,name:`Sound Wave EQ`,category:`Abstract`,added:`2026-06-11`,description:`A frozen spectrum analyzer: vertical equalizer bars of random heights rising from the baseline, segmented into LED blocks with a hot peak tip.`,shader:`
+  `,uniforms:[{id:`u_rings`,name:`Range Rings`,type:`float`,min:2,max:10,default:5},{id:`u_sweep`,name:`Sweep Bearing`,type:`float`,min:0,max:1,default:.62},{id:`u_contacts`,name:`Contact Density`,type:`float`,min:0,max:1,default:.55},{id:`u_screen_color`,name:`Phosphor Color`,type:`color`,default:[.2,1,.45,1]}]},Am=e({default:()=>jm}),jm={id:`sound_wave_eq`,name:`Sound Wave EQ`,category:`Abstract`,added:`2026-06-11`,description:`A frozen spectrum analyzer: vertical equalizer bars of random heights rising from the baseline, segmented into LED blocks with a hot peak tip.`,shader:`
 
     vec4 generate() {
       float bars = floor(u_bars + 0.5);
@@ -14915,7 +15211,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 color = mix(u_color_bg, vec4(rgb, alpha), lit);
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Neon Green`,uniforms:{u_color_bar:[.1,.9,.3,1],u_color_tip:[1,.3,.15,1],u_color_bg:[.03,.04,.04,1]}},{name:`Sunset Meter`,uniforms:{u_color_bar:[.98,.45,.12,1],u_color_tip:[1,.9,.4,1],u_color_bg:[.12,.04,.14,1]}},{name:`Ice Blue`,uniforms:{u_color_bar:[.25,.7,.95,1],u_color_tip:[.95,.99,1,1],u_color_bg:[.02,.04,.1,1]}},{name:`Magma`,uniforms:{u_color_bar:[.75,.12,.05,1],u_color_tip:[1,.85,.25,1],u_color_bg:[.04,.02,.02,1]}}],uniforms:[{id:`u_bars`,name:`Bar Count`,type:`float`,min:8,max:96,default:32},{id:`u_segments`,name:`LED Segments (0 = solid)`,type:`float`,min:0,max:40,default:18},{id:`u_gap`,name:`Gap Thickness`,type:`float`,min:0,max:.6,default:.25},{id:`u_color_bar`,name:`Bar Color`,type:`color`,default:[.1,.9,.3,1]},{id:`u_color_tip`,name:`Peak Tip Color`,type:`color`,default:[1,.3,.15,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.03,.04,.04,1]}]},gm=e({default:()=>_m}),_m={id:`southwest_blanket`,name:`Southwest Blanket`,category:`Textile`,added:`2026-06-12`,description:`Serape-style southwest blanket: stepped diamond bands in cream, red, black and turquoise wool, woven with coarse weft ribs, lanolin sheen and handspun slubs.`,shader:`
+  `,variants:[{name:`Neon Green`,uniforms:{u_color_bar:[.1,.9,.3,1],u_color_tip:[1,.3,.15,1],u_color_bg:[.03,.04,.04,1]}},{name:`Sunset Meter`,uniforms:{u_color_bar:[.98,.45,.12,1],u_color_tip:[1,.9,.4,1],u_color_bg:[.12,.04,.14,1]}},{name:`Ice Blue`,uniforms:{u_color_bar:[.25,.7,.95,1],u_color_tip:[.95,.99,1,1],u_color_bg:[.02,.04,.1,1]}},{name:`Magma`,uniforms:{u_color_bar:[.75,.12,.05,1],u_color_tip:[1,.85,.25,1],u_color_bg:[.04,.02,.02,1]}}],uniforms:[{id:`u_bars`,name:`Bar Count`,type:`float`,min:8,max:96,default:32},{id:`u_segments`,name:`LED Segments (0 = solid)`,type:`float`,min:0,max:40,default:18},{id:`u_gap`,name:`Gap Thickness`,type:`float`,min:0,max:.6,default:.25},{id:`u_color_bar`,name:`Bar Color`,type:`color`,default:[.1,.9,.3,1]},{id:`u_color_tip`,name:`Peak Tip Color`,type:`color`,default:[1,.3,.15,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.03,.04,.04,1]}]},Mm=e({default:()=>Nm}),Nm={id:`southwest_blanket`,name:`Southwest Blanket`,category:`Textile`,added:`2026-06-12`,description:`Serape-style southwest blanket: stepped diamond bands in cream, red, black and turquoise wool, woven with coarse weft ribs, lanolin sheen and handspun slubs.`,shader:`
     float tri_swb(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -14992,7 +15288,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_bands`,name:`Band Count`,type:`float`,min:3,max:12,default:6},{id:`u_main_color`,name:`Main Wool`,type:`color`,default:[.65,.16,.12,1]}]},vm=e({default:()=>ym}),ym={id:`speed_blocks`,name:`Speed Blocks`,category:`Heritage`,added:`2026-06-12`,description:`Sixties-style offset colour blocks with motion bias — sheared rectangles racing left to right in staggered rows, trailing echo bars and screen-print grain.`,shader:`
+  `,uniforms:[{id:`u_bands`,name:`Band Count`,type:`float`,min:3,max:12,default:6},{id:`u_main_color`,name:`Main Wool`,type:`color`,default:[.65,.16,.12,1]}]},Pm=e({default:()=>Fm}),Fm={id:`speed_blocks`,name:`Speed Blocks`,category:`Heritage`,added:`2026-06-12`,description:`Sixties-style offset colour blocks with motion bias — sheared rectangles racing left to right in staggered rows, trailing echo bars and screen-print grain.`,shader:`
     vec4 generate() {
       float rows = u_row_count;
 
@@ -15068,7 +15364,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_row_count`,name:`Block Rows`,type:`float`,min:2,max:8,default:4},{id:`u_motion_skew`,name:`Motion Skew`,type:`float`,min:0,max:.6,default:.22},{id:`u_base_color`,name:`Stock Colour`,type:`color`,default:[.93,.89,.8,1]},{id:`u_block_color`,name:`Hero Colour`,type:`color`,default:[.75,.15,.13,1]}]},bm=e({default:()=>xm}),xm={id:`speed_trails_artisan`,name:`Speed Trails`,category:`Racing`,added:`2026-04-15`,description:`Horizontal motion-style smears representing velocity and aerodynamic flow.`,shader:`
+  `,uniforms:[{id:`u_row_count`,name:`Block Rows`,type:`float`,min:2,max:8,default:4},{id:`u_motion_skew`,name:`Motion Skew`,type:`float`,min:0,max:.6,default:.22},{id:`u_base_color`,name:`Stock Colour`,type:`color`,default:[.93,.89,.8,1]},{id:`u_block_color`,name:`Hero Colour`,type:`color`,default:[.75,.15,.13,1]}]},Im=e({default:()=>Lm}),Lm={id:`speed_trails_artisan`,name:`Speed Trails`,category:`Racing`,added:`2026-04-15`,description:`Horizontal motion-style smears representing velocity and aerodynamic flow.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * u_scale);
@@ -15076,7 +15372,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float trail = step(0.9, hash(v_uv.x * 0.1 + y));
       return mix(u_secondary_color, u_primary_color, trail);
     }
-  `,uniforms:[{id:`u_scale`,name:`Trail Density`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Trail Lite`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[0,0,0,0]}]},Sm=e({default:()=>Cm}),Cm={id:`spider_lightning`,name:`Spider Lightning`,category:`Abstract`,added:`2026-06-11`,description:`A spider web spun from lightning: jagged electric bolts radiate from a glowing core, linked by sagging arcs of plasma and branching micro-filaments. Static render — Trading Paints safe.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Trail Density`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Trail Lite`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Void`,type:`color`,default:[0,0,0,0]}]},Rm=e({default:()=>zm}),zm={id:`spider_lightning`,name:`Spider Lightning`,category:`Abstract`,added:`2026-06-11`,description:`A spider web spun from lightning: jagged electric bolts radiate from a glowing core, linked by sagging arcs of plasma and branching micro-filaments. Static render — Trading Paints safe.`,shader:`
 
     // Hot bolt core plus a soft electric halo around it
     float boltGlow(float dist, float thickness) {
@@ -15123,7 +15419,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(color.rgb, color.a);
     }
-  `,variants:[{name:`Storm Blue`,uniforms:{u_color_bolt:[.85,.95,1,1],u_color_glow:[.15,.45,1,1],u_color_bg:[.01,.02,.06,1]}},{name:`Plasma Purple`,uniforms:{u_color_bolt:[.95,.85,1,1],u_color_glow:[.55,.2,.95,1],u_color_bg:[.03,.01,.06,1]}},{name:`Venom Green`,uniforms:{u_color_bolt:[.9,1,.85,1],u_color_glow:[.25,.9,.2,1],u_color_bg:[.01,.04,.01,1]}},{name:`Hellfire`,uniforms:{u_color_bolt:[1,.95,.75,1],u_color_glow:[1,.35,.05,1],u_color_bg:[.05,.01,.01,1]}}],uniforms:[{id:`u_strands`,name:`Web Strands`,type:`float`,min:4,max:24,default:12},{id:`u_rings`,name:`Web Rings`,type:`float`,min:2,max:16,default:6},{id:`u_chaos`,name:`Bolt Chaos`,type:`float`,min:1,max:10,default:3.5},{id:`u_jitter`,name:`Bolt Jitter`,type:`float`,min:0,max:.6,default:.16},{id:`u_thickness`,name:`Bolt Thickness`,type:`float`,min:.001,max:.02,default:.004},{id:`u_glow`,name:`Glow Radius`,type:`float`,min:.1,max:3,default:1},{id:`u_color_bolt`,name:`Bolt Core`,type:`color`,default:[.85,.95,1,1]},{id:`u_color_glow`,name:`Electric Glow`,type:`color`,default:[.15,.45,1,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.01,.02,.06,1]}]},wm=e({default:()=>Tm}),Tm={id:`spider_web_artisan`,name:`Silk Web`,category:`Natural`,added:`2026-04-16`,description:`Radial-concentric silk networks found in professional predatory arachnid structures.`,shader:`
+  `,variants:[{name:`Storm Blue`,uniforms:{u_color_bolt:[.85,.95,1,1],u_color_glow:[.15,.45,1,1],u_color_bg:[.01,.02,.06,1]}},{name:`Plasma Purple`,uniforms:{u_color_bolt:[.95,.85,1,1],u_color_glow:[.55,.2,.95,1],u_color_bg:[.03,.01,.06,1]}},{name:`Venom Green`,uniforms:{u_color_bolt:[.9,1,.85,1],u_color_glow:[.25,.9,.2,1],u_color_bg:[.01,.04,.01,1]}},{name:`Hellfire`,uniforms:{u_color_bolt:[1,.95,.75,1],u_color_glow:[1,.35,.05,1],u_color_bg:[.05,.01,.01,1]}}],uniforms:[{id:`u_strands`,name:`Web Strands`,type:`float`,min:4,max:24,default:12},{id:`u_rings`,name:`Web Rings`,type:`float`,min:2,max:16,default:6},{id:`u_chaos`,name:`Bolt Chaos`,type:`float`,min:1,max:10,default:3.5},{id:`u_jitter`,name:`Bolt Jitter`,type:`float`,min:0,max:.6,default:.16},{id:`u_thickness`,name:`Bolt Thickness`,type:`float`,min:.001,max:.02,default:.004},{id:`u_glow`,name:`Glow Radius`,type:`float`,min:.1,max:3,default:1},{id:`u_color_bolt`,name:`Bolt Core`,type:`color`,default:[.85,.95,1,1]},{id:`u_color_glow`,name:`Electric Glow`,type:`color`,default:[.15,.45,1,1]},{id:`u_color_bg`,name:`Background`,type:`color`,default:[.01,.02,.06,1]}]},Bm=e({default:()=>Vm}),Vm={id:`spider_web_artisan`,name:`Silk Web`,category:`Natural`,added:`2026-04-16`,description:`Radial-concentric silk networks found in professional predatory arachnid structures.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float d = length(uv);
@@ -15144,7 +15440,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       color = mix(color, u_accent_color, clamp(concentric * (1.0 - radial), 0.0, 1.0));
       return color;
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.9,.9,1,1],u_accent_color:[.9,.9,1,1],u_secondary_color:[0,0,0,1],u_spokes:8,u_rings:10,u_thickness:1,u_sag:0}},{name:`Widow's Lair`,uniforms:{u_primary_color:[.85,.85,.85,1],u_accent_color:[.8,.1,.1,1],u_secondary_color:[.03,.02,.02,1],u_spokes:12,u_rings:12,u_thickness:1,u_sag:.6}},{name:`Frost Web`,uniforms:{u_primary_color:[.8,.92,1,1],u_accent_color:[.55,.75,.95,1],u_secondary_color:[.02,.05,.12,1],u_spokes:8,u_rings:14,u_thickness:.8,u_sag:.2}},{name:`Halloween`,uniforms:{u_primary_color:[1,.55,.1,1],u_accent_color:[1,.8,.2,1],u_secondary_color:[.05,0,.08,1],u_spokes:10,u_rings:9,u_thickness:1.4,u_sag:.45}}],uniforms:[{id:`u_spokes`,name:`Spoke Count`,type:`float`,min:3,max:24,default:8},{id:`u_rings`,name:`Ring Count`,type:`float`,min:2,max:30,default:10},{id:`u_thickness`,name:`Strand Thickness`,type:`float`,min:.3,max:3,default:1},{id:`u_sag`,name:`Silk Sag`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Silk Strand`,type:`color`,default:[.9,.9,1,1]},{id:`u_accent_color`,name:`Ring Silk`,type:`color`,default:[.9,.9,1,1]},{id:`u_secondary_color`,name:`Void Backdrop`,type:`color`,default:[0,0,0,1]}]},Em=e({default:()=>Dm}),Dm={id:`splinter_camo`,name:`Splinter Camo`,category:`Geometric`,added:`2026-05-12`,description:`A non-digital but highly angular, geometric camouflage consisting of sharp intersecting polygons and shards.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.9,.9,1,1],u_accent_color:[.9,.9,1,1],u_secondary_color:[0,0,0,1],u_spokes:8,u_rings:10,u_thickness:1,u_sag:0}},{name:`Widow's Lair`,uniforms:{u_primary_color:[.85,.85,.85,1],u_accent_color:[.8,.1,.1,1],u_secondary_color:[.03,.02,.02,1],u_spokes:12,u_rings:12,u_thickness:1,u_sag:.6}},{name:`Frost Web`,uniforms:{u_primary_color:[.8,.92,1,1],u_accent_color:[.55,.75,.95,1],u_secondary_color:[.02,.05,.12,1],u_spokes:8,u_rings:14,u_thickness:.8,u_sag:.2}},{name:`Halloween`,uniforms:{u_primary_color:[1,.55,.1,1],u_accent_color:[1,.8,.2,1],u_secondary_color:[.05,0,.08,1],u_spokes:10,u_rings:9,u_thickness:1.4,u_sag:.45}}],uniforms:[{id:`u_spokes`,name:`Spoke Count`,type:`float`,min:3,max:24,default:8},{id:`u_rings`,name:`Ring Count`,type:`float`,min:2,max:30,default:10},{id:`u_thickness`,name:`Strand Thickness`,type:`float`,min:.3,max:3,default:1},{id:`u_sag`,name:`Silk Sag`,type:`float`,min:0,max:1,default:0},{id:`u_primary_color`,name:`Silk Strand`,type:`color`,default:[.9,.9,1,1]},{id:`u_accent_color`,name:`Ring Silk`,type:`color`,default:[.9,.9,1,1]},{id:`u_secondary_color`,name:`Void Backdrop`,type:`color`,default:[0,0,0,1]}]},Hm=e({default:()=>Um}),Um={id:`splinter_camo`,name:`Splinter Camo`,category:`Geometric`,added:`2026-05-12`,description:`A non-digital but highly angular, geometric camouflage consisting of sharp intersecting polygons and shards.`,shader:`
     
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -15172,7 +15468,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Swedish M90`,uniforms:{u_color_base:[.65,.7,.55,1],u_color_1:[.35,.45,.3,1],u_color_2:[.15,.25,.15,1],u_color_3:[.1,.12,.1,1]}},{name:`Winter Splinter`,uniforms:{u_color_base:[.9,.9,.95,1],u_color_1:[.7,.7,.75,1],u_color_2:[.4,.45,.5,1],u_color_3:[.2,.2,.25,1]}},{name:`Urban Splinter`,uniforms:{u_color_base:[.55,.55,.55,1],u_color_1:[.4,.4,.4,1],u_color_2:[.2,.2,.2,1],u_color_3:[.05,.05,.05,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.1,.1,.1,1],u_color_2:[.05,.05,.05,1],u_color_3:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Grid Scale`,type:`float`,min:1,max:20,default:8},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.65,.7,.55,1]},{id:`u_color_1`,name:`Shard 1`,type:`color`,default:[.35,.45,.3,1]},{id:`u_color_2`,name:`Shard 2`,type:`color`,default:[.15,.25,.15,1]},{id:`u_color_3`,name:`Shard 3`,type:`color`,default:[.1,.12,.1,1]}]},Om=e({default:()=>km}),km={id:`sponsor_patchwork`,name:`Sponsor Patchwork`,category:`Heritage`,added:`2026-06-12`,description:`A dense quilt of varied blank sponsor blocks — white decal panels, colour bars, pill shapes and text-line placeholders crowding the bodywork like a 70s privateer.`,shader:`
+  `,variants:[{name:`Swedish M90`,uniforms:{u_color_base:[.65,.7,.55,1],u_color_1:[.35,.45,.3,1],u_color_2:[.15,.25,.15,1],u_color_3:[.1,.12,.1,1]}},{name:`Winter Splinter`,uniforms:{u_color_base:[.9,.9,.95,1],u_color_1:[.7,.7,.75,1],u_color_2:[.4,.45,.5,1],u_color_3:[.2,.2,.25,1]}},{name:`Urban Splinter`,uniforms:{u_color_base:[.55,.55,.55,1],u_color_1:[.4,.4,.4,1],u_color_2:[.2,.2,.2,1],u_color_3:[.05,.05,.05,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.15,.15,.15,1],u_color_1:[.1,.1,.1,1],u_color_2:[.05,.05,.05,1],u_color_3:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Grid Scale`,type:`float`,min:1,max:20,default:8},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.65,.7,.55,1]},{id:`u_color_1`,name:`Shard 1`,type:`color`,default:[.35,.45,.3,1]},{id:`u_color_2`,name:`Shard 2`,type:`color`,default:[.15,.25,.15,1]},{id:`u_color_3`,name:`Shard 3`,type:`color`,default:[.1,.12,.1,1]}]},Wm=e({default:()=>Gm}),Gm={id:`sponsor_patchwork`,name:`Sponsor Patchwork`,category:`Heritage`,added:`2026-06-12`,description:`A dense quilt of varied blank sponsor blocks — white decal panels, colour bars, pill shapes and text-line placeholders crowding the bodywork like a 70s privateer.`,shader:`
     // rounded-rectangle signed distance
     float rrect_hrt9(vec2 p, vec2 b, float r) {
       vec2 q = abs(p) - b + r;
@@ -15269,7 +15565,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_density`,name:`Decal Density`,type:`float`,min:2,max:8,default:4},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.85,.86,.88,1]},{id:`u_accent_color`,name:`Hero Accent`,type:`color`,default:[.8,.12,.1,1]}]},Am=e({default:()=>jm}),jm={id:`spray_drip_artisan`,name:`Spray Drip`,category:`Abstract`,added:`2026-04-15`,description:`Static vertical paint drip effect mimicking street-art application.`,shader:`
+  `,uniforms:[{id:`u_density`,name:`Decal Density`,type:`float`,min:2,max:8,default:4},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.85,.86,.88,1]},{id:`u_accent_color`,name:`Hero Accent`,type:`color`,default:[.8,.12,.1,1]}]},Km=e({default:()=>qm}),qm={id:`spray_drip_artisan`,name:`Spray Drip`,category:`Abstract`,added:`2026-04-15`,description:`Static vertical paint drip effect mimicking street-art application.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float x = floor(v_uv.x * u_scale);
@@ -15277,7 +15573,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(v_uv.y, h * 0.5 + 0.3);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Drip Count`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Drip Color`,type:`color`,default:[1,0,.2,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.05,.05,.05,1]}]},Mm=e({default:()=>Nm}),Nm={id:`stadium_seats`,name:`Stadium Seats`,category:`Racing`,added:`2026-07-07`,description:`Grandstand seating from the air — blocks of colored seats split by aisles.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Drip Count`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Drip Color`,type:`color`,default:[1,0,.2,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.05,.05,.05,1]}]},Jm=e({default:()=>Ym}),Ym={id:`stadium_seats`,name:`Stadium Seats`,category:`Racing`,added:`2026-07-07`,description:`Grandstand seating from the air — blocks of colored seats split by aisles.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -15300,7 +15596,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 col = mix(u_secondary_color, seatCol, seat * (1.0 - aisle));
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Seat Density`,type:`float`,min:10,max:80,default:32},{id:`u_secondary_color`,name:`Concrete`,type:`color`,default:[.32,.32,.34,1]},{id:`u_primary_color`,name:`Section 1`,type:`color`,default:[.85,.12,.15,1]},{id:`u_accent_color`,name:`Section 2`,type:`color`,default:[.12,.3,.7,1]},{id:`u_pop_color`,name:`Section 3`,type:`color`,default:[.92,.78,.12,1]}],variants:[{name:`Main Straight`,uniforms:{u_secondary_color:[.32,.32,.34,1],u_primary_color:[.85,.12,.15,1],u_accent_color:[.12,.3,.7,1],u_pop_color:[.92,.78,.12,1]}},{name:`Home Team`,uniforms:{u_secondary_color:[.25,.27,.28,1],u_primary_color:[.1,.45,.25,1],u_accent_color:[.95,.95,.92,1],u_pop_color:[.08,.3,.16,1]}},{name:`Night Race`,uniforms:{u_secondary_color:[.1,.1,.13,1],u_primary_color:[.5,.1,.55,1],u_accent_color:[.1,.55,.6,1],u_pop_color:[.2,.2,.3,1]}}]},Pm=e({default:()=>Fm}),Fm={id:`stained_glass`,name:`Stained Glass`,category:`Abstract`,added:`2026-04-16`,description:`Backlit stained glass window with vivid saturated color panels and thick dark lead came lines.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Seat Density`,type:`float`,min:10,max:80,default:32},{id:`u_secondary_color`,name:`Concrete`,type:`color`,default:[.32,.32,.34,1]},{id:`u_primary_color`,name:`Section 1`,type:`color`,default:[.85,.12,.15,1]},{id:`u_accent_color`,name:`Section 2`,type:`color`,default:[.12,.3,.7,1]},{id:`u_pop_color`,name:`Section 3`,type:`color`,default:[.92,.78,.12,1]}],variants:[{name:`Main Straight`,uniforms:{u_secondary_color:[.32,.32,.34,1],u_primary_color:[.85,.12,.15,1],u_accent_color:[.12,.3,.7,1],u_pop_color:[.92,.78,.12,1]}},{name:`Home Team`,uniforms:{u_secondary_color:[.25,.27,.28,1],u_primary_color:[.1,.45,.25,1],u_accent_color:[.95,.95,.92,1],u_pop_color:[.08,.3,.16,1]}},{name:`Night Race`,uniforms:{u_secondary_color:[.1,.1,.13,1],u_primary_color:[.5,.1,.55,1],u_accent_color:[.1,.55,.6,1],u_pop_color:[.2,.2,.3,1]}}]},Xm=e({default:()=>Zm}),Zm={id:`stained_glass`,name:`Stained Glass`,category:`Abstract`,added:`2026-04-16`,description:`Backlit stained glass window with vivid saturated color panels and thick dark lead came lines.`,shader:`
     // --- helpers BEFORE generate() ---
 
     vec2 voronoi_rand(vec2 p) {
@@ -15394,7 +15690,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_scale`,name:`Glass Sections`,type:`float`,min:2,max:20,default:7},{id:`u_lead_width`,name:`Lead Thickness`,type:`float`,min:.01,max:.12,default:.04},{id:`u_brightness`,name:`Panel Luminosity`,type:`float`,min:.3,max:2,default:1.3}]},Im=e({default:()=>Lm}),Lm={id:`standing_seam_copper`,name:`Standing Seam Copper`,category:`Architecture`,added:`2026-06-12`,description:`Verdigris copper roof — vertical pans between raised double-lock seams, the patina mottled from mint-green bloom to surviving brown metal, runoff streaking down each pan and oil-canning waves in the sheet.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Glass Sections`,type:`float`,min:2,max:20,default:7},{id:`u_lead_width`,name:`Lead Thickness`,type:`float`,min:.01,max:.12,default:.04},{id:`u_brightness`,name:`Panel Luminosity`,type:`float`,min:.3,max:2,default:1.3}]},Qm=e({default:()=>$m}),$m={id:`standing_seam_copper`,name:`Standing Seam Copper`,category:`Architecture`,added:`2026-06-12`,description:`Verdigris copper roof — vertical pans between raised double-lock seams, the patina mottled from mint-green bloom to surviving brown metal, runoff streaking down each pan and oil-canning waves in the sheet.`,shader:`
     float hash_ssc(vec2 p) {
       return fract(sin(dot(p, vec2(311.3, 149.7))) * 42667.1937);
     }
@@ -15474,13 +15770,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_pans`,name:`Pans`,type:`float`,min:3,max:16,default:7},{id:`u_patina_age`,name:`Patina Age`,type:`float`,min:0,max:1,default:.7},{id:`u_patina_color`,name:`Verdigris`,type:`color`,default:[.42,.68,.58,1]}]},Rm=e({default:()=>zm}),zm={id:`star_field_artisan`,name:`Star Field Static`,category:`Natural`,added:`2026-04-15`,description:`High-density thresholded noise clusters representing deep-space star fields.`,shader:`
+  `,uniforms:[{id:`u_pans`,name:`Pans`,type:`float`,min:3,max:16,default:7},{id:`u_patina_age`,name:`Patina Age`,type:`float`,min:0,max:1,default:.7},{id:`u_patina_color`,name:`Verdigris`,type:`color`,default:[.42,.68,.58,1]}]},eh=e({default:()=>th}),th={id:`star_field_artisan`,name:`Star Field Static`,category:`Natural`,added:`2026-04-15`,description:`High-density thresholded noise clusters representing deep-space star fields.`,shader:`
     vec4 generate() {
       float n = hash(v_uv * u_scale);
       float mask = step(0.99, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cluster Density`,type:`float`,min:100,max:2e3,default:800},{id:`u_primary_color`,name:`Star Alpha`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,.02,1]}]},Bm=e({default:()=>Vm}),Vm={id:`starlight_drive_artisan`,name:`Star Drive`,category:`Abstract`,added:`2026-04-16`,description:`Streaked starfield with motion blur effects found in high-speed space transit simulations.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cluster Density`,type:`float`,min:100,max:2e3,default:800},{id:`u_primary_color`,name:`Star Alpha`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,.02,1]}]},nh=e({default:()=>rh}),rh={id:`starlight_drive_artisan`,name:`Star Drive`,category:`Abstract`,added:`2026-04-16`,description:`Streaked starfield with motion blur effects found in high-speed space transit simulations.`,shader:`
     float hash(float n) { return fract(sin(n) * 43758.5453); }
     vec4 generate() {
       float y = floor(v_uv.y * 100.0);
@@ -15488,7 +15784,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float dash = step(0.9, fract(v_uv.x * 2.0 + h));
       return mix(u_secondary_color, u_primary_color, dash * h);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Star Streak`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,0,1]}]},Hm=e({default:()=>Um}),Um={id:`steel_wool_artisan`,name:`Steel Wool`,category:`Industrial`,added:`2026-04-15`,description:`Tangled swirling metal fibers — layered strand nests with directional sheen.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Star Streak`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Deep Space`,type:`color`,default:[0,0,0,1]}]},ih=e({default:()=>ah}),ah={id:`steel_wool_artisan`,name:`Steel Wool`,category:`Industrial`,added:`2026-04-15`,description:`Tangled swirling metal fibers — layered strand nests with directional sheen.`,shader:`
     // one nest layer: contour lines of a domain-warped field — the level
     // sets read as long curling fibers
     float strands(vec2 p, float seed, float freq) {
@@ -15515,7 +15811,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col += vec3(0.3) * step(0.998, hash(floor(uv * 24.0)));
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Nest Scale`,type:`float`,min:1,max:12,default:3},{id:`u_swirl`,name:`Swirl`,type:`float`,min:.2,max:2,default:1},{id:`u_primary_color`,name:`Steel Strand`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[.1,.1,.15,1]}],variants:[{name:`Fresh Pad`,uniforms:{u_primary_color:[.7,.7,.75,1],u_secondary_color:[.1,.1,.15,1],u_swirl:1}},{name:`Copper Scourer`,uniforms:{u_primary_color:[.78,.5,.3,1],u_secondary_color:[.15,.08,.05,1],u_swirl:1.3}},{name:`Burnt Wool`,uniforms:{u_primary_color:[.45,.4,.38,1],u_secondary_color:[.05,.04,.04,1],u_swirl:.7}}]},Wm=e({default:()=>Gm}),Gm={id:`stitched_leather_pro`,name:`Stitched Leather`,category:`Organic`,added:`2026-04-15`,description:`Pebbled upholstery leather with diamond seam channels and dashed thread stitching.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Nest Scale`,type:`float`,min:1,max:12,default:3},{id:`u_swirl`,name:`Swirl`,type:`float`,min:.2,max:2,default:1},{id:`u_primary_color`,name:`Steel Strand`,type:`color`,default:[.7,.7,.75,1]},{id:`u_secondary_color`,name:`Internal Shadow`,type:`color`,default:[.1,.1,.15,1]}],variants:[{name:`Fresh Pad`,uniforms:{u_primary_color:[.7,.7,.75,1],u_secondary_color:[.1,.1,.15,1],u_swirl:1}},{name:`Copper Scourer`,uniforms:{u_primary_color:[.78,.5,.3,1],u_secondary_color:[.15,.08,.05,1],u_swirl:1.3}},{name:`Burnt Wool`,uniforms:{u_primary_color:[.45,.4,.38,1],u_secondary_color:[.05,.04,.04,1],u_swirl:.7}}]},oh=e({default:()=>sh}),sh={id:`stitched_leather_pro`,name:`Stitched Leather`,category:`Organic`,added:`2026-04-15`,description:`Pebbled upholstery leather with diamond seam channels and dashed thread stitching.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // pebble grain: two scales of cellular-ish noise shading
@@ -15542,7 +15838,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 col = mix(leather, u_thread_color.rgb * (0.8 + 0.2 * fract(along * 14.0)), thread);
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:100,default:30},{id:`u_show_stitch`,name:`Show Stitch`,type:`float`,min:0,max:1,default:1},{id:`u_leather_color`,name:`Leather`,type:`color`,default:[.32,.18,.1,1]},{id:`u_thread_color`,name:`Thread`,type:`color`,default:[.85,.72,.4,1]}],variants:[{name:`Saddle Interior`,uniforms:{u_leather_color:[.32,.18,.1,1],u_thread_color:[.85,.72,.4,1],u_show_stitch:1}},{name:`Black Nappa Red Stitch`,uniforms:{u_leather_color:[.09,.09,.1,1],u_thread_color:[.85,.15,.15,1],u_show_stitch:1}},{name:`Oxblood Plain`,uniforms:{u_leather_color:[.28,.1,.1,1],u_thread_color:[.7,.6,.5,1],u_show_stitch:0}}]},Km=e({default:()=>qm}),qm={id:`stucco_dash`,name:`Stucco Dash`,category:`Architecture`,added:`2026-06-12`,description:`Rough-cast render — wet mortar thrown against the wall, every lump and crater throwing its own shadow, sharp aggregate poking through the skin and broad trowel passes ghosting beneath.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grain Density`,type:`float`,min:10,max:100,default:30},{id:`u_show_stitch`,name:`Show Stitch`,type:`float`,min:0,max:1,default:1},{id:`u_leather_color`,name:`Leather`,type:`color`,default:[.32,.18,.1,1]},{id:`u_thread_color`,name:`Thread`,type:`color`,default:[.85,.72,.4,1]}],variants:[{name:`Saddle Interior`,uniforms:{u_leather_color:[.32,.18,.1,1],u_thread_color:[.85,.72,.4,1],u_show_stitch:1}},{name:`Black Nappa Red Stitch`,uniforms:{u_leather_color:[.09,.09,.1,1],u_thread_color:[.85,.15,.15,1],u_show_stitch:1}},{name:`Oxblood Plain`,uniforms:{u_leather_color:[.28,.1,.1,1],u_thread_color:[.7,.6,.5,1],u_show_stitch:0}}]},ch=e({default:()=>lh}),lh={id:`stucco_dash`,name:`Stucco Dash`,category:`Architecture`,added:`2026-06-12`,description:`Rough-cast render — wet mortar thrown against the wall, every lump and crater throwing its own shadow, sharp aggregate poking through the skin and broad trowel passes ghosting beneath.`,shader:`
     float hash_std(vec2 p) {
       return fract(sin(dot(p, vec2(241.3, 179.9))) * 39719.4571);
     }
@@ -15623,7 +15919,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_coarseness`,name:`Coarseness`,type:`float`,min:.4,max:2.5,default:1},{id:`u_grime`,name:`Weathering`,type:`float`,min:0,max:1,default:.4},{id:`u_render_color`,name:`Render`,type:`color`,default:[.8,.76,.68,1]}]},Jm=e({default:()=>Ym}),Ym={id:`subway_tiles`,name:`Subway Tiles`,category:`Architecture`,added:`2026-06-12`,description:`Running-bond glazed subway brick — 2:1 tiles with pillowed bevel edges, dark recessed grout, a tall ceramic reflection sliding across each tile and the odd off-batch tile in the field.`,shader:`
+  `,uniforms:[{id:`u_coarseness`,name:`Coarseness`,type:`float`,min:.4,max:2.5,default:1},{id:`u_grime`,name:`Weathering`,type:`float`,min:0,max:1,default:.4},{id:`u_render_color`,name:`Render`,type:`color`,default:[.8,.76,.68,1]}]},uh=e({default:()=>dh}),dh={id:`subway_tiles`,name:`Subway Tiles`,category:`Architecture`,added:`2026-06-12`,description:`Running-bond glazed subway brick — 2:1 tiles with pillowed bevel edges, dark recessed grout, a tall ceramic reflection sliding across each tile and the odd off-batch tile in the field.`,shader:`
     float hash_sub(vec2 p) {
       return fract(sin(dot(p, vec2(311.7, 137.1))) * 43017.3571);
     }
@@ -15697,7 +15993,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rows`,name:`Tile Rows`,type:`float`,min:4,max:24,default:10},{id:`u_grout_width`,name:`Grout Width`,type:`float`,min:.02,max:.1,default:.045},{id:`u_tile_color`,name:`Glaze`,type:`color`,default:[.92,.93,.91,1]},{id:`u_grout_color`,name:`Grout`,type:`color`,default:[.22,.21,.2,1]}]},Xm=e({default:()=>Zm}),Zm={id:`sulfur_crystals`,name:`Sulfur Crystals`,category:`Geology`,added:`2026-07-07`,description:`Vivid yellow crystal shards erupting from a dark fumarole crust, each facet a flat flash.`,shader:`
+  `,uniforms:[{id:`u_rows`,name:`Tile Rows`,type:`float`,min:4,max:24,default:10},{id:`u_grout_width`,name:`Grout Width`,type:`float`,min:.02,max:.1,default:.045},{id:`u_tile_color`,name:`Glaze`,type:`color`,default:[.92,.93,.91,1]},{id:`u_grout_color`,name:`Grout`,type:`color`,default:[.22,.21,.2,1]}]},fh=e({default:()=>ph}),ph={id:`sulfur_crystals`,name:`Sulfur Crystals`,category:`Geology`,added:`2026-07-07`,description:`Vivid yellow crystal shards erupting from a dark fumarole crust, each facet a flat flash.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // dark volcanic crust
@@ -15736,7 +16032,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, u_primary_color.rgb * 0.45, dust * 0.3);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Crystal Density`,type:`float`,min:2,max:14,default:6},{id:`u_bare`,name:`Bare Crust`,type:`float`,min:0,max:.8,default:.25},{id:`u_primary_color`,name:`Sulfur`,type:`color`,default:[.95,.85,.1,1]},{id:`u_secondary_color`,name:`Fumarole Crust`,type:`color`,default:[.13,.11,.1,1]}],variants:[{name:`Fumarole`,uniforms:{u_primary_color:[.95,.85,.1,1],u_secondary_color:[.13,.11,.1,1],u_bare:.25}},{name:`Emerald Spray`,uniforms:{u_primary_color:[.2,.8,.4,1],u_secondary_color:[.08,.1,.09,1],u_bare:.35}},{name:`Amethyst Bed`,uniforms:{u_primary_color:[.65,.4,.85,1],u_secondary_color:[.12,.1,.15,1],u_bare:.2}}]},Qm=e({default:()=>$m}),$m={id:`sumi_brushstrokes`,name:`Sumi Brushstrokes`,category:`Abstract`,added:`2026-07-07`,description:`Ink-loaded brush strokes on paper — tapered sweeps with dry-brush streaks and flick spatter.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Crystal Density`,type:`float`,min:2,max:14,default:6},{id:`u_bare`,name:`Bare Crust`,type:`float`,min:0,max:.8,default:.25},{id:`u_primary_color`,name:`Sulfur`,type:`color`,default:[.95,.85,.1,1]},{id:`u_secondary_color`,name:`Fumarole Crust`,type:`color`,default:[.13,.11,.1,1]}],variants:[{name:`Fumarole`,uniforms:{u_primary_color:[.95,.85,.1,1],u_secondary_color:[.13,.11,.1,1],u_bare:.25}},{name:`Emerald Spray`,uniforms:{u_primary_color:[.2,.8,.4,1],u_secondary_color:[.08,.1,.09,1],u_bare:.35}},{name:`Amethyst Bed`,uniforms:{u_primary_color:[.65,.4,.85,1],u_secondary_color:[.12,.1,.15,1],u_bare:.2}}]},mh=e({default:()=>hh}),hh={id:`sumi_brushstrokes`,name:`Sumi Brushstrokes`,category:`Abstract`,added:`2026-07-07`,description:`Ink-loaded brush strokes on paper — tapered sweeps with dry-brush streaks and flick spatter.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // paper with faint fiber
@@ -15767,7 +16063,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, inkC, ink * u_opacity_ink);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Stroke Density`,type:`float`,min:1.5,max:12,default:4},{id:`u_weight`,name:`Brush Weight`,type:`float`,min:.1,max:.5,default:.26},{id:`u_dryness`,name:`Dry Brush`,type:`float`,min:0,max:1,default:.55},{id:`u_opacity_ink`,name:`Ink Opacity`,type:`float`,min:.4,max:1,default:.92},{id:`u_primary_color`,name:`Ink`,type:`color`,default:[.09,.09,.11,1]},{id:`u_secondary_color`,name:`Paper`,type:`color`,default:[.93,.91,.85,1]}],variants:[{name:`Zen Study`,uniforms:{u_primary_color:[.09,.09,.11,1],u_secondary_color:[.93,.91,.85,1],u_dryness:.55}},{name:`Vermilion Seal`,uniforms:{u_primary_color:[.65,.15,.1,1],u_secondary_color:[.95,.92,.86,1],u_dryness:.4}},{name:`Ghost Ink`,uniforms:{u_primary_color:[.85,.87,.9,1],u_secondary_color:[.1,.11,.14,1],u_dryness:.7}}]},eh=e({default:()=>th}),th={id:`sunspot_granulation`,name:`Sunspot Granulation`,category:`Cosmos`,added:`2026-07-07`,description:`The boiling solar surface — bright convection granules split by dark lanes, with sunspot pairs.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Stroke Density`,type:`float`,min:1.5,max:12,default:4},{id:`u_weight`,name:`Brush Weight`,type:`float`,min:.1,max:.5,default:.26},{id:`u_dryness`,name:`Dry Brush`,type:`float`,min:0,max:1,default:.55},{id:`u_opacity_ink`,name:`Ink Opacity`,type:`float`,min:.4,max:1,default:.92},{id:`u_primary_color`,name:`Ink`,type:`color`,default:[.09,.09,.11,1]},{id:`u_secondary_color`,name:`Paper`,type:`color`,default:[.93,.91,.85,1]}],variants:[{name:`Zen Study`,uniforms:{u_primary_color:[.09,.09,.11,1],u_secondary_color:[.93,.91,.85,1],u_dryness:.55}},{name:`Vermilion Seal`,uniforms:{u_primary_color:[.65,.15,.1,1],u_secondary_color:[.95,.92,.86,1],u_dryness:.4}},{name:`Ghost Ink`,uniforms:{u_primary_color:[.85,.87,.9,1],u_secondary_color:[.1,.11,.14,1],u_dryness:.7}}]},gh=e({default:()=>_h}),_h={id:`sunspot_granulation`,name:`Sunspot Granulation`,category:`Cosmos`,added:`2026-07-07`,description:`The boiling solar surface — bright convection granules split by dark lanes, with sunspot pairs.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       // granule cells: ridged noise makes bright cells with dark lanes
@@ -15786,7 +16082,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, u_secondary_color.rgb * 0.25, core * u_spots);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Granule Scale`,type:`float`,min:1,max:12,default:4},{id:`u_spots`,name:`Sunspots`,type:`float`,min:0,max:1,default:.8},{id:`u_primary_color`,name:`Granules`,type:`color`,default:[1,.75,.25,1]},{id:`u_accent_color`,name:`Lanes`,type:`color`,default:[.85,.4,.05,1]},{id:`u_secondary_color`,name:`Spot Umbra`,type:`color`,default:[.25,.08,.02,1]}],variants:[{name:`Photosphere`,uniforms:{u_primary_color:[1,.75,.25,1],u_accent_color:[.85,.4,.05,1],u_secondary_color:[.25,.08,.02,1],u_spots:.8}},{name:`Calcium K`,uniforms:{u_primary_color:[.7,.4,.9,1],u_accent_color:[.35,.12,.5,1],u_secondary_color:[.12,.03,.18,1],u_spots:.6}},{name:`Red Dwarf`,uniforms:{u_primary_color:[.95,.35,.15,1],u_accent_color:[.55,.12,.05,1],u_secondary_color:[.15,.03,.02,1],u_spots:1}}]},nh=e({default:()=>rh}),rh={id:`supernova_remnant`,name:`Supernova Remnant`,category:`Cosmos`,added:`2026-06-11`,description:`Lace-like filamentary shells of a stellar explosion — interlocking ribbons of glowing oxygen teal and sulfur crimson around a hollow blast cavity.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Granule Scale`,type:`float`,min:1,max:12,default:4},{id:`u_spots`,name:`Sunspots`,type:`float`,min:0,max:1,default:.8},{id:`u_primary_color`,name:`Granules`,type:`color`,default:[1,.75,.25,1]},{id:`u_accent_color`,name:`Lanes`,type:`color`,default:[.85,.4,.05,1]},{id:`u_secondary_color`,name:`Spot Umbra`,type:`color`,default:[.25,.08,.02,1]}],variants:[{name:`Photosphere`,uniforms:{u_primary_color:[1,.75,.25,1],u_accent_color:[.85,.4,.05,1],u_secondary_color:[.25,.08,.02,1],u_spots:.8}},{name:`Calcium K`,uniforms:{u_primary_color:[.7,.4,.9,1],u_accent_color:[.35,.12,.5,1],u_secondary_color:[.12,.03,.18,1],u_spots:.6}},{name:`Red Dwarf`,uniforms:{u_primary_color:[.95,.35,.15,1],u_accent_color:[.55,.12,.05,1],u_secondary_color:[.15,.03,.02,1],u_spots:1}}]},vh=e({default:()=>yh}),yh={id:`supernova_remnant`,name:`Supernova Remnant`,category:`Cosmos`,added:`2026-06-11`,description:`Lace-like filamentary shells of a stellar explosion — interlocking ribbons of glowing oxygen teal and sulfur crimson around a hollow blast cavity.`,shader:`
     // Ridged turbulence: |snoise| folded into sharp filament crests
     float ridge_snr(vec2 p) {
       float v = 0.0;
@@ -15860,7 +16156,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_shell_size`,name:`Shell Size`,type:`float`,min:.3,max:.9,default:.62},{id:`u_filament_scale`,name:`Filament Scale`,type:`float`,min:.4,max:2.5,default:1},{id:`u_teal_color`,name:`Oxygen Teal`,type:`color`,default:[.15,.8,.7,1]},{id:`u_red_color`,name:`Sulfur Red`,type:`color`,default:[.85,.18,.12,1]}]},ih=e({default:()=>ah}),ah={id:`suzani_embroidery`,name:`Suzani Embroidery`,category:`Textile`,added:`2026-06-12`,description:`Uzbek suzani: huge embroidered sun-flower medallions in silk thread on cotton, the fill built from visible radial satin stitches with chain-stitch outlines and vine tendrils.`,shader:`
+  `,uniforms:[{id:`u_shell_size`,name:`Shell Size`,type:`float`,min:.3,max:.9,default:.62},{id:`u_filament_scale`,name:`Filament Scale`,type:`float`,min:.4,max:2.5,default:1},{id:`u_teal_color`,name:`Oxygen Teal`,type:`color`,default:[.15,.8,.7,1]},{id:`u_red_color`,name:`Sulfur Red`,type:`color`,default:[.85,.18,.12,1]}]},bh=e({default:()=>xh}),xh={id:`suzani_embroidery`,name:`Suzani Embroidery`,category:`Textile`,added:`2026-06-12`,description:`Uzbek suzani: huge embroidered sun-flower medallions in silk thread on cotton, the fill built from visible radial satin stitches with chain-stitch outlines and vine tendrils.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -15940,7 +16236,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_repeats`,name:`Medallion Repeats`,type:`float`,min:1,max:5,default:2},{id:`u_vines`,name:`Vine Tendrils`,type:`float`,min:0,max:1,default:.8},{id:`u_sun_color`,name:`Sun Thread`,type:`color`,default:[.83,.45,.1,1]}]},oh=e({default:()=>sh}),sh={id:`synaptic_spark_artisan`,name:`Synaptic Spark`,category:`Organic`,added:`2026-05-13`,description:`A network of neurons and dendrites with high-contrast electrical impulses.`,shader:`
+  `,uniforms:[{id:`u_repeats`,name:`Medallion Repeats`,type:`float`,min:1,max:5,default:2},{id:`u_vines`,name:`Vine Tendrils`,type:`float`,min:0,max:1,default:.8},{id:`u_sun_color`,name:`Sun Thread`,type:`color`,default:[.83,.45,.1,1]}]},Sh=e({default:()=>Ch}),Ch={id:`synaptic_spark_artisan`,name:`Synaptic Spark`,category:`Organic`,added:`2026-05-13`,description:`A network of neurons and dendrites with high-contrast electrical impulses.`,shader:`
     vec2 random2( vec2 p ) {
         return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
@@ -15981,7 +16277,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         
         return network + u_spark_color * sparkGlow * 2.0;
     }
-  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:6},{id:`u_bg_color`,name:`Brain Matter`,type:`color`,default:[.05,.02,.08,1]},{id:`u_neuron_color`,name:`Neurons`,type:`color`,default:[.4,.2,.6,1]},{id:`u_spark_color`,name:`Electrical Impulse`,type:`color`,default:[.4,1,1,1]},{id:`u_flow`,name:`Synapse Fire`,type:`float`,min:0,max:100,default:0}]},ch=e({default:()=>lh}),lh={id:`targa_band`,name:`Targa Band`,category:`Heritage`,added:`2026-06-12`,description:`A full-wrap solid band across the panel with a flowing model-script underline beneath it — brushed-look band, chrome script swash, and gloss body colour.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Network Scale`,type:`float`,min:2,max:20,default:6},{id:`u_bg_color`,name:`Brain Matter`,type:`color`,default:[.05,.02,.08,1]},{id:`u_neuron_color`,name:`Neurons`,type:`color`,default:[.4,.2,.6,1]},{id:`u_spark_color`,name:`Electrical Impulse`,type:`color`,default:[.4,1,1,1]},{id:`u_flow`,name:`Synapse Fire`,type:`float`,min:0,max:100,default:0}]},wh=e({default:()=>Th}),Th={id:`targa_band`,name:`Targa Band`,category:`Heritage`,added:`2026-06-12`,description:`A full-wrap solid band across the panel with a flowing model-script underline beneath it — brushed-look band, chrome script swash, and gloss body colour.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -16052,7 +16348,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_band_width`,name:`Band Width`,type:`float`,min:.06,max:.3,default:.15},{id:`u_script_repeat`,name:`Script Repeats`,type:`float`,min:1,max:4,default:2},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.65,.79,.84,1]},{id:`u_band_color`,name:`Band Colour`,type:`color`,default:[.14,.14,.16,1]}]},uh=e({default:()=>dh}),dh={id:`tatami_weave`,name:`Tatami Weave`,category:`Textile`,added:`2026-06-12`,description:`Japanese tatami: tightly woven igusa rush straw in alternating panel directions, each strand subtly colour-shifted, panels bordered by dark brocade heri edge bands.`,shader:`
+  `,uniforms:[{id:`u_band_width`,name:`Band Width`,type:`float`,min:.06,max:.3,default:.15},{id:`u_script_repeat`,name:`Script Repeats`,type:`float`,min:1,max:4,default:2},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.65,.79,.84,1]},{id:`u_band_color`,name:`Band Colour`,type:`color`,default:[.14,.14,.16,1]}]},Eh=e({default:()=>Dh}),Dh={id:`tatami_weave`,name:`Tatami Weave`,category:`Textile`,added:`2026-06-12`,description:`Japanese tatami: tightly woven igusa rush straw in alternating panel directions, each strand subtly colour-shifted, panels bordered by dark brocade heri edge bands.`,shader:`
     float tri_ttm(float x) {
       return abs(fract(x) - 0.5) * 2.0;
     }
@@ -16138,7 +16434,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_panels`,name:`Mat Panels`,type:`float`,min:1,max:6,default:2},{id:`u_age`,name:`Straw Aging`,type:`float`,min:0,max:1,default:.6},{id:`u_heri_color`,name:`Edge Band`,type:`color`,default:[.12,.1,.18,1]}]},fh=e({default:()=>ph}),ph={id:`tech_fractal_artisan`,name:`Logic Fractal`,category:`Abstract`,added:`2026-04-16`,description:`Geometric recursive logic patterns mimicking complex computational architectures.`,shader:`
+  `,uniforms:[{id:`u_panels`,name:`Mat Panels`,type:`float`,min:1,max:6,default:2},{id:`u_age`,name:`Straw Aging`,type:`float`,min:0,max:1,default:.6},{id:`u_heri_color`,name:`Edge Band`,type:`color`,default:[.12,.1,.18,1]}]},Oh=e({default:()=>kh}),kh={id:`tech_fractal_artisan`,name:`Logic Fractal`,category:`Abstract`,added:`2026-04-16`,description:`Geometric recursive logic patterns mimicking complex computational architectures.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
       float d = 0.0;
@@ -16149,7 +16445,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(1.5, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Pattern Edge`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Deep Core`,type:`color`,default:[0,.1,.15,1]}]},mh=e({default:()=>hh}),hh={id:`tech_hex_v2_artisan`,name:`Tech Hex v2`,category:`Technology`,added:`2026-04-15`,description:`Advanced geometric hex-grid with internal subdivided offsets for sci-fi panels.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Pattern Edge`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Deep Core`,type:`color`,default:[0,.1,.15,1]}]},Ah=e({default:()=>jh}),jh={id:`tech_hex_v2_artisan`,name:`Tech Hex v2`,category:`Technology`,added:`2026-04-15`,description:`Advanced geometric hex-grid with internal subdivided offsets for sci-fi panels.`,shader:`
     vec2 hexCoords(vec2 uv) {
       vec2 r = vec2(1.0, 1.73);
       vec2 h = r * 0.5;
@@ -16163,7 +16459,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float inner = smoothstep(0.3, 0.28, length(gv));
       return mix(u_secondary_color, u_primary_color, mask - inner);
     }
-  `,uniforms:[{id:`u_scale`,name:`Module Count`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Housing`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Frame`,type:`color`,default:[.05,.05,.08,1]}]},gh=e({default:()=>_h}),_h={id:`teletext_blocks`,name:`Teletext Blocks`,category:`Retro`,added:`2026-06-11`,description:`Ceefax page 888 mosaic graphics — 2×3 sixel blocks clustering into saturated seven-colour shapes on broadcast black, with the faint shimmer of a tuned-in telly.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Module Count`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Housing`,type:`color`,default:[0,.8,1,1]},{id:`u_secondary_color`,name:`Frame`,type:`color`,default:[.05,.05,.08,1]}]},Mh=e({default:()=>Nh}),Nh={id:`teletext_blocks`,name:`Teletext Blocks`,category:`Retro`,added:`2026-06-11`,description:`Ceefax page 888 mosaic graphics — 2×3 sixel blocks clustering into saturated seven-colour shapes on broadcast black, with the faint shimmer of a tuned-in telly.`,shader:`
     vec3 ttpal_tt(float k) {
       if (k < 1.0) return vec3(1.0, 1.0, 1.0);     // white
       if (k < 2.0) return vec3(1.0, 1.0, 0.0);     // yellow
@@ -16223,7 +16519,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_cols`,name:`Character Columns`,type:`float`,min:10,max:60,default:26},{id:`u_fill`,name:`Mosaic Fill`,type:`float`,min:.15,max:.9,default:.55},{id:`u_bg_color`,name:`Broadcast Black`,type:`color`,default:[.02,.02,.03,1]}]},vh=e({default:()=>yh}),yh={id:`terracotta_roof`,name:`Terracotta Roof`,category:`Architecture`,added:`2026-06-12`,description:`Overlapping barrel pantile courses — sun-fired clay cylinders with kiln-varied tone, deep shadow under each overlap, lichen blooms and dust washed into the troughs.`,shader:`
+  `,uniforms:[{id:`u_cols`,name:`Character Columns`,type:`float`,min:10,max:60,default:26},{id:`u_fill`,name:`Mosaic Fill`,type:`float`,min:.15,max:.9,default:.55},{id:`u_bg_color`,name:`Broadcast Black`,type:`color`,default:[.02,.02,.03,1]}]},Ph=e({default:()=>Fh}),Fh={id:`terracotta_roof`,name:`Terracotta Roof`,category:`Architecture`,added:`2026-06-12`,description:`Overlapping barrel pantile courses — sun-fired clay cylinders with kiln-varied tone, deep shadow under each overlap, lichen blooms and dust washed into the troughs.`,shader:`
     float hash_ter(vec2 p) {
       return fract(sin(dot(p, vec2(251.7, 113.3))) * 42371.8123);
     }
@@ -16297,7 +16593,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_columns`,name:`Tile Columns`,type:`float`,min:3,max:16,default:7},{id:`u_overlap`,name:`Overlap Shadow`,type:`float`,min:.1,max:.5,default:.28},{id:`u_weathering`,name:`Weathering`,type:`float`,min:0,max:1,default:.5},{id:`u_clay_color`,name:`Clay`,type:`color`,default:[.78,.42,.26,1]}]},bh=e({default:()=>xh}),xh={id:`terrazzo_chip_artisan`,name:`Terrazzo Chip`,category:`Industrial`,added:`2026-04-16`,description:`Scattered irregular stone flakes and marble chips mimicking professional terrazzo flooring.`,shader:`
+  `,uniforms:[{id:`u_columns`,name:`Tile Columns`,type:`float`,min:3,max:16,default:7},{id:`u_overlap`,name:`Overlap Shadow`,type:`float`,min:.1,max:.5,default:.28},{id:`u_weathering`,name:`Weathering`,type:`float`,min:0,max:1,default:.5},{id:`u_clay_color`,name:`Clay`,type:`color`,default:[.78,.42,.26,1]}]},Ih=e({default:()=>Lh}),Lh={id:`terrazzo_chip_artisan`,name:`Terrazzo Chip`,category:`Industrial`,added:`2026-04-16`,description:`Scattered irregular stone flakes and marble chips mimicking professional terrazzo flooring.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
@@ -16306,7 +16602,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.6, hash(i_uv * 1.5));
       return mix(u_secondary_color, vec4(col, 1.0), mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:10,max:100,default:50},{id:`u_secondary_color`,name:`Binding Resin`,type:`color`,default:[.1,.1,.12,1]}]},Sh=e({default:()=>Ch}),Ch={id:`terrazzo_stone_artisan`,name:`Terrazzo Stone`,category:`Industrial`,added:`2026-04-15`,description:`Multi-colored irregular stone chunks embedded in a polished composite base.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:10,max:100,default:50},{id:`u_secondary_color`,name:`Binding Resin`,type:`color`,default:[.1,.1,.12,1]}]},Rh=e({default:()=>zh}),zh={id:`terrazzo_stone_artisan`,name:`Terrazzo Stone`,category:`Industrial`,added:`2026-04-15`,description:`Multi-colored irregular stone chunks embedded in a polished composite base.`,shader:`
     vec2 rand2(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -16328,7 +16624,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.1, m_dist);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Stone Chip`,type:`color`,default:[.6,.62,.65,1]},{id:`u_secondary_color`,name:`Base Mortar`,type:`color`,default:[.8,.8,.82,1]}]},wh=e({default:()=>Th}),Th={id:`thermal_heatmap`,name:`Thermal Heatmap`,category:`Technology`,added:`2026-07-07`,description:`Infrared camera view — iron-bow palette blobs from cold shadow to white-hot core.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Chip Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Stone Chip`,type:`color`,default:[.6,.62,.65,1]},{id:`u_secondary_color`,name:`Base Mortar`,type:`color`,default:[.8,.8,.82,1]}]},Bh=e({default:()=>Vh}),Vh={id:`thermal_heatmap`,name:`Thermal Heatmap`,category:`Technology`,added:`2026-07-07`,description:`Infrared camera view — iron-bow palette blobs from cold shadow to white-hot core.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float t = fbm(uv * 0.6) * 0.5 + 0.5;
@@ -16346,7 +16642,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= 1.0 - line * 0.35;
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Blob Scale`,type:`float`,min:1,max:12,default:4},{id:`u_heat`,name:`Overall Heat`,type:`float`,min:0,max:1,default:.5},{id:`u_contrast`,name:`Contrast`,type:`float`,min:.4,max:3,default:1.4},{id:`u_bands`,name:`Isotherm Bands`,type:`float`,min:0,max:1,default:0},{id:`u_secondary_color`,name:`Cold`,type:`color`,default:[.02,0,.1,1]},{id:`u_primary_color`,name:`Warm`,type:`color`,default:[.6,.05,.45,1]},{id:`u_accent_color`,name:`Hot`,type:`color`,default:[1,.55,.05,1]}],variants:[{name:`Iron Bow`,uniforms:{u_secondary_color:[.02,0,.1,1],u_primary_color:[.6,.05,.45,1],u_accent_color:[1,.55,.05,1],u_bands:0,u_heat:.5}},{name:`Rainbow IR`,uniforms:{u_secondary_color:[.05,.05,.4,1],u_primary_color:[.05,.6,.3,1],u_accent_color:[.95,.85,.1,1],u_bands:.6,u_heat:.5}},{name:`Tire Temps`,uniforms:{u_secondary_color:[.03,.1,.25,1],u_primary_color:[.15,.55,.25,1],u_accent_color:[.9,.2,.08,1],u_bands:1,u_heat:.6}}]},Eh=e({default:()=>Dh}),Dh={id:`thermal_tile_scorch_artisan`,name:`Thermal Tile Scorch`,category:`Industrial`,added:`2026-05-13`,description:`Heat-ablated spacecraft tiles showing directional plasma scorch marks and edge wear.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Blob Scale`,type:`float`,min:1,max:12,default:4},{id:`u_heat`,name:`Overall Heat`,type:`float`,min:0,max:1,default:.5},{id:`u_contrast`,name:`Contrast`,type:`float`,min:.4,max:3,default:1.4},{id:`u_bands`,name:`Isotherm Bands`,type:`float`,min:0,max:1,default:0},{id:`u_secondary_color`,name:`Cold`,type:`color`,default:[.02,0,.1,1]},{id:`u_primary_color`,name:`Warm`,type:`color`,default:[.6,.05,.45,1]},{id:`u_accent_color`,name:`Hot`,type:`color`,default:[1,.55,.05,1]}],variants:[{name:`Iron Bow`,uniforms:{u_secondary_color:[.02,0,.1,1],u_primary_color:[.6,.05,.45,1],u_accent_color:[1,.55,.05,1],u_bands:0,u_heat:.5}},{name:`Rainbow IR`,uniforms:{u_secondary_color:[.05,.05,.4,1],u_primary_color:[.05,.6,.3,1],u_accent_color:[.95,.85,.1,1],u_bands:.6,u_heat:.5}},{name:`Tire Temps`,uniforms:{u_secondary_color:[.03,.1,.25,1],u_primary_color:[.15,.55,.25,1],u_accent_color:[.9,.2,.08,1],u_bands:1,u_heat:.6}}]},Hh=e({default:()=>Uh}),Uh={id:`thermal_tile_scorch_artisan`,name:`Thermal Tile Scorch`,category:`Industrial`,added:`2026-05-13`,description:`Heat-ablated spacecraft tiles showing directional plasma scorch marks and edge wear.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
     float fbm(vec2 p) {
       float f = 0.0;
@@ -16380,14 +16676,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec4 finalColor = mix(tileColor, vec4(0.0,0.0,0.0,1.0), border); // Dark grout
       return mix(finalColor, u_scorch_color, crack); // Wear on edges
     }
-  `,uniforms:[{id:`u_scale`,name:`Tile Scale`,type:`float`,min:2,max:20,default:8},{id:`u_tile_color`,name:`Clean Tile`,type:`color`,default:[.85,.85,.8,1]},{id:`u_scorch_color`,name:`Plasma Scorch`,type:`color`,default:[.15,.1,.08,1]}]},Oh=e({default:()=>kh}),kh={id:`threaded_screw_artisan`,name:`Threaded Bolt`,category:`Industrial`,added:`2026-04-15`,description:`Helical metal grooves representing industrial fasteners and bolts.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tile Scale`,type:`float`,min:2,max:20,default:8},{id:`u_tile_color`,name:`Clean Tile`,type:`color`,default:[.85,.85,.8,1]},{id:`u_scorch_color`,name:`Plasma Scorch`,type:`color`,default:[.15,.1,.08,1]}]},Wh=e({default:()=>Gh}),Gh={id:`threaded_screw_artisan`,name:`Threaded Bolt`,category:`Industrial`,added:`2026-04-15`,description:`Helical metal grooves representing industrial fasteners and bolts.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float thread = sin(uv.y * 10.0 - uv.x * 2.0);
       float mask = smoothstep(-0.1, 0.1, thread);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Thread Pitch`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Peak Metal`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Valley`,type:`color`,default:[.1,.1,.15,1]}]},Ah=e({default:()=>jh}),jh={id:`ticket_roll`,name:`Ticket Roll`,category:`Retro`,added:`2026-06-11`,description:`Carnival admit-one tickets unspooled in brick-laid rows — perforated ends, punched side notches, inset keyline panels and serial-number blocks on sunfaded red stock.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Thread Pitch`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Peak Metal`,type:`color`,default:[.9,.9,.95,1]},{id:`u_secondary_color`,name:`Valley`,type:`color`,default:[.1,.1,.15,1]}]},Kh=e({default:()=>qh}),qh={id:`ticket_roll`,name:`Ticket Roll`,category:`Retro`,added:`2026-06-11`,description:`Carnival admit-one tickets unspooled in brick-laid rows — perforated ends, punched side notches, inset keyline panels and serial-number blocks on sunfaded red stock.`,shader:`
     vec4 generate() {
       float rows = u_rows;
       // tickets are roughly 2:1 — half as many columns as rows
@@ -16454,7 +16750,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_rows`,name:`Ticket Rows`,type:`float`,min:3,max:10,default:5},{id:`u_wear`,name:`Pocket Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_ticket_color`,name:`Ticket Stock`,type:`color`,default:[.82,.18,.12,1]}]},Mh=e({default:()=>Nh}),Nh={id:`tide_pool_rings`,name:`Tide Pool Rings`,category:`Ocean`,added:`2026-06-11`,description:`Mineral water-level rings receding into rocky tide pools — salt-crust lines, algae stains and rust bands around each basin.`,shader:`
+  `,uniforms:[{id:`u_rows`,name:`Ticket Rows`,type:`float`,min:3,max:10,default:5},{id:`u_wear`,name:`Pocket Wear`,type:`float`,min:0,max:1,default:.35},{id:`u_ticket_color`,name:`Ticket Stock`,type:`color`,default:[.82,.18,.12,1]}]},Jh=e({default:()=>Yh}),Yh={id:`tide_pool_rings`,name:`Tide Pool Rings`,category:`Ocean`,added:`2026-06-11`,description:`Mineral water-level rings receding into rocky tide pools — salt-crust lines, algae stains and rust bands around each basin.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -16528,7 +16824,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ring_freq`,name:`Ring Frequency`,type:`float`,min:3,max:16,default:8},{id:`u_warp`,name:`Basin Irregularity`,type:`float`,min:0,max:.5,default:.22},{id:`u_rock_color`,name:`Rock Color`,type:`color`,default:[.42,.38,.33,1]}]},Ph=e({default:()=>Fh}),Fh={id:`tie_dye_spiral`,name:`Tie-Dye Spiral`,category:`Textile`,added:`2026-07-07`,description:`The classic pinwheel tie-dye — dye sectors twisting into the center with white crease rays.`,shader:`
+  `,uniforms:[{id:`u_ring_freq`,name:`Ring Frequency`,type:`float`,min:3,max:16,default:8},{id:`u_warp`,name:`Basin Irregularity`,type:`float`,min:0,max:.5,default:.22},{id:`u_rock_color`,name:`Rock Color`,type:`color`,default:[.42,.38,.33,1]}]},Xh=e({default:()=>Zh}),Zh={id:`tie_dye_spiral`,name:`Tie-Dye Spiral`,category:`Textile`,added:`2026-07-07`,description:`The classic pinwheel tie-dye — dye sectors twisting into the center with white crease rays.`,shader:`
     vec4 generate() {
       vec2 p = (v_uv - 0.5) * u_scale;
       float r = length(p);
@@ -16554,7 +16850,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= 0.95 + 0.05 * sin(p.x * 160.0) * sin(p.y * 160.0);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:2.5},{id:`u_twist`,name:`Spiral Twist`,type:`float`,min:.5,max:8,default:3},{id:`u_crease`,name:`Crease Lines`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Dye 1`,type:`color`,default:[.9,.2,.3,1]},{id:`u_accent_color`,name:`Dye 2`,type:`color`,default:[.95,.8,.15,1]},{id:`u_pop_color`,name:`Dye 3`,type:`color`,default:[.2,.4,.85,1]},{id:`u_secondary_color`,name:`Cloth`,type:`color`,default:[.96,.95,.92,1]}],variants:[{name:`Summer of 69`,uniforms:{u_primary_color:[.9,.2,.3,1],u_accent_color:[.95,.8,.15,1],u_pop_color:[.2,.4,.85,1],u_secondary_color:[.96,.95,.92,1],u_twist:3}},{name:`Grape Swirl`,uniforms:{u_primary_color:[.5,.2,.7,1],u_accent_color:[.85,.3,.6,1],u_pop_color:[.25,.25,.55,1],u_secondary_color:[.94,.92,.95,1],u_twist:4.5}},{name:`Sea Breeze`,uniforms:{u_primary_color:[.1,.55,.6,1],u_accent_color:[.4,.8,.75,1],u_pop_color:[.15,.3,.55,1],u_secondary_color:[.95,.97,.96,1],u_twist:2}}]},Ih=e({default:()=>Lh}),Lh={id:`tig_weld`,name:`TIG Weld Bead`,category:`Industrial`,added:`2026-05-01`,description:`TIG weld bead running horizontally with characteristic stacked-coin ripple arcs, hot bright center, and heat-affected steel.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Zoom`,type:`float`,min:1,max:8,default:2.5},{id:`u_twist`,name:`Spiral Twist`,type:`float`,min:.5,max:8,default:3},{id:`u_crease`,name:`Crease Lines`,type:`float`,min:0,max:1,default:.6},{id:`u_primary_color`,name:`Dye 1`,type:`color`,default:[.9,.2,.3,1]},{id:`u_accent_color`,name:`Dye 2`,type:`color`,default:[.95,.8,.15,1]},{id:`u_pop_color`,name:`Dye 3`,type:`color`,default:[.2,.4,.85,1]},{id:`u_secondary_color`,name:`Cloth`,type:`color`,default:[.96,.95,.92,1]}],variants:[{name:`Summer of 69`,uniforms:{u_primary_color:[.9,.2,.3,1],u_accent_color:[.95,.8,.15,1],u_pop_color:[.2,.4,.85,1],u_secondary_color:[.96,.95,.92,1],u_twist:3}},{name:`Grape Swirl`,uniforms:{u_primary_color:[.5,.2,.7,1],u_accent_color:[.85,.3,.6,1],u_pop_color:[.25,.25,.55,1],u_secondary_color:[.94,.92,.95,1],u_twist:4.5}},{name:`Sea Breeze`,uniforms:{u_primary_color:[.1,.55,.6,1],u_accent_color:[.4,.8,.75,1],u_pop_color:[.15,.3,.55,1],u_secondary_color:[.95,.97,.96,1],u_twist:2}}]},Qh=e({default:()=>$h}),$h={id:`tig_weld`,name:`TIG Weld Bead`,category:`Industrial`,added:`2026-05-01`,description:`TIG weld bead running horizontally with characteristic stacked-coin ripple arcs, hot bright center, and heat-affected steel.`,shader:`
     // --- helpers BEFORE generate() ---
 
     float hash1_tw(vec2 p) {
@@ -16640,7 +16936,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_bead_freq`,name:`Ripple Frequency`,type:`float`,min:4,max:40,default:16},{id:`u_bead_width`,name:`Bead Width`,type:`float`,min:.05,max:.4,default:.18},{id:`u_heat_spread`,name:`Heat Affected Zone`,type:`float`,min:.5,max:3,default:1.5}]},Rh=e({default:()=>zh}),zh={id:`tiger_eye`,name:`Tiger Eye`,category:`Geology`,added:`2026-06-12`,description:`Golden tiger eye gemstone — wavy chatoyant fiber bands of gold and chocolate brown with a bright moving sheen stripe and fine silky striations.`,shader:`
+  `,uniforms:[{id:`u_bead_freq`,name:`Ripple Frequency`,type:`float`,min:4,max:40,default:16},{id:`u_bead_width`,name:`Bead Width`,type:`float`,min:.05,max:.4,default:.18},{id:`u_heat_spread`,name:`Heat Affected Zone`,type:`float`,min:.5,max:3,default:1.5}]},eg=e({default:()=>tg}),tg={id:`tiger_eye`,name:`Tiger Eye`,category:`Geology`,added:`2026-06-12`,description:`Golden tiger eye gemstone — wavy chatoyant fiber bands of gold and chocolate brown with a bright moving sheen stripe and fine silky striations.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -16692,7 +16988,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_band_scale`,name:`Band Density`,type:`float`,min:3,max:30,default:10},{id:`u_sheen_pos`,name:`Sheen Position`,type:`float`,min:0,max:1,default:.45},{id:`u_sheen_strength`,name:`Chatoyancy`,type:`float`,min:0,max:2,default:1},{id:`u_gold_color`,name:`Gold Tone`,type:`color`,default:[.78,.52,.18,1]}]},Bh=e({default:()=>Vh}),Vh={id:`tiger_stripe_camo`,name:`Tiger Stripe Camo`,category:`Organic`,added:`2026-05-12`,description:`Aggressive, horizontally flowing organic stripes characteristic of jungle warfare uniforms.`,shader:`
+  `,uniforms:[{id:`u_band_scale`,name:`Band Density`,type:`float`,min:3,max:30,default:10},{id:`u_sheen_pos`,name:`Sheen Position`,type:`float`,min:0,max:1,default:.45},{id:`u_sheen_strength`,name:`Chatoyancy`,type:`float`,min:0,max:2,default:1},{id:`u_gold_color`,name:`Gold Tone`,type:`color`,default:[.78,.52,.18,1]}]},ng=e({default:()=>rg}),rg={id:`tiger_stripe_camo`,name:`Tiger Stripe Camo`,category:`Organic`,added:`2026-05-12`,description:`Aggressive, horizontally flowing organic stripes characteristic of jungle warfare uniforms.`,shader:`
     
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
@@ -16711,7 +17007,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Jungle Tiger`,uniforms:{u_color_base:[.35,.38,.25,1],u_color_1:[.2,.25,.15,1],u_color_2:[.45,.35,.2,1],u_color_3:[.08,.08,.08,1]}},{name:`Desert Tiger`,uniforms:{u_color_base:[.85,.75,.55,1],u_color_1:[.65,.55,.4,1],u_color_2:[.45,.35,.25,1],u_color_3:[.25,.15,.1,1]}},{name:`Snow Tiger`,uniforms:{u_color_base:[.95,.95,.95,1],u_color_1:[.75,.75,.78,1],u_color_2:[.45,.45,.5,1],u_color_3:[.15,.15,.18,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.12,1],u_color_1:[.08,.08,.08,1],u_color_2:[.05,.05,.05,1],u_color_3:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Stripe Scale`,type:`float`,min:1,max:20,default:4},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.35,.38,.25,1]},{id:`u_color_1`,name:`Stripe 1`,type:`color`,default:[.2,.25,.15,1]},{id:`u_color_2`,name:`Stripe 2`,type:`color`,default:[.45,.35,.2,1]},{id:`u_color_3`,name:`Stripe 3`,type:`color`,default:[.08,.08,.08,1]}]},Hh=e({default:()=>Uh}),Uh={id:`tiger_stripes_artisan`,name:`Predator Stripes`,category:`Organic`,added:`2026-04-15`,description:`Organic predator-style tiger stripes with tapered edges.`,shader:`
+  `,variants:[{name:`Jungle Tiger`,uniforms:{u_color_base:[.35,.38,.25,1],u_color_1:[.2,.25,.15,1],u_color_2:[.45,.35,.2,1],u_color_3:[.08,.08,.08,1]}},{name:`Desert Tiger`,uniforms:{u_color_base:[.85,.75,.55,1],u_color_1:[.65,.55,.4,1],u_color_2:[.45,.35,.25,1],u_color_3:[.25,.15,.1,1]}},{name:`Snow Tiger`,uniforms:{u_color_base:[.95,.95,.95,1],u_color_1:[.75,.75,.78,1],u_color_2:[.45,.45,.5,1],u_color_3:[.15,.15,.18,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.12,1],u_color_1:[.08,.08,.08,1],u_color_2:[.05,.05,.05,1],u_color_3:[.02,.02,.02,1]}}],uniforms:[{id:`u_scale`,name:`Stripe Scale`,type:`float`,min:1,max:20,default:4},{id:`u_color_base`,name:`Base Color`,type:`color`,default:[.35,.38,.25,1]},{id:`u_color_1`,name:`Stripe 1`,type:`color`,default:[.2,.25,.15,1]},{id:`u_color_2`,name:`Stripe 2`,type:`color`,default:[.45,.35,.2,1]},{id:`u_color_3`,name:`Stripe 3`,type:`color`,default:[.08,.08,.08,1]}]},ig=e({default:()=>ag}),ag={id:`tiger_stripes_artisan`,name:`Predator Stripes`,category:`Organic`,added:`2026-04-15`,description:`Organic predator-style tiger stripes with tapered edges.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = noise(vec2(uv.x * 0.2 * u_breakup, uv.y * 2.0));
@@ -16719,7 +17015,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(u_coverage - s, u_coverage + s, n + sin(uv.x * 2.0) * u_wave);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.05,.05,.05,1],u_secondary_color:[1,.45,.05,1],u_coverage:.5,u_softness:.1,u_wave:.2,u_breakup:1}},{name:`White Tiger`,uniforms:{u_primary_color:[.25,.28,.32,1],u_secondary_color:[.93,.94,.96,1],u_coverage:.52,u_softness:.08,u_wave:.2,u_breakup:1.2}},{name:`Jungle Ghost`,uniforms:{u_primary_color:[.05,.09,.04,1],u_secondary_color:[.32,.42,.2,1],u_coverage:.45,u_softness:.14,u_wave:.3,u_breakup:1.6}},{name:`Synthwave`,uniforms:{u_primary_color:[.95,.1,.6,1],u_secondary_color:[.08,.02,.15,1],u_coverage:.5,u_softness:.04,u_wave:.35,u_breakup:.8}}],uniforms:[{id:`u_scale`,name:`Stripe Spacing`,type:`float`,min:2,max:20,default:8},{id:`u_coverage`,name:`Stripe Coverage`,type:`float`,min:.2,max:.8,default:.5},{id:`u_softness`,name:`Edge Taper`,type:`float`,min:.005,max:.3,default:.1},{id:`u_wave`,name:`Stripe Waviness`,type:`float`,min:0,max:.6,default:.2},{id:`u_breakup`,name:`Stripe Break-up`,type:`float`,min:.2,max:4,default:1},{id:`u_primary_color`,name:`Stripe Color`,type:`color`,default:[.05,.05,.05,1]},{id:`u_secondary_color`,name:`Base Color`,type:`color`,default:[1,.45,.05,1]}]},Wh=e({default:()=>Gh}),Gh={id:`tinted_carbon`,name:`Tinted Carbon Fibre`,category:`Racing`,added:`2026-05-13`,description:`Colour-tinted resin carbon fibre — gold, blue, and red carbon as seen on real motorsport bodywork.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[.05,.05,.05,1],u_secondary_color:[1,.45,.05,1],u_coverage:.5,u_softness:.1,u_wave:.2,u_breakup:1}},{name:`White Tiger`,uniforms:{u_primary_color:[.25,.28,.32,1],u_secondary_color:[.93,.94,.96,1],u_coverage:.52,u_softness:.08,u_wave:.2,u_breakup:1.2}},{name:`Jungle Ghost`,uniforms:{u_primary_color:[.05,.09,.04,1],u_secondary_color:[.32,.42,.2,1],u_coverage:.45,u_softness:.14,u_wave:.3,u_breakup:1.6}},{name:`Synthwave`,uniforms:{u_primary_color:[.95,.1,.6,1],u_secondary_color:[.08,.02,.15,1],u_coverage:.5,u_softness:.04,u_wave:.35,u_breakup:.8}}],uniforms:[{id:`u_scale`,name:`Stripe Spacing`,type:`float`,min:2,max:20,default:8},{id:`u_coverage`,name:`Stripe Coverage`,type:`float`,min:.2,max:.8,default:.5},{id:`u_softness`,name:`Edge Taper`,type:`float`,min:.005,max:.3,default:.1},{id:`u_wave`,name:`Stripe Waviness`,type:`float`,min:0,max:.6,default:.2},{id:`u_breakup`,name:`Stripe Break-up`,type:`float`,min:.2,max:4,default:1},{id:`u_primary_color`,name:`Stripe Color`,type:`color`,default:[.05,.05,.05,1]},{id:`u_secondary_color`,name:`Base Color`,type:`color`,default:[1,.45,.05,1]}]},og=e({default:()=>sg}),sg={id:`tinted_carbon`,name:`Tinted Carbon Fibre`,category:`Racing`,added:`2026-05-13`,description:`Colour-tinted resin carbon fibre — gold, blue, and red carbon as seen on real motorsport bodywork.`,shader:`
     float hash_tc(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
     vec4 generate() {
@@ -16772,21 +17068,21 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scale`,type:`float`,default:24,min:8,max:64},{id:`u_tint`,name:`Resin Tint`,type:`color`,default:[.85,.62,.08,1]},{id:`u_tint_strength`,name:`Tint Strength`,type:`float`,default:.65,min:0,max:1}]},Kh=e({default:()=>qh}),qh={id:`tire_marbles_artisan`,name:`Tire Marbles`,category:`Racing`,added:`2026-04-16`,description:`Clumpy rubber debris and "offline" track grit formed during high-heat racing conditions.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scale`,type:`float`,default:24,min:8,max:64},{id:`u_tint`,name:`Resin Tint`,type:`color`,default:[.85,.62,.08,1]},{id:`u_tint_strength`,name:`Tint Strength`,type:`float`,default:.65,min:0,max:1}]},cg=e({default:()=>lg}),lg={id:`tire_marbles_artisan`,name:`Tire Marbles`,category:`Racing`,added:`2026-04-16`,description:`Clumpy rubber debris and "offline" track grit formed during high-heat racing conditions.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
       float mask = step(0.8, hash(i_uv));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Grit Size`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Rubber Clump`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Track Surface`,type:`color`,default:[.2,.2,.2,1]}]},Jh=e({default:()=>Yh}),Yh={id:`tire_sidewall_artisan`,name:`Tire Sidewall`,category:`Racing`,added:`2026-04-16`,description:`Raised geometric patterns and grip ridges found on professional racing tires.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grit Size`,type:`float`,min:10,max:100,default:50},{id:`u_primary_color`,name:`Rubber Clump`,type:`color`,default:[.1,.1,.1,1]},{id:`u_secondary_color`,name:`Track Surface`,type:`color`,default:[.2,.2,.2,1]}]},ug=e({default:()=>dg}),dg={id:`tire_sidewall_artisan`,name:`Tire Sidewall`,category:`Racing`,added:`2026-04-16`,description:`Raised geometric patterns and grip ridges found on professional racing tires.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
       float mask = step(0.1, gv.x) * step(gv.x, 0.4) * step(0.1, gv.y) * step(gv.y, 0.9);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Detail Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rubber High`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Rubber Base`,type:`color`,default:[.08,.08,.08,1]}]},Xh=e({default:()=>Zh}),Zh={id:`tire_tread_rain`,name:`Rain Tire Tread`,category:`Racing`,added:`2026-04-15`,description:`Deep directional grooves for wet weather conditions.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Detail Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rubber High`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Rubber Base`,type:`color`,default:[.08,.08,.08,1]}]},fg=e({default:()=>pg}),pg={id:`tire_tread_rain`,name:`Rain Tire Tread`,category:`Racing`,added:`2026-04-15`,description:`Deep directional grooves for wet weather conditions.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float x = abs(fract(uv.x) - 0.5);
@@ -16794,7 +17090,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.15, abs(x - y * 0.5)) * step(0.05, x);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Rubber`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Groove`,type:`color`,default:[.05,.05,.05,1]}]},Qh=e({default:()=>$h}),$h={id:`toile_de_jouy`,name:`Toile de Jouy`,category:`Textile`,added:`2026-06-12`,description:`French toile: one-colour pastoral vignettes — tree, cottage and grounds — copper-plate printed in fine engraved hatching on cream cotton, repeated in offset drops.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Rubber`,type:`color`,default:[.15,.15,.15,1]},{id:`u_secondary_color`,name:`Groove`,type:`color`,default:[.05,.05,.05,1]}]},mg=e({default:()=>hg}),hg={id:`toile_de_jouy`,name:`Toile de Jouy`,category:`Textile`,added:`2026-06-12`,description:`French toile: one-colour pastoral vignettes — tree, cottage and grounds — copper-plate printed in fine engraved hatching on cream cotton, repeated in offset drops.`,shader:`
     // soft ellipse mask
     float ell_tdj(vec2 p, vec2 c, vec2 r) {
       return 1.0 - smoothstep(0.85, 1.05, length((p - c) / r));
@@ -16876,7 +17172,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_repeats`,name:`Vignette Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_hatch`,name:`Hatch Fineness`,type:`float`,min:30,max:160,default:80},{id:`u_ink_color`,name:`Ink Color`,type:`color`,default:[.2,.3,.55,1]}]},eg=e({default:()=>tg}),tg={id:`tooled_leather`,name:`Tooled Leather`,category:`Textile`,added:`2026-07-07`,description:`Western saddle leather — carved scroll lines embossed into a stained hide with stamp shading.`,shader:`
+  `,uniforms:[{id:`u_repeats`,name:`Vignette Repeats`,type:`float`,min:1,max:6,default:2},{id:`u_hatch`,name:`Hatch Fineness`,type:`float`,min:30,max:160,default:80},{id:`u_ink_color`,name:`Ink Color`,type:`color`,default:[.2,.3,.55,1]}]},gg=e({default:()=>_g}),_g={id:`tooled_leather`,name:`Tooled Leather`,category:`Textile`,added:`2026-07-07`,description:`Western saddle leather — carved scroll lines embossed into a stained hide with stamp shading.`,shader:`
     float scroll(vec2 p, float seed) {
       // spiral arcs: distance to an archimedean spiral around the cell center
       float r = length(p);
@@ -16907,7 +17203,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col.rgb = mix(col.rgb, col.rgb * 0.8, smoothstep(0.3, 0.5, max(abs(f.x), abs(f.y))) * 0.5);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Motif Density`,type:`float`,min:2,max:12,default:4},{id:`u_depth`,name:`Carve Depth`,type:`float`,min:.2,max:1,default:.75},{id:`u_primary_color`,name:`Leather`,type:`color`,default:[.55,.35,.18,1]},{id:`u_secondary_color`,name:`Carve Stain`,type:`color`,default:[.2,.11,.05,1]}],variants:[{name:`Saddle Tan`,uniforms:{u_primary_color:[.55,.35,.18,1],u_secondary_color:[.2,.11,.05,1],u_depth:.75}},{name:`Oxblood`,uniforms:{u_primary_color:[.4,.15,.12,1],u_secondary_color:[.14,.05,.04,1],u_depth:.85}},{name:`Bleached Ranch`,uniforms:{u_primary_color:[.78,.68,.52,1],u_secondary_color:[.45,.35,.22,1],u_depth:.6}}]},ng=e({default:()=>rg}),rg={id:`topographic_pro`,name:`Topographic Map`,category:`Abstract`,added:`2026-04-15`,description:`Technical contour lines mimicking elevation mapping.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Motif Density`,type:`float`,min:2,max:12,default:4},{id:`u_depth`,name:`Carve Depth`,type:`float`,min:.2,max:1,default:.75},{id:`u_primary_color`,name:`Leather`,type:`color`,default:[.55,.35,.18,1]},{id:`u_secondary_color`,name:`Carve Stain`,type:`color`,default:[.2,.11,.05,1]}],variants:[{name:`Saddle Tan`,uniforms:{u_primary_color:[.55,.35,.18,1],u_secondary_color:[.2,.11,.05,1],u_depth:.75}},{name:`Oxblood`,uniforms:{u_primary_color:[.4,.15,.12,1],u_secondary_color:[.14,.05,.04,1],u_depth:.85}},{name:`Bleached Ranch`,uniforms:{u_primary_color:[.78,.68,.52,1],u_secondary_color:[.45,.35,.22,1],u_depth:.6}}]},vg=e({default:()=>yg}),yg={id:`topographic_pro`,name:`Topographic Map`,category:`Abstract`,added:`2026-04-15`,description:`Technical contour lines mimicking elevation mapping.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     vec4 generate() {
       float n = noise(v_uv * u_scale);
@@ -16918,7 +17214,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       if (u_is_spec > 0.5) return vec4(0.1, 0.4, 1.0, 1.0);
       return color;
     }
-  `,uniforms:[{id:`u_scale`,name:`Territory Size`,type:`float`,min:1,max:10,default:3},{id:`u_layers`,name:`Contour Detail`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Line Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Land Color`,type:`color`,default:[.1,.1,.1,1]}]},ig=e({default:()=>ag}),ag={id:`tortoise_shell`,name:`Tortoise Shell`,category:`Natural`,added:`2026-07-07`,description:`Polygonal scutes with growth rings, ringed by pale seams — a tortoise carapace.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Territory Size`,type:`float`,min:1,max:10,default:3},{id:`u_layers`,name:`Contour Detail`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Line Color`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Land Color`,type:`color`,default:[.1,.1,.1,1]}]},bg=e({default:()=>xg}),xg={id:`tortoise_shell`,name:`Tortoise Shell`,category:`Natural`,added:`2026-07-07`,description:`Polygonal scutes with growth rings, ringed by pale seams — a tortoise carapace.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -16947,7 +17243,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 c = mix(scute, u_secondary_color.rgb, seam);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Scute Density`,type:`float`,min:2,max:12,default:4},{id:`u_seam`,name:`Seam Width`,type:`float`,min:.02,max:.3,default:.1},{id:`u_rings`,name:`Growth Rings`,type:`float`,min:2,max:16,default:7},{id:`u_primary_color`,name:`Scute`,type:`color`,default:[.42,.28,.12,1]},{id:`u_accent_color`,name:`Amber Mottle`,type:`color`,default:[.72,.5,.2,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.82,.74,.55,1]}],variants:[{name:`Carapace`,uniforms:{u_primary_color:[.42,.28,.12,1],u_accent_color:[.72,.5,.2,1],u_secondary_color:[.82,.74,.55,1],u_rings:7}},{name:`Eyewear Acetate`,uniforms:{u_primary_color:[.3,.16,.08,1],u_accent_color:[.85,.55,.22,1],u_secondary_color:[.5,.32,.15,1],u_rings:3}},{name:`Jade Turtle`,uniforms:{u_primary_color:[.15,.35,.25,1],u_accent_color:[.4,.6,.4,1],u_secondary_color:[.75,.82,.7,1],u_rings:9}}]},og=e({default:()=>sg}),sg={id:`tourmaline_slice`,name:`Tourmaline Slice`,category:`Geology`,added:`2026-07-07`,description:`Watermelon tourmaline cross-sections — pink cores ringed in white and rimmed green.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Scute Density`,type:`float`,min:2,max:12,default:4},{id:`u_seam`,name:`Seam Width`,type:`float`,min:.02,max:.3,default:.1},{id:`u_rings`,name:`Growth Rings`,type:`float`,min:2,max:16,default:7},{id:`u_primary_color`,name:`Scute`,type:`color`,default:[.42,.28,.12,1]},{id:`u_accent_color`,name:`Amber Mottle`,type:`color`,default:[.72,.5,.2,1]},{id:`u_secondary_color`,name:`Seam`,type:`color`,default:[.82,.74,.55,1]}],variants:[{name:`Carapace`,uniforms:{u_primary_color:[.42,.28,.12,1],u_accent_color:[.72,.5,.2,1],u_secondary_color:[.82,.74,.55,1],u_rings:7}},{name:`Eyewear Acetate`,uniforms:{u_primary_color:[.3,.16,.08,1],u_accent_color:[.85,.55,.22,1],u_secondary_color:[.5,.32,.15,1],u_rings:3}},{name:`Jade Turtle`,uniforms:{u_primary_color:[.15,.35,.25,1],u_accent_color:[.4,.6,.4,1],u_secondary_color:[.75,.82,.7,1],u_rings:9}}]},Sg=e({default:()=>Cg}),Cg={id:`tourmaline_slice`,name:`Tourmaline Slice`,category:`Geology`,added:`2026-07-07`,description:`Watermelon tourmaline cross-sections — pink cores ringed in white and rimmed green.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -16981,7 +17277,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Slice Density`,type:`float`,min:2,max:10,default:4},{id:`u_primary_color`,name:`Core`,type:`color`,default:[.9,.35,.55,1]},{id:`u_accent_color`,name:`Rim`,type:`color`,default:[.2,.55,.35,1]},{id:`u_secondary_color`,name:`Matrix`,type:`color`,default:[.22,.2,.22,1]}],variants:[{name:`Watermelon`,uniforms:{u_primary_color:[.9,.35,.55,1],u_accent_color:[.2,.55,.35,1],u_secondary_color:[.22,.2,.22,1]}},{name:`Indicolite`,uniforms:{u_primary_color:[.2,.45,.75,1],u_accent_color:[.1,.25,.4,1],u_secondary_color:[.15,.16,.2,1]}},{name:`Citrus Zone`,uniforms:{u_primary_color:[.95,.75,.2,1],u_accent_color:[.55,.65,.15,1],u_secondary_color:[.2,.18,.14,1]}}]},cg=e({default:()=>lg}),lg={id:`track_outlines`,name:`Track Outlines`,category:`Racing`,added:`2026-07-07`,description:`A field of wobbly closed circuit maps — every cell its own fantasy race track outline.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Slice Density`,type:`float`,min:2,max:10,default:4},{id:`u_primary_color`,name:`Core`,type:`color`,default:[.9,.35,.55,1]},{id:`u_accent_color`,name:`Rim`,type:`color`,default:[.2,.55,.35,1]},{id:`u_secondary_color`,name:`Matrix`,type:`color`,default:[.22,.2,.22,1]}],variants:[{name:`Watermelon`,uniforms:{u_primary_color:[.9,.35,.55,1],u_accent_color:[.2,.55,.35,1],u_secondary_color:[.22,.2,.22,1]}},{name:`Indicolite`,uniforms:{u_primary_color:[.2,.45,.75,1],u_accent_color:[.1,.25,.4,1],u_secondary_color:[.15,.16,.2,1]}},{name:`Citrus Zone`,uniforms:{u_primary_color:[.95,.75,.2,1],u_accent_color:[.55,.65,.15,1],u_secondary_color:[.2,.18,.14,1]}}]},wg=e({default:()=>Tg}),Tg={id:`track_outlines`,name:`Track Outlines`,category:`Racing`,added:`2026-07-07`,description:`A field of wobbly closed circuit maps — every cell its own fantasy race track outline.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -17001,7 +17297,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = mix(col, u_accent_color, tick);
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Track Density`,type:`float`,min:2,max:12,default:5},{id:`u_width`,name:`Line Width`,type:`float`,min:.005,max:.08,default:.025},{id:`u_primary_color`,name:`Track Line`,type:`color`,default:[.92,.92,.9,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.08,.09,.12,1]},{id:`u_accent_color`,name:`Start Line`,type:`color`,default:[.9,.15,.15,1]}],variants:[{name:`Night Stage`,uniforms:{u_primary_color:[.92,.92,.9,1],u_secondary_color:[.08,.09,.12,1],u_accent_color:[.9,.15,.15,1],u_width:.025}},{name:`Blueprint`,uniforms:{u_primary_color:[.85,.92,1,1],u_secondary_color:[.07,.2,.45,1],u_accent_color:[1,.8,.2,1],u_width:.018}},{name:`Paper Maps`,uniforms:{u_primary_color:[.2,.2,.22,1],u_secondary_color:[.94,.92,.86,1],u_accent_color:[.8,.2,.2,1],u_width:.03}}]},ug=e({default:()=>dg}),dg={id:`travertine_natural`,name:`Travertine`,category:`Natural`,added:`2026-05-01`,description:`Layered travertine limestone with wavy cream-to-tan sedimentary bands and occasional trapped gas-bubble void pockets.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Track Density`,type:`float`,min:2,max:12,default:5},{id:`u_width`,name:`Line Width`,type:`float`,min:.005,max:.08,default:.025},{id:`u_primary_color`,name:`Track Line`,type:`color`,default:[.92,.92,.9,1]},{id:`u_secondary_color`,name:`Background`,type:`color`,default:[.08,.09,.12,1]},{id:`u_accent_color`,name:`Start Line`,type:`color`,default:[.9,.15,.15,1]}],variants:[{name:`Night Stage`,uniforms:{u_primary_color:[.92,.92,.9,1],u_secondary_color:[.08,.09,.12,1],u_accent_color:[.9,.15,.15,1],u_width:.025}},{name:`Blueprint`,uniforms:{u_primary_color:[.85,.92,1,1],u_secondary_color:[.07,.2,.45,1],u_accent_color:[1,.8,.2,1],u_width:.018}},{name:`Paper Maps`,uniforms:{u_primary_color:[.2,.2,.22,1],u_secondary_color:[.94,.92,.86,1],u_accent_color:[.8,.2,.2,1],u_width:.03}}]},Eg=e({default:()=>Dg}),Dg={id:`travertine_natural`,name:`Travertine`,category:`Natural`,added:`2026-05-01`,description:`Layered travertine limestone with wavy cream-to-tan sedimentary bands and occasional trapped gas-bubble void pockets.`,shader:`
     float hash11(float p)  { return fract(sin(p * 127.1) * 43758.5453); }
     float hash21(vec2 p)   { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
@@ -17098,7 +17394,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_band_freq`,name:`Band Frequency`,type:`float`,min:2,max:20,default:8},{id:`u_base_color`,name:`Travertine Color`,type:`color`,default:[.88,.8,.67,1]},{id:`u_void_density`,name:`Void Density`,type:`float`,min:0,max:10,default:3}]},fg=e({default:()=>pg}),pg={id:`tricolore_sash`,name:`Tricolore Sash`,category:`Heritage`,added:`2026-06-12`,description:`A diagonal three-colour sash sweeping the panel — national-stripe trio with white keylines between bands, painted edge wobble, and gloss body either side.`,shader:`
+  `,uniforms:[{id:`u_band_freq`,name:`Band Frequency`,type:`float`,min:2,max:20,default:8},{id:`u_base_color`,name:`Travertine Color`,type:`color`,default:[.88,.8,.67,1]},{id:`u_void_density`,name:`Void Density`,type:`float`,min:0,max:10,default:3}]},Og=e({default:()=>kg}),kg={id:`tricolore_sash`,name:`Tricolore Sash`,category:`Heritage`,added:`2026-06-12`,description:`A diagonal three-colour sash sweeping the panel — national-stripe trio with white keylines between bands, painted edge wobble, and gloss body either side.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv;
 
@@ -17166,7 +17462,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_sash_width`,name:`Sash Width`,type:`float`,min:.1,max:.45,default:.24},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.9,.88,.82,1]},{id:`u_color_a`,name:`Leading Band`,type:`color`,default:[.1,.32,.18,1]},{id:`u_color_b`,name:`Trailing Band`,type:`color`,default:[.74,.13,.12,1]}]},mg=e({default:()=>hg}),hg={id:`truchet_tiles_artisan`,name:`Truchet Arc`,category:`Abstract`,added:`2026-04-16`,description:`Interlocking arc-based tiles mimicking complex organic circuitry and decorative pavement.`,shader:`
+  `,uniforms:[{id:`u_sash_width`,name:`Sash Width`,type:`float`,min:.1,max:.45,default:.24},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.9,.88,.82,1]},{id:`u_color_a`,name:`Leading Band`,type:`color`,default:[.1,.32,.18,1]},{id:`u_color_b`,name:`Trailing Band`,type:`color`,default:[.74,.13,.12,1]}]},Ag=e({default:()=>jg}),jg={id:`truchet_tiles_artisan`,name:`Truchet Arc`,category:`Abstract`,added:`2026-04-16`,description:`Interlocking arc-based tiles mimicking complex organic circuitry and decorative pavement.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 i_uv = floor(uv);
@@ -17176,7 +17472,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.02, 0.0, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Tile Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Arc Ribbon`,type:`color`,default:[1,.4,0,1]},{id:`u_secondary_color`,name:`Tile Depth`,type:`color`,default:[.1,.1,.15,1]}]},gg=e({default:()=>_g}),_g={id:`tumbling_blocks`,name:`Tumbling Blocks`,category:`Geometric`,added:`2026-07-07`,description:`Isometric cubes in three-tone rhombille tiling — the classic impossible stack illusion.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tile Zoom`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Arc Ribbon`,type:`color`,default:[1,.4,0,1]},{id:`u_secondary_color`,name:`Tile Depth`,type:`color`,default:[.1,.1,.15,1]}]},Mg=e({default:()=>Ng}),Ng={id:`tumbling_blocks`,name:`Tumbling Blocks`,category:`Geometric`,added:`2026-07-07`,description:`Isometric cubes in three-tone rhombille tiling — the classic impossible stack illusion.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -17201,7 +17497,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= 1.0 - edge * u_edges * 0.5;
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cube Density`,type:`float`,min:2,max:20,default:7},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:60,default:0},{id:`u_edges`,name:`Edge Lines`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Top Face`,type:`color`,default:[.92,.9,.85,1]},{id:`u_secondary_color`,name:`Light Side`,type:`color`,default:[.62,.55,.45,1]},{id:`u_accent_color`,name:`Dark Side`,type:`color`,default:[.25,.2,.16,1]}],variants:[{name:`Quilt Classic`,uniforms:{u_primary_color:[.92,.9,.85,1],u_secondary_color:[.62,.55,.45,1],u_accent_color:[.25,.2,.16,1],u_edges:.5}},{name:`Vasarely Blue`,uniforms:{u_primary_color:[.65,.8,.95,1],u_secondary_color:[.2,.4,.75,1],u_accent_color:[.07,.12,.3,1],u_edges:.2}},{name:`Racing Slate`,uniforms:{u_primary_color:[.75,.75,.78,1],u_secondary_color:[.4,.42,.46,1],u_accent_color:[.12,.13,.15,1],u_edges:.8}}]},vg=e({default:()=>yg}),yg={id:`turbo_fan_artisan`,name:`Turbo Turbine`,category:`Technology`,added:`2026-04-16`,description:`Radial blades of a high-boost turbocharger compressor wheel.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cube Density`,type:`float`,min:2,max:20,default:7},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:60,default:0},{id:`u_edges`,name:`Edge Lines`,type:`float`,min:0,max:1,default:.5},{id:`u_primary_color`,name:`Top Face`,type:`color`,default:[.92,.9,.85,1]},{id:`u_secondary_color`,name:`Light Side`,type:`color`,default:[.62,.55,.45,1]},{id:`u_accent_color`,name:`Dark Side`,type:`color`,default:[.25,.2,.16,1]}],variants:[{name:`Quilt Classic`,uniforms:{u_primary_color:[.92,.9,.85,1],u_secondary_color:[.62,.55,.45,1],u_accent_color:[.25,.2,.16,1],u_edges:.5}},{name:`Vasarely Blue`,uniforms:{u_primary_color:[.65,.8,.95,1],u_secondary_color:[.2,.4,.75,1],u_accent_color:[.07,.12,.3,1],u_edges:.2}},{name:`Racing Slate`,uniforms:{u_primary_color:[.75,.75,.78,1],u_secondary_color:[.4,.42,.46,1],u_accent_color:[.12,.13,.15,1],u_edges:.8}}]},Pg=e({default:()=>Fg}),Fg={id:`turbo_fan_artisan`,name:`Turbo Turbine`,category:`Technology`,added:`2026-04-16`,description:`Radial blades of a high-boost turbocharger compressor wheel.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float angle = atan(uv.y, uv.x);
@@ -17209,7 +17505,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(-0.5, 0.5, blades);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_blades`,name:`Blade Count`,type:`float`,min:6,max:24,default:12},{id:`u_primary_color`,name:`Blade Top`,type:`color`,default:[.9,.92,.95,1]},{id:`u_secondary_color`,name:`Blade Void`,type:`color`,default:[.1,.1,.15,1]}]},bg=e({default:()=>xg}),xg={id:`turquoise_matrix`,name:`Turquoise Matrix`,category:`Geology`,added:`2026-06-12`,description:`Sky-blue turquoise shot through with a black-brown spiderweb matrix — two scales of veining with thickened web junctions and waxy polish.`,shader:`
+  `,uniforms:[{id:`u_blades`,name:`Blade Count`,type:`float`,min:6,max:24,default:12},{id:`u_primary_color`,name:`Blade Top`,type:`color`,default:[.9,.92,.95,1]},{id:`u_secondary_color`,name:`Blade Void`,type:`color`,default:[.1,.1,.15,1]}]},Ig=e({default:()=>Lg}),Lg={id:`turquoise_matrix`,name:`Turquoise Matrix`,category:`Geology`,added:`2026-06-12`,description:`Sky-blue turquoise shot through with a black-brown spiderweb matrix — two scales of veining with thickened web junctions and waxy polish.`,shader:`
     // Ridged vein line from simplex noise: 1 at the ridge, 0 elsewhere
     float vein_tqm(vec2 p, float width) {
       float n = snoise(p);
@@ -17268,7 +17564,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_web_scale`,name:`Web Scale`,type:`float`,min:2,max:16,default:6},{id:`u_web_thickness`,name:`Web Thickness`,type:`float`,min:.2,max:2.5,default:1},{id:`u_stone_color`,name:`Stone Blue`,type:`color`,default:[.22,.66,.72,1]}]},Sg=e({default:()=>Cg}),Cg={id:`twill_carbon_pro`,name:`Pro Twill Carbon`,category:`Racing`,added:`2026-04-15`,description:`Classic high-detail 2x2 carbon fiber weave.`,shader:`
+  `,uniforms:[{id:`u_web_scale`,name:`Web Scale`,type:`float`,min:2,max:16,default:6},{id:`u_web_thickness`,name:`Web Thickness`,type:`float`,min:.2,max:2.5,default:1},{id:`u_stone_color`,name:`Stone Blue`,type:`color`,default:[.22,.66,.72,1]}]},Rg=e({default:()=>zg}),zg={id:`twill_carbon_pro`,name:`Pro Twill Carbon`,category:`Racing`,added:`2026-04-15`,description:`Classic high-detail 2x2 carbon fiber weave.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = fract(uv);
@@ -17283,7 +17579,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Primary`,type:`color`,default:[.12,.12,.12,1]},{id:`u_secondary_color`,name:`Secondary`,type:`color`,default:[.05,.05,.05,1]}]},wg=e({default:()=>Tg}),Tg={id:`tyre_burnout`,name:`Tyre Burnout`,category:`Racing`,added:`2026-05-01`,description:`Dark rubber burnout and skid marks on asphalt with irregular fuzzy edges, lighter internal streaks, and visible tyre tread impressions.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Weave Size`,type:`float`,min:10,max:100,default:40},{id:`u_primary_color`,name:`Primary`,type:`color`,default:[.12,.12,.12,1]},{id:`u_secondary_color`,name:`Secondary`,type:`color`,default:[.05,.05,.05,1]}]},Bg=e({default:()=>Vg}),Vg={id:`tyre_burnout`,name:`Tyre Burnout`,category:`Racing`,added:`2026-05-01`,description:`Dark rubber burnout and skid marks on asphalt with irregular fuzzy edges, lighter internal streaks, and visible tyre tread impressions.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 3; i++) {
@@ -17359,7 +17655,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_asphalt`,name:`Asphalt`,type:`color`,default:[.18,.17,.16,1]},{id:`u_rubber_color`,name:`Rubber`,type:`color`,default:[.04,.03,.03,1]},{id:`u_intensity`,name:`Intensity`,type:`float`,min:.2,max:2,default:1},{id:`u_width`,name:`Track Width`,type:`float`,min:.05,max:.5,default:.25}]},Eg=e({default:()=>Dg}),Dg={id:`vacuum_tubes`,name:`Vacuum Tubes`,category:`Technology`,added:`2026-07-07`,description:`Rows of warm glass valves on a dark chassis — glowing filaments and metal bases.`,shader:`
+  `,uniforms:[{id:`u_asphalt`,name:`Asphalt`,type:`color`,default:[.18,.17,.16,1]},{id:`u_rubber_color`,name:`Rubber`,type:`color`,default:[.04,.03,.03,1]},{id:`u_intensity`,name:`Intensity`,type:`float`,min:.2,max:2,default:1},{id:`u_width`,name:`Track Width`,type:`float`,min:.05,max:.5,default:.25}]},Hg=e({default:()=>Ug}),Ug={id:`vacuum_tubes`,name:`Vacuum Tubes`,category:`Technology`,added:`2026-07-07`,description:`Rows of warm glass valves on a dark chassis — glowing filaments and metal bases.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 cell = floor(uv);
@@ -17388,7 +17684,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c = mix(c, baseC, base * present);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Tube Density`,type:`float`,min:3,max:16,default:6},{id:`u_glow`,name:`Filament Glow`,type:`float`,min:0,max:2,default:1},{id:`u_primary_color`,name:`Glass`,type:`color`,default:[.25,.28,.3,1]},{id:`u_accent_color`,name:`Filament`,type:`color`,default:[1,.55,.15,1]},{id:`u_secondary_color`,name:`Chassis`,type:`color`,default:[.09,.08,.08,1]}],variants:[{name:`Tube Amp`,uniforms:{u_primary_color:[.25,.28,.3,1],u_accent_color:[1,.55,.15,1],u_secondary_color:[.09,.08,.08,1],u_glow:1}},{name:`Overdriven`,uniforms:{u_primary_color:[.3,.25,.22,1],u_accent_color:[1,.3,.1,1],u_secondary_color:[.12,.07,.05,1],u_glow:1.8}},{name:`Cold Cathode`,uniforms:{u_primary_color:[.2,.26,.34,1],u_accent_color:[.3,.7,1,1],u_secondary_color:[.05,.06,.09,1],u_glow:1.3}}]},Og=e({default:()=>kg}),kg={id:`vaporwave_sun_artisan`,name:`Retro Sun`,category:`Abstract`,added:`2026-04-16`,description:`Segmented radial retro sun patterns found in 80s synthwave and vaporwave aesthetics.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Tube Density`,type:`float`,min:3,max:16,default:6},{id:`u_glow`,name:`Filament Glow`,type:`float`,min:0,max:2,default:1},{id:`u_primary_color`,name:`Glass`,type:`color`,default:[.25,.28,.3,1]},{id:`u_accent_color`,name:`Filament`,type:`color`,default:[1,.55,.15,1]},{id:`u_secondary_color`,name:`Chassis`,type:`color`,default:[.09,.08,.08,1]}],variants:[{name:`Tube Amp`,uniforms:{u_primary_color:[.25,.28,.3,1],u_accent_color:[1,.55,.15,1],u_secondary_color:[.09,.08,.08,1],u_glow:1}},{name:`Overdriven`,uniforms:{u_primary_color:[.3,.25,.22,1],u_accent_color:[1,.3,.1,1],u_secondary_color:[.12,.07,.05,1],u_glow:1.8}},{name:`Cold Cathode`,uniforms:{u_primary_color:[.2,.26,.34,1],u_accent_color:[.3,.7,1,1],u_secondary_color:[.05,.06,.09,1],u_glow:1.3}}]},Wg=e({default:()=>Gg}),Gg={id:`vaporwave_sun_artisan`,name:`Retro Sun`,category:`Abstract`,added:`2026-04-16`,description:`Segmented radial retro sun patterns found in 80s synthwave and vaporwave aesthetics.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv - 0.5;
       float d = length(uv);
@@ -17396,7 +17692,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float stripes = step(0.1, fract(v_uv.y * 10.0));
       return mix(u_secondary_color, u_primary_color, mask * stripes);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Sun Core`,type:`color`,default:[1,.6,0,1]},{id:`u_secondary_color`,name:`Atmosphere`,type:`color`,default:[1,0,.5,1]}]},Ag=e({default:()=>jg}),jg={id:`velvet_pile`,name:`Velvet Pile`,category:`Industrial`,added:`2026-05-01`,description:`Velvet fabric with directional pile sheen â€” bright along the pile, dark against it, with a dramatic direction effect.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Sun Core`,type:`color`,default:[1,.6,0,1]},{id:`u_secondary_color`,name:`Atmosphere`,type:`color`,default:[1,0,.5,1]}]},Kg=e({default:()=>qg}),qg={id:`velvet_pile`,name:`Velvet Pile`,category:`Industrial`,added:`2026-05-01`,description:`Velvet fabric with directional pile sheen â€” bright along the pile, dark against it, with a dramatic direction effect.`,shader:`
     // Hash noise for micro-fibre variation
     float hash21(vec2 p) {
       vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -17471,7 +17767,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_base_color`,type:`color`,default:[.35,.05,.08,1],name:`Velvet Colour`},{id:`u_pile_direction`,type:`float`,default:.785,min:0,max:6.28,name:`Pile Direction (rad)`},{id:`u_sheen`,type:`float`,default:1.2,min:.3,max:2,name:`Sheen Intensity`}]},Mg=e({default:()=>Ng}),Ng={id:`verdigris_patina`,name:`Verdigris Patina`,category:`Industrial`,added:`2026-05-01`,description:`Aged copper or bronze with green-blue verdigris oxidation pooling in recesses over warm reddish copper.`,shader:`
+  `,uniforms:[{id:`u_base_color`,type:`color`,default:[.35,.05,.08,1],name:`Velvet Colour`},{id:`u_pile_direction`,type:`float`,default:.785,min:0,max:6.28,name:`Pile Direction (rad)`},{id:`u_sheen`,type:`float`,default:1.2,min:.3,max:2,name:`Sheen Intensity`}]},Jg=e({default:()=>Yg}),Yg={id:`verdigris_patina`,name:`Verdigris Patina`,category:`Industrial`,added:`2026-05-01`,description:`Aged copper or bronze with green-blue verdigris oxidation pooling in recesses over warm reddish copper.`,shader:`
     // --- helpers BEFORE generate() ---
 
     float hash1_vp(vec2 p) {
@@ -17553,7 +17849,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col * u_opacity, u_opacity);
     }
-  `,uniforms:[{id:`u_patina_coverage`,name:`Patina Coverage`,type:`float`,min:0,max:1,default:.6},{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:15,default:5},{id:`u_patina_color`,name:`Verdigris Color`,type:`color`,default:[.18,.52,.42,1]}]},Pg=e({default:()=>Fg}),Fg={id:`victory_confetti`,name:`Victory Confetti`,category:`Racing`,added:`2026-07-07`,description:`Podium celebration — tumbling rectangular confetti pieces scattered mid-air.`,shader:`
+  `,uniforms:[{id:`u_patina_coverage`,name:`Patina Coverage`,type:`float`,min:0,max:1,default:.6},{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:15,default:5},{id:`u_patina_color`,name:`Verdigris Color`,type:`color`,default:[.18,.52,.42,1]}]},Xg=e({default:()=>Zg}),Zg={id:`victory_confetti`,name:`Victory Confetti`,category:`Racing`,added:`2026-07-07`,description:`Podium celebration — tumbling rectangular confetti pieces scattered mid-air.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec4 col = u_secondary_color;
@@ -17580,7 +17876,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       }
       return col;
     }
-  `,uniforms:[{id:`u_scale`,name:`Confetti Density`,type:`float`,min:4,max:30,default:12},{id:`u_secondary_color`,name:`Sky`,type:`color`,default:[.07,.08,.12,1]},{id:`u_primary_color`,name:`Confetti 1`,type:`color`,default:[.95,.75,.1,1]},{id:`u_accent_color`,name:`Confetti 2`,type:`color`,default:[.9,.15,.35,1]},{id:`u_pop_color`,name:`Confetti 3`,type:`color`,default:[.15,.7,.9,1]}],variants:[{name:`Champagne Night`,uniforms:{u_secondary_color:[.07,.08,.12,1],u_primary_color:[.95,.75,.1,1],u_accent_color:[.9,.15,.35,1],u_pop_color:[.15,.7,.9,1]}},{name:`Gold Shower`,uniforms:{u_secondary_color:[.1,.07,.03,1],u_primary_color:[.95,.78,.2,1],u_accent_color:[.85,.6,.1,1],u_pop_color:[1,.9,.55,1]}},{name:`Ticker Parade`,uniforms:{u_secondary_color:[.9,.92,.95,1],u_primary_color:[.85,.12,.15,1],u_accent_color:[.1,.3,.7,1],u_pop_color:[.15,.15,.17,1]}}]},Ig=e({default:()=>Lg}),Lg={id:`victory_laurel`,name:`Victory Laurel`,category:`Heritage`,added:`2026-06-12`,description:`Laurel wreath rings repeated across the panel — paired leaves climbing two arcs to a crossed-ribbon base, gold-leaf print over felt green with plate misregistration.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Confetti Density`,type:`float`,min:4,max:30,default:12},{id:`u_secondary_color`,name:`Sky`,type:`color`,default:[.07,.08,.12,1]},{id:`u_primary_color`,name:`Confetti 1`,type:`color`,default:[.95,.75,.1,1]},{id:`u_accent_color`,name:`Confetti 2`,type:`color`,default:[.9,.15,.35,1]},{id:`u_pop_color`,name:`Confetti 3`,type:`color`,default:[.15,.7,.9,1]}],variants:[{name:`Champagne Night`,uniforms:{u_secondary_color:[.07,.08,.12,1],u_primary_color:[.95,.75,.1,1],u_accent_color:[.9,.15,.35,1],u_pop_color:[.15,.7,.9,1]}},{name:`Gold Shower`,uniforms:{u_secondary_color:[.1,.07,.03,1],u_primary_color:[.95,.78,.2,1],u_accent_color:[.85,.6,.1,1],u_pop_color:[1,.9,.55,1]}},{name:`Ticker Parade`,uniforms:{u_secondary_color:[.9,.92,.95,1],u_primary_color:[.85,.12,.15,1],u_accent_color:[.1,.3,.7,1],u_pop_color:[.15,.15,.17,1]}}]},Qg=e({default:()=>$g}),$g={id:`victory_laurel`,name:`Victory Laurel`,category:`Heritage`,added:`2026-06-12`,description:`Laurel wreath rings repeated across the panel — paired leaves climbing two arcs to a crossed-ribbon base, gold-leaf print over felt green with plate misregistration.`,shader:`
     // distance to a single laurel leaf: a lens shape, length L, half-width W
     float leaf_hrt6(vec2 p, float L, float W) {
       float t = clamp(p.x / L, 0.0, 1.0);
@@ -17661,7 +17957,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_grid_scale`,name:`Wreaths Per Tile`,type:`float`,min:1,max:5,default:2},{id:`u_field_color`,name:`Field Colour`,type:`color`,default:[.1,.25,.16,1]},{id:`u_wreath_color`,name:`Wreath Colour`,type:`color`,default:[.85,.68,.28,1]}]},Rg=e({default:()=>zg}),zg={id:`vintage_scallops`,name:`Vintage Scallops`,category:`Heritage`,added:`2026-06-12`,description:`Hand-painted hot-rod scallops — rows of long tapering spears with a contrasting keyline, brush-edge wobble, and lacquer that has yellowed in the sun.`,shader:`
+  `,uniforms:[{id:`u_grid_scale`,name:`Wreaths Per Tile`,type:`float`,min:1,max:5,default:2},{id:`u_field_color`,name:`Field Colour`,type:`color`,default:[.1,.25,.16,1]},{id:`u_wreath_color`,name:`Wreath Colour`,type:`color`,default:[.85,.68,.28,1]}]},e_=e({default:()=>t_}),t_={id:`vintage_scallops`,name:`Vintage Scallops`,category:`Heritage`,added:`2026-06-12`,description:`Hand-painted hot-rod scallops — rows of long tapering spears with a contrasting keyline, brush-edge wobble, and lacquer that has yellowed in the sun.`,shader:`
     // distance to a scallop spear: round head at the left, long taper right
     float spear_hrt3(vec2 p, float len, float head) {
       float t = clamp(p.x / len, 0.0, 1.0);
@@ -17722,7 +18018,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_row_count`,name:`Scallop Rows`,type:`float`,min:2,max:8,default:4},{id:`u_scallop_length`,name:`Spear Length`,type:`float`,min:.4,max:.95,default:.8},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.3,.06,.09,1]},{id:`u_scallop_color`,name:`Scallop Colour`,type:`color`,default:[.93,.72,.25,1]}]},Bg=e({default:()=>Vg}),Vg={id:`vinyl_grooves`,name:`Vinyl Grooves`,category:`Retro`,added:`2026-06-11`,description:`A 45 fresh out of the sleeve — micro-groove rings catching twin anisotropic light streaks, track-gap bands, dead wax and a paper label around the spindle hole.`,shader:`
+  `,uniforms:[{id:`u_row_count`,name:`Scallop Rows`,type:`float`,min:2,max:8,default:4},{id:`u_scallop_length`,name:`Spear Length`,type:`float`,min:.4,max:.95,default:.8},{id:`u_body_color`,name:`Body Colour`,type:`color`,default:[.3,.06,.09,1]},{id:`u_scallop_color`,name:`Scallop Colour`,type:`color`,default:[.93,.72,.25,1]}]},n_=e({default:()=>r_}),r_={id:`vinyl_grooves`,name:`Vinyl Grooves`,category:`Retro`,added:`2026-06-11`,description:`A 45 fresh out of the sleeve — micro-groove rings catching twin anisotropic light streaks, track-gap bands, dead wax and a paper label around the spindle hole.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_tiles;
       vec2 cell = floor(uv);
@@ -17787,7 +18083,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_tiles`,name:`Records Across`,type:`float`,min:1,max:5,default:2},{id:`u_groove_density`,name:`Groove Density`,type:`float`,min:20,max:140,default:70},{id:`u_sheen`,name:`Light Sheen`,type:`float`,min:0,max:1.5,default:.8},{id:`u_label_color`,name:`Label Paper`,type:`color`,default:[.85,.25,.15,1]}]},Hg=e({default:()=>Ug}),Ug={id:`vinyl_wrap`,name:`Vinyl Wrap Film`,category:`Racing`,added:`2026-05-13`,description:`Matte vinyl wrap film with characteristic micro-pebble surface texture and subtle directional sheen. Excellent as a spec or normal-map source for flat paint finishes.`,shader:`
+  `,uniforms:[{id:`u_tiles`,name:`Records Across`,type:`float`,min:1,max:5,default:2},{id:`u_groove_density`,name:`Groove Density`,type:`float`,min:20,max:140,default:70},{id:`u_sheen`,name:`Light Sheen`,type:`float`,min:0,max:1.5,default:.8},{id:`u_label_color`,name:`Label Paper`,type:`color`,default:[.85,.25,.15,1]}]},i_=e({default:()=>a_}),a_={id:`vinyl_wrap`,name:`Vinyl Wrap Film`,category:`Racing`,added:`2026-05-13`,description:`Matte vinyl wrap film with characteristic micro-pebble surface texture and subtle directional sheen. Excellent as a spec or normal-map source for flat paint finishes.`,shader:`
     float hash_vw(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise_vw(vec2 p) {
       vec2 i = floor(p), f = fract(p);
@@ -17838,7 +18134,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), u_opacity);
     }
-  `,uniforms:[{id:`u_base_color`,name:`Base Colour`,type:`color`,default:[.12,.12,.15,1]},{id:`u_pebble_scale`,name:`Pebble Scale`,type:`float`,default:80,min:20,max:200},{id:`u_texture_depth`,name:`Texture Depth`,type:`float`,default:.7,min:0,max:1},{id:`u_sheen`,name:`Gloss Sheen`,type:`float`,default:.6,min:0,max:1}]},Wg=e({default:()=>Gg}),Gg={id:`viral_capsid_artisan`,name:`Viral Capsid`,category:`Organic`,added:`2026-05-13`,description:`Geometric, icosahedral protein structures interlocking to form complex biological shells.`,shader:`
+  `,uniforms:[{id:`u_base_color`,name:`Base Colour`,type:`color`,default:[.12,.12,.15,1]},{id:`u_pebble_scale`,name:`Pebble Scale`,type:`float`,default:80,min:20,max:200},{id:`u_texture_depth`,name:`Texture Depth`,type:`float`,default:.7,min:0,max:1},{id:`u_sheen`,name:`Gloss Sheen`,type:`float`,default:.6,min:0,max:1}]},o_=e({default:()=>s_}),s_={id:`viral_capsid_artisan`,name:`Viral Capsid`,category:`Organic`,added:`2026-05-13`,description:`Geometric, icosahedral protein structures interlocking to form complex biological shells.`,shader:`
     // Hexagonal grid basis to simulate icosahedral unwrapping
     float hexDist(vec2 p) {
       p = abs(p);
@@ -17880,13 +18176,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
         // Add spike protein color
         return mix(capsidLayer, u_spike_color, spikeMask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Capsid Scale`,type:`float`,min:2,max:20,default:8},{id:`u_shell_dark`,name:`Capsid Shadow`,type:`color`,default:[.1,.2,.15,1]},{id:`u_shell_light`,name:`Capsid Surface`,type:`color`,default:[.4,.7,.5,1]},{id:`u_spike_color`,name:`Spike Protein`,type:`color`,default:[.8,.2,.3,1]}]},Kg=e({default:()=>qg}),qg={id:`void_grid_artisan`,name:`Void Grid`,category:`Abstract`,added:`2026-04-16`,description:`Infinite perspective grid reminiscent of 1980s retro-futuristic digital visualization.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Capsid Scale`,type:`float`,min:2,max:20,default:8},{id:`u_shell_dark`,name:`Capsid Shadow`,type:`color`,default:[.1,.2,.15,1]},{id:`u_shell_light`,name:`Capsid Surface`,type:`color`,default:[.4,.7,.5,1]},{id:`u_spike_color`,name:`Spike Protein`,type:`color`,default:[.8,.2,.3,1]}]},c_=e({default:()=>l_}),l_={id:`void_grid_artisan`,name:`Void Grid`,category:`Abstract`,added:`2026-04-16`,description:`Infinite perspective grid reminiscent of 1980s retro-futuristic digital visualization.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float grid = step(0.95, fract(uv.x)) + step(0.95, fract(uv.y));
       return mix(u_secondary_color, u_primary_color, clamp(grid, 0.0, 1.0));
     }
-  `,uniforms:[{id:`u_scale`,name:`Grid Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Grid Glow`,type:`color`,default:[1,0,1,1]},{id:`u_secondary_color`,name:`Void Base`,type:`color`,default:[0,0,.05,1]}]},Jg=e({default:()=>Yg}),Yg={id:`volcanic_basalt_artisan`,name:`Basalt Pillar`,category:`Geology`,added:`2026-04-16`,description:`Pitted, geometric volcanic rock found in hexagonal basalt formations.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Grid Density`,type:`float`,min:5,max:50,default:20},{id:`u_primary_color`,name:`Grid Glow`,type:`color`,default:[1,0,1,1]},{id:`u_secondary_color`,name:`Void Base`,type:`color`,default:[0,0,.05,1]}]},u_=e({default:()=>d_}),d_={id:`volcanic_basalt_artisan`,name:`Basalt Pillar`,category:`Geology`,added:`2026-04-16`,description:`Pitted, geometric volcanic rock found in hexagonal basalt formations.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       if (mod(floor(uv.y), 2.0) == 0.0) uv.x += 0.5;
@@ -17895,7 +18191,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.48, d);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Pillar Scale`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rock Face`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Pillar Joint`,type:`color`,default:[0,0,.05,1]}]},Xg=e({default:()=>Zg}),Zg={id:`voronoi_cells_pro`,name:`Voronoi Cells`,category:`Abstract`,added:`2026-04-15`,description:`Mathematical fractured cell structures often found in biological and geological formations.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Pillar Scale`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Rock Face`,type:`color`,default:[.1,.1,.12,1]},{id:`u_secondary_color`,name:`Pillar Joint`,type:`color`,default:[0,0,.05,1]}]},f_=e({default:()=>p_}),p_={id:`voronoi_cells_pro`,name:`Voronoi Cells`,category:`Abstract`,added:`2026-04-15`,description:`Mathematical fractured cell structures often found in biological and geological formations.`,shader:`
     vec2 hash2(vec2 p) {
       return vec2(hash(p), hash(p + 1.0));
     }
@@ -17917,7 +18213,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.0, 1.0, minDist);
       return mix(u_primary_color, u_secondary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Cell Center`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Cell Border`,type:`color`,default:[.1,.1,.12,1]}]},Qg=e({default:()=>$g}),$g={id:`washi_paper`,name:`Washi Paper`,category:`Natural`,added:`2026-05-01`,description:`Japanese handmade washi paper with long random fibres, mottled translucency, and cream base.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Cell Count`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Cell Center`,type:`color`,default:[.2,.2,.25,1]},{id:`u_secondary_color`,name:`Cell Border`,type:`color`,default:[.1,.1,.12,1]}]},m_=e({default:()=>h_}),h_={id:`washi_paper`,name:`Washi Paper`,category:`Natural`,added:`2026-05-01`,description:`Japanese handmade washi paper with long random fibres, mottled translucency, and cream base.`,shader:`
     float hash21(vec2 p) {
       vec3 p3 = fract(vec3(p.xyx) * 0.1031);
       p3 += dot(p3, p3.yzx + 33.33);
@@ -17979,7 +18275,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, 1.0) * u_opacity;
     }
-  `,uniforms:[{id:`u_fiber_density`,name:`Fibre Density`,type:`float`,min:1,max:12,default:4},{id:`u_paper_color`,name:`Paper Colour`,type:`color`,default:[.93,.91,.85,1]},{id:`u_fiber_color`,name:`Fibre Colour`,type:`color`,default:[.6,.54,.44,1]}]},e_=e({default:()=>t_}),t_={id:`water_ripples_artisan`,name:`Water Ripples`,category:`Natural`,added:`2026-04-15`,description:`Static concentric liquid wave interference patterns.`,shader:`
+  `,uniforms:[{id:`u_fiber_density`,name:`Fibre Density`,type:`float`,min:1,max:12,default:4},{id:`u_paper_color`,name:`Paper Colour`,type:`color`,default:[.93,.91,.85,1]},{id:`u_fiber_color`,name:`Fibre Colour`,type:`color`,default:[.6,.54,.44,1]}]},g_=e({default:()=>__}),__={id:`water_ripples_artisan`,name:`Water Ripples`,category:`Natural`,added:`2026-04-15`,description:`Static concentric liquid wave interference patterns.`,shader:`
     vec4 generate() {
       vec2 uv = (v_uv - 0.5) * u_scale;
       float d = length(uv);
@@ -17988,12 +18284,12 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(-0.1, 0.1, ripple);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Wave Scale`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Peak Color`,type:`color`,default:[.1,.6,1,1]},{id:`u_secondary_color`,name:`Deep Water`,type:`color`,default:[0,.2,.4,1]}]},n_=e({default:()=>r_}),r_={id:`watercolor_bleed_artisan`,name:`Watercolor Flow`,category:`Abstract`,added:`2026-04-15`,description:`Soft organic color spreads and bleeding textures mimicking paint on high-fidelity wet paper.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wave Scale`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Peak Color`,type:`color`,default:[.1,.6,1,1]},{id:`u_secondary_color`,name:`Deep Water`,type:`color`,default:[0,.2,.4,1]}]},v_=e({default:()=>y_}),y_={id:`watercolor_bleed_artisan`,name:`Watercolor Flow`,category:`Abstract`,added:`2026-04-15`,description:`Soft organic color spreads and bleeding textures mimicking paint on high-fidelity wet paper.`,shader:`
     vec4 generate() {
       float n = noise(v_uv * 5.0 + noise(v_uv * 10.0));
       return mix(u_secondary_color, u_primary_color, n);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Ink Bleed`,type:`color`,default:[.2,.4,.8,.8]},{id:`u_secondary_color`,name:`Pulp Base`,type:`color`,default:[.95,.95,.9,1]}]},i_=e({default:()=>a_}),a_={id:`wavy_checkers_artisan`,name:`Wavy Checkers`,category:`Racing`,added:`2026-04-15`,description:`Flowing, distorted racing flags mimicking a waving checkered banner.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Ink Bleed`,type:`color`,default:[.2,.4,.8,.8]},{id:`u_secondary_color`,name:`Pulp Base`,type:`color`,default:[.95,.95,.9,1]}]},b_=e({default:()=>x_}),x_={id:`wavy_checkers_artisan`,name:`Wavy Checkers`,category:`Racing`,added:`2026-04-15`,description:`Flowing, distorted racing flags mimicking a waving checkered banner.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       uv.x += sin(uv.y * u_wave_freq) * u_wave_amp;
@@ -18008,7 +18304,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = mx + my - 2.0 * mx * my;
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,1,1,1],u_secondary_color:[0,0,0,1],u_wave_freq:3,u_wave_amp:.2}},{name:`Victory Gold`,uniforms:{u_primary_color:[.95,.78,.2,1],u_secondary_color:[.07,.06,.05,1],u_wave_freq:3,u_wave_amp:.35}},{name:`Ocean Flag`,uniforms:{u_primary_color:[.92,.95,.97,1],u_secondary_color:[.05,.12,.3,1],u_wave_freq:4.5,u_wave_amp:.15}},{name:`Heat Shimmer`,uniforms:{u_primary_color:[.9,.2,.08,1],u_secondary_color:[.1,.02,.02,1],u_wave_freq:6,u_wave_amp:.3,u_softness:.05}}],uniforms:[{id:`u_scale`,name:`Check Size`,type:`float`,min:2,max:20,default:8},{id:`u_wave_freq`,name:`Wave Frequency`,type:`float`,min:0,max:10,default:3},{id:`u_wave_amp`,name:`Wave Amplitude`,type:`float`,min:0,max:.8,default:.2},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.2,default:.015},{id:`u_primary_color`,name:`Checker A`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Checker B`,type:`color`,default:[0,0,0,1]}]},o_=e({default:()=>s_}),s_={id:`weathered_paint_artisan`,name:`Weathered Paint`,category:`Industrial`,added:`2026-04-15`,description:`Chipped and peeling paint flakes mimicking aged industrial surfaces.`,shader:`
+  `,variants:[{name:`Classic`,uniforms:{u_primary_color:[1,1,1,1],u_secondary_color:[0,0,0,1],u_wave_freq:3,u_wave_amp:.2}},{name:`Victory Gold`,uniforms:{u_primary_color:[.95,.78,.2,1],u_secondary_color:[.07,.06,.05,1],u_wave_freq:3,u_wave_amp:.35}},{name:`Ocean Flag`,uniforms:{u_primary_color:[.92,.95,.97,1],u_secondary_color:[.05,.12,.3,1],u_wave_freq:4.5,u_wave_amp:.15}},{name:`Heat Shimmer`,uniforms:{u_primary_color:[.9,.2,.08,1],u_secondary_color:[.1,.02,.02,1],u_wave_freq:6,u_wave_amp:.3,u_softness:.05}}],uniforms:[{id:`u_scale`,name:`Check Size`,type:`float`,min:2,max:20,default:8},{id:`u_wave_freq`,name:`Wave Frequency`,type:`float`,min:0,max:10,default:3},{id:`u_wave_amp`,name:`Wave Amplitude`,type:`float`,min:0,max:.8,default:.2},{id:`u_softness`,name:`Edge Softness`,type:`float`,min:0,max:.2,default:.015},{id:`u_primary_color`,name:`Checker A`,type:`color`,default:[1,1,1,1]},{id:`u_secondary_color`,name:`Checker B`,type:`color`,default:[0,0,0,1]}]},S_=e({default:()=>C_}),C_={id:`weathered_paint_artisan`,name:`Weathered Paint`,category:`Industrial`,added:`2026-04-15`,description:`Chipped and peeling paint flakes mimicking aged industrial surfaces.`,shader:`
     float noise(vec2 p) {
       vec2 i = floor(p); vec2 f = fract(p);
       return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
@@ -18018,7 +18314,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.6, n);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Chip Detail`,type:`float`,min:5,max:50,default:10},{id:`u_primary_color`,name:`Paint`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Exposed Metal`,type:`color`,default:[.3,.3,.35,1]}]},c_=e({default:()=>l_}),l_={id:`weathered_rust_pro`,name:`Weathered Rust`,category:`Industrial`,added:`2026-04-15`,description:`Pro-grade oxidizing metallic surface with realistic pitting and oxidation layers.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Chip Detail`,type:`float`,min:5,max:50,default:10},{id:`u_primary_color`,name:`Paint`,type:`color`,default:[.8,.1,.1,1]},{id:`u_secondary_color`,name:`Exposed Metal`,type:`color`,default:[.3,.3,.35,1]}]},w_=e({default:()=>T_}),T_={id:`weathered_rust_pro`,name:`Weathered Rust`,category:`Industrial`,added:`2026-04-15`,description:`Pro-grade oxidizing metallic surface with realistic pitting and oxidation layers.`,shader:`
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
     
     vec4 generate() {
@@ -18032,7 +18328,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return mix(steel, rust, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Rust Intensity`,type:`float`,min:1,max:20,default:5}]},u_=e({default:()=>d_}),d_={id:`whale_song_spectrogram`,name:`Whale Song Spectrogram`,category:`Ocean`,added:`2026-06-11`,description:`A hydrophone spectrogram of humpback calls — sweeping harmonic arcs and low moans burning through cold analysis-grade noise.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Rust Intensity`,type:`float`,min:1,max:20,default:5}]},E_=e({default:()=>D_}),D_={id:`whale_song_spectrogram`,name:`Whale Song Spectrogram`,category:`Ocean`,added:`2026-06-11`,description:`A hydrophone spectrogram of humpback calls — sweeping harmonic arcs and low moans burning through cold analysis-grade noise.`,shader:`
     // Heat palette: black → deep violet → magma orange → white-hot
     vec3 heat_wss(float t) {
       t = clamp(t, 0.0, 1.0);
@@ -18105,7 +18401,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_calls`,name:`Call Count`,type:`float`,min:1,max:9,default:6},{id:`u_intensity`,name:`Signal Gain`,type:`float`,min:.3,max:2.5,default:1.2},{id:`u_grid_color`,name:`Grid Color`,type:`color`,default:[.25,.55,.65,1]}]},f_=e({default:()=>p_}),p_={id:`wicker_weave_artisan`,name:`Wicker Weave`,category:`Natural`,added:`2026-04-15`,description:`Interlocking thick strands of woven wood found in traditional basketry.`,shader:`
+  `,uniforms:[{id:`u_calls`,name:`Call Count`,type:`float`,min:1,max:9,default:6},{id:`u_intensity`,name:`Signal Gain`,type:`float`,min:.3,max:2.5,default:1.2},{id:`u_grid_color`,name:`Grid Color`,type:`color`,default:[.25,.55,.65,1]}]},O_=e({default:()=>k_}),k_={id:`wicker_weave_artisan`,name:`Wicker Weave`,category:`Natural`,added:`2026-04-15`,description:`Interlocking thick strands of woven wood found in traditional basketry.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float w = floor(uv.y);
@@ -18114,7 +18410,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = step(0.1, gv.x) * step(gv.x, 0.9) * step(0.1, gv.y) * step(gv.y, 0.9);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Wicker Slat`,type:`color`,default:[.7,.5,.3,1]},{id:`u_secondary_color`,name:`Joint Deep`,type:`color`,default:[.2,.1,.05,1]}]},m_=e({default:()=>h_}),h_={id:`widmanstatten_etch`,name:`Widmanstätten Etch`,category:`Geology`,added:`2026-06-12`,description:`Acid-etched iron meteorite — interlocking kamacite lamellae crossing at fixed angles, each band catching light differently, with taenite seams between.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Weave Density`,type:`float`,min:2,max:20,default:8},{id:`u_primary_color`,name:`Wicker Slat`,type:`color`,default:[.7,.5,.3,1]},{id:`u_secondary_color`,name:`Joint Deep`,type:`color`,default:[.2,.1,.05,1]}]},A_=e({default:()=>j_}),j_={id:`widmanstatten_etch`,name:`Widmanstätten Etch`,category:`Geology`,added:`2026-06-12`,description:`Acid-etched iron meteorite — interlocking kamacite lamellae crossing at fixed angles, each band catching light differently, with taenite seams between.`,shader:`
     // Triangle-wave band distance for one lamella direction:
     // 0 at band centre, 1 at band edge
     float band_wid(vec2 p, vec2 dir, float phase) {
@@ -18193,7 +18489,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(clamp(col, 0.0, 1.0), 1.0);
     }
-  `,uniforms:[{id:`u_lattice_scale`,name:`Lattice Scale`,type:`float`,min:2,max:18,default:7},{id:`u_seam_width`,name:`Taenite Seams`,type:`float`,min:0,max:1,default:.4},{id:`u_etch_contrast`,name:`Etch Contrast`,type:`float`,min:.4,max:2,default:1},{id:`u_metal_color`,name:`Iron Tone`,type:`color`,default:[.62,.6,.58,1]}]},g_=e({default:()=>__}),__={id:`wire_wound`,name:`Wire Wound`,category:`Industrial`,added:`2026-05-01`,description:`Tightly wound coil seen from above — concentric oval rings from wire turns with bright highlights and trailing-edge shadows, as in a solenoid cross-section.`,shader:`
+  `,uniforms:[{id:`u_lattice_scale`,name:`Lattice Scale`,type:`float`,min:2,max:18,default:7},{id:`u_seam_width`,name:`Taenite Seams`,type:`float`,min:0,max:1,default:.4},{id:`u_etch_contrast`,name:`Etch Contrast`,type:`float`,min:.4,max:2,default:1},{id:`u_metal_color`,name:`Iron Tone`,type:`color`,default:[.62,.6,.58,1]}]},M_=e({default:()=>N_}),N_={id:`wire_wound`,name:`Wire Wound`,category:`Industrial`,added:`2026-05-01`,description:`Tightly wound coil seen from above — concentric oval rings from wire turns with bright highlights and trailing-edge shadows, as in a solenoid cross-section.`,shader:`
 
     // Oval ring radius: slight Y compression gives wound-coil perspective
     float ovalRadius(vec2 uv) {
@@ -18246,14 +18542,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_turns`,name:`Coil Turns`,type:`float`,min:4,max:30,default:12},{id:`u_wire_color`,name:`Wire Color`,type:`color`,default:[.75,.73,.68,1]},{id:`u_gap_color`,name:`Gap Color`,type:`color`,default:[.1,.09,.08,1]}]},v_=e({default:()=>y_}),y_={id:`wood_block_print_artisan`,name:`Wood Print`,category:`Abstract`,added:`2026-04-16`,description:`Coarse carved relief texture mimicking traditional wood block printing techniques.`,shader:`
+  `,uniforms:[{id:`u_turns`,name:`Coil Turns`,type:`float`,min:4,max:30,default:12},{id:`u_wire_color`,name:`Wire Color`,type:`color`,default:[.75,.73,.68,1]},{id:`u_gap_color`,name:`Gap Color`,type:`color`,default:[.1,.09,.08,1]}]},P_=e({default:()=>F_}),F_={id:`wood_block_print_artisan`,name:`Wood Print`,category:`Abstract`,added:`2026-04-16`,description:`Coarse carved relief texture mimicking traditional wood block printing techniques.`,shader:`
     vec4 generate() {
       float y = floor(v_uv.y * 80.0);
       float h = hash(vec2(y, y));
       float bark = step(0.5, fract(v_uv.x * 5.0 + h));
       return mix(u_secondary_color, u_primary_color, bark);
     }
-  `,uniforms:[{id:`u_primary_color`,name:`Relief High`,type:`color`,default:[.2,.2,.2,1]},{id:`u_secondary_color`,name:`Carved Wood`,type:`color`,default:[.1,.05,0,1]}]},b_=e({default:()=>x_}),x_={id:`wood_grain_artisan`,name:`Wood Grain Pro`,category:`Natural`,added:`2026-04-15`,description:`High-detail procedural timber with concentric growth rings and knots.`,shader:`
+  `,uniforms:[{id:`u_primary_color`,name:`Relief High`,type:`color`,default:[.2,.2,.2,1]},{id:`u_secondary_color`,name:`Carved Wood`,type:`color`,default:[.1,.05,0,1]}]},I_=e({default:()=>L_}),L_={id:`wood_grain_artisan`,name:`Wood Grain Pro`,category:`Natural`,added:`2026-04-15`,description:`High-detail procedural timber with concentric growth rings and knots.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float n = noise(uv * 0.1);
@@ -18261,14 +18557,14 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       float mask = smoothstep(0.4, 0.6, ring);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Wood density`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Grain Color`,type:`color`,default:[.3,.15,.05,1]},{id:`u_secondary_color`,name:`Base Timber`,type:`color`,default:[.45,.25,.1,1]}]},S_=e({default:()=>C_}),C_={id:`wood_parquet_artisan`,name:`Wood Parquet`,category:`Industrial`,added:`2026-04-15`,description:`Complex interlocking geometric floor planks for premium interior design.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Wood density`,type:`float`,min:1,max:10,default:4},{id:`u_primary_color`,name:`Grain Color`,type:`color`,default:[.3,.15,.05,1]},{id:`u_secondary_color`,name:`Base Timber`,type:`color`,default:[.45,.25,.1,1]}]},R_=e({default:()=>z_}),z_={id:`wood_parquet_artisan`,name:`Wood Parquet`,category:`Industrial`,added:`2026-04-15`,description:`Complex interlocking geometric floor planks for premium interior design.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       vec2 gv = floor(uv);
       float mask = mod(gv.x + gv.y, 2.0);
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,uniforms:[{id:`u_scale`,name:`Mosaic Size`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Plank A`,type:`color`,default:[.5,.3,.1,1]},{id:`u_secondary_color`,name:`Plank B`,type:`color`,default:[.4,.25,.08,1]}]},w_=e({default:()=>T_}),T_={id:`woodland_classic_camo`,name:`Woodland Classic Camo`,category:`Organic`,added:`2026-05-12`,description:`Classic M81 style camouflage with large organic blobs overlapping each other.`,shader:`
+  `,uniforms:[{id:`u_scale`,name:`Mosaic Size`,type:`float`,min:2,max:20,default:10},{id:`u_primary_color`,name:`Plank A`,type:`color`,default:[.5,.3,.1,1]},{id:`u_secondary_color`,name:`Plank B`,type:`color`,default:[.4,.25,.08,1]}]},B_=e({default:()=>V_}),V_={id:`woodland_classic_camo`,name:`Woodland Classic Camo`,category:`Organic`,added:`2026-05-12`,description:`Classic M81 style camouflage with large organic blobs overlapping each other.`,shader:`
     
 
     vec4 generate() {
@@ -18285,7 +18581,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       
       return color;
     }
-  `,variants:[{name:`Classic Woodland`,uniforms:{u_color_base:[.63,.56,.45,1],u_color_1:[.28,.35,.22,1],u_color_2:[.35,.26,.18,1],u_color_3:[.08,.08,.08,1]}},{name:`Desert Recon`,uniforms:{u_color_base:[.82,.75,.61,1],u_color_1:[.73,.62,.47,1],u_color_2:[.55,.44,.31,1],u_color_3:[.35,.25,.15,1]}},{name:`Urban Stealth`,uniforms:{u_color_base:[.7,.7,.75,1],u_color_1:[.45,.45,.5,1],u_color_2:[.25,.25,.3,1],u_color_3:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.14,1],u_color_1:[.08,.08,.1,1],u_color_2:[.04,.04,.05,1],u_color_3:[.01,.01,.01,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base (Tan)`,type:`color`,default:[.63,.56,.45,1]},{id:`u_color_1`,name:`Layer 1 (Green)`,type:`color`,default:[.28,.35,.22,1]},{id:`u_color_2`,name:`Layer 2 (Brown)`,type:`color`,default:[.35,.26,.18,1]},{id:`u_color_3`,name:`Layer 3 (Black)`,type:`color`,default:[.08,.08,.08,1]}]},E_=e({default:()=>D_}),D_={id:`wormhole_tunnel`,name:`Wormhole Tunnel`,category:`Cosmos`,added:`2026-06-11`,description:`Staring down a spacetime throat — twisting concentric energy rings telescoping toward a blinding singularity, walls streaked with infalling starlight.`,shader:`
+  `,variants:[{name:`Classic Woodland`,uniforms:{u_color_base:[.63,.56,.45,1],u_color_1:[.28,.35,.22,1],u_color_2:[.35,.26,.18,1],u_color_3:[.08,.08,.08,1]}},{name:`Desert Recon`,uniforms:{u_color_base:[.82,.75,.61,1],u_color_1:[.73,.62,.47,1],u_color_2:[.55,.44,.31,1],u_color_3:[.35,.25,.15,1]}},{name:`Urban Stealth`,uniforms:{u_color_base:[.7,.7,.75,1],u_color_1:[.45,.45,.5,1],u_color_2:[.25,.25,.3,1],u_color_3:[.1,.1,.12,1]}},{name:`Blackout Stealth`,uniforms:{u_color_base:[.12,.12,.14,1],u_color_1:[.08,.08,.1,1],u_color_2:[.04,.04,.05,1],u_color_3:[.01,.01,.01,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Scale`,type:`float`,min:1,max:20,default:5},{id:`u_color_base`,name:`Base (Tan)`,type:`color`,default:[.63,.56,.45,1]},{id:`u_color_1`,name:`Layer 1 (Green)`,type:`color`,default:[.28,.35,.22,1]},{id:`u_color_2`,name:`Layer 2 (Brown)`,type:`color`,default:[.35,.26,.18,1]},{id:`u_color_3`,name:`Layer 3 (Black)`,type:`color`,default:[.08,.08,.08,1]}]},H_=e({default:()=>U_}),U_={id:`wormhole_tunnel`,name:`Wormhole Tunnel`,category:`Cosmos`,added:`2026-06-11`,description:`Staring down a spacetime throat — twisting concentric energy rings telescoping toward a blinding singularity, walls streaked with infalling starlight.`,shader:`
     vec4 generate() {
       vec2 uv = fract(v_uv) - 0.5;
       float r = length(uv) * 2.0;
@@ -18351,7 +18647,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
 
       return vec4(col, 1.0);
     }
-  `,uniforms:[{id:`u_ring_density`,name:`Ring Density`,type:`float`,min:1,max:8,default:3},{id:`u_twist`,name:`Throat Twist`,type:`float`,min:0,max:4,default:1.5},{id:`u_energy_color`,name:`Energy Hue`,type:`color`,default:[.3,.65,1,1]}]},O_=e({default:()=>k_}),k_={id:`worn_asphalt`,name:`Worn Asphalt`,category:`Racing`,added:`2026-05-01`,description:`Heavily worn racing asphalt with exposed aggregate, oil-stained patches, crack lines, and rubber marbling from racing tyres.`,shader:`
+  `,uniforms:[{id:`u_ring_density`,name:`Ring Density`,type:`float`,min:1,max:8,default:3},{id:`u_twist`,name:`Throat Twist`,type:`float`,min:0,max:4,default:1.5},{id:`u_energy_color`,name:`Energy Hue`,type:`color`,default:[.3,.65,1,1]}]},W_=e({default:()=>G_}),G_={id:`worn_asphalt`,name:`Worn Asphalt`,category:`Racing`,added:`2026-05-01`,description:`Heavily worn racing asphalt with exposed aggregate, oil-stained patches, crack lines, and rubber marbling from racing tyres.`,shader:`
     float fbm(vec2 p) {
       float v = 0.0; float a = 0.5;
       for (int i = 0; i < 4; i++) {
@@ -18425,7 +18721,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_opacity);
     }
-  `,uniforms:[{id:`u_wear`,name:`Wear Level`,type:`float`,min:0,max:1,default:.7},{id:`u_base_color`,name:`Asphalt Base`,type:`color`,default:[.28,.27,.26,1]},{id:`u_crack_density`,name:`Crack Density`,type:`float`,min:1,max:10,default:4}]},A_=e({default:()=>j_}),j_={id:`woven_fiberglass`,name:`Woven Fiberglass`,category:`Industrial`,added:`2026-04-30`,description:`E-glass plain-weave fiberglass cloth with cream tow bundles, glass-sheen highlights, and amber resin pockets.`,shader:`
+  `,uniforms:[{id:`u_wear`,name:`Wear Level`,type:`float`,min:0,max:1,default:.7},{id:`u_base_color`,name:`Asphalt Base`,type:`color`,default:[.28,.27,.26,1]},{id:`u_crack_density`,name:`Crack Density`,type:`float`,min:1,max:10,default:4}]},K_=e({default:()=>q_}),q_={id:`woven_fiberglass`,name:`Woven Fiberglass`,category:`Industrial`,added:`2026-04-30`,description:`E-glass plain-weave fiberglass cloth with cream tow bundles, glass-sheen highlights, and amber resin pockets.`,shader:`
     // Smooth Hermite profile for a tow cross-section.
     // Returns 1.0 at the crown (phase == 0) and 0.0 at the flanks.
     float towProfile(float phase) {
@@ -18496,7 +18792,7 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       col = clamp(col, 0.0, 1.0);
       return vec4(col, u_fiber_color.a * u_opacity);
     }
-  `,uniforms:[{id:`u_weave_scale`,name:`Weave Scale`,type:`float`,min:2,max:30,default:12},{id:`u_fiber_color`,name:`Fiber Color`,type:`color`,default:[.88,.88,.84,1]},{id:`u_resin_color`,name:`Resin Color`,type:`color`,default:[.55,.52,.47,1]},{id:`u_sheen`,name:`Glass Specularity`,type:`float`,min:0,max:2,default:1}]},M_=e({default:()=>N_}),N_={id:`wrought_iron_scroll`,name:`Wrought Iron Scroll`,category:`Architecture`,added:`2026-06-12`,description:`Forged scrollwork lattice — C-scrolls curling between straight bars, hammered collar bands clamping the joints, black-lead finish with worn edge highlights and rust creeping out of the seams.`,shader:`
+  `,uniforms:[{id:`u_weave_scale`,name:`Weave Scale`,type:`float`,min:2,max:30,default:12},{id:`u_fiber_color`,name:`Fiber Color`,type:`color`,default:[.88,.88,.84,1]},{id:`u_resin_color`,name:`Resin Color`,type:`color`,default:[.55,.52,.47,1]},{id:`u_sheen`,name:`Glass Specularity`,type:`float`,min:0,max:2,default:1}]},J_=e({default:()=>Y_}),Y_={id:`wrought_iron_scroll`,name:`Wrought Iron Scroll`,category:`Architecture`,added:`2026-06-12`,description:`Forged scrollwork lattice — C-scrolls curling between straight bars, hammered collar bands clamping the joints, black-lead finish with worn edge highlights and rust creeping out of the seams.`,shader:`
     float hash_wis(vec2 p) {
       return fract(sin(dot(p, vec2(173.7, 313.1))) * 40961.7193);
     }
@@ -18592,13 +18888,13 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       vec3 outCol = mix(back, col, metal);
       return vec4(outCol, 1.0);
     }
-  `,uniforms:[{id:`u_cells`,name:`Lattice Cells`,type:`float`,min:1,max:8,default:3},{id:`u_bar_width`,name:`Bar Weight`,type:`float`,min:.015,max:.06,default:.03},{id:`u_rust`,name:`Rust`,type:`float`,min:0,max:1,default:.35},{id:`u_iron_color`,name:`Iron`,type:`color`,default:[.13,.13,.15,1]}]},P_=e({default:()=>F_}),F_={id:`zebra_camo_v2_artisan`,name:`Zebra Camo v2`,category:`Abstract`,added:`2026-04-15`,description:`High-contrast geometric distortion variant of precision camouflages.`,shader:`
+  `,uniforms:[{id:`u_cells`,name:`Lattice Cells`,type:`float`,min:1,max:8,default:3},{id:`u_bar_width`,name:`Bar Weight`,type:`float`,min:.015,max:.06,default:.03},{id:`u_rust`,name:`Rust`,type:`float`,min:0,max:1,default:.35},{id:`u_iron_color`,name:`Iron`,type:`color`,default:[.13,.13,.15,1]}]},X_=e({default:()=>Z_}),Z_={id:`zebra_camo_v2_artisan`,name:`Zebra Camo v2`,category:`Abstract`,added:`2026-04-15`,description:`High-contrast geometric distortion variant of precision camouflages.`,shader:`
     vec4 generate() {
       vec2 uv = v_uv * u_scale;
       float mask = step(0.5, fract(uv.x + sin(uv.y * 2.0)));
       return mix(u_secondary_color, u_primary_color, mask);
     }
-  `,variants:[{name:`High Contrast (Default)`,uniforms:{u_primary_color:[0,0,0,1],u_secondary_color:[1,1,1,1]}},{name:`Blackout Stealth`,uniforms:{u_primary_color:[.02,.02,.02,1],u_secondary_color:[.15,.15,.15,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Stripe A`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Stripe B`,type:`color`,default:[1,1,1,1]}]},I_=e({default:()=>L_}),L_={id:`zigzag_chevron`,name:`Zigzag Chevron`,category:`Geometric`,added:`2026-07-07`,description:`Flame-stitch zigzag rows — multicolor chevron bands with an optional knit texture.`,shader:`
+  `,variants:[{name:`High Contrast (Default)`,uniforms:{u_primary_color:[0,0,0,1],u_secondary_color:[1,1,1,1]}},{name:`Blackout Stealth`,uniforms:{u_primary_color:[.02,.02,.02,1],u_secondary_color:[.15,.15,.15,1]}}],uniforms:[{id:`u_scale`,name:`Pattern Density`,type:`float`,min:1,max:10,default:5},{id:`u_primary_color`,name:`Stripe A`,type:`color`,default:[0,0,0,1]},{id:`u_secondary_color`,name:`Stripe B`,type:`color`,default:[1,1,1,1]}]},Q_=e({default:()=>$_}),$_={id:`zigzag_chevron`,name:`Zigzag Chevron`,category:`Geometric`,added:`2026-07-07`,description:`Flame-stitch zigzag rows — multicolor chevron bands with an optional knit texture.`,shader:`
     vec4 generate() {
       float a = u_rotate * 0.01745329;
       vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * (v_uv - 0.5);
@@ -18621,4 +18917,4 @@ import{n as e}from"./rolldown-runtime-Dw2cE7zH.js";var t=e({default:()=>n}),n={i
       c *= mix(1.0, 0.88 + 0.12 * knit, u_weave);
       return vec4(c, 1.0);
     }
-  `,uniforms:[{id:`u_scale`,name:`Row Density`,type:`float`,min:2,max:20,default:7},{id:`u_freq`,name:`Zig Frequency`,type:`float`,min:.25,max:2,default:.7},{id:`u_peak`,name:`Peak Height`,type:`float`,min:.2,max:2,default:.8},{id:`u_weave`,name:`Stitch Texture`,type:`float`,min:0,max:1,default:.3},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Band 1`,type:`color`,default:[.9,.85,.78,1]},{id:`u_accent_color`,name:`Band 2`,type:`color`,default:[.85,.45,.2,1]},{id:`u_secondary_color`,name:`Band 3`,type:`color`,default:[.25,.3,.4,1]},{id:`u_pop_color`,name:`Band 4`,type:`color`,default:[.6,.65,.6,1]}],variants:[{name:`Missoni Knit`,uniforms:{u_primary_color:[.9,.85,.78,1],u_accent_color:[.85,.45,.2,1],u_secondary_color:[.25,.3,.4,1],u_pop_color:[.6,.65,.6,1],u_weave:.6}},{name:`Bargello Jewel`,uniforms:{u_primary_color:[.45,.12,.35,1],u_accent_color:[.8,.3,.35,1],u_secondary_color:[.2,.3,.55,1],u_pop_color:[.9,.7,.25,1],u_weave:.8}},{name:`Clean Mod`,uniforms:{u_primary_color:[.95,.94,.92,1],u_accent_color:[.1,.1,.12,1],u_secondary_color:[.95,.94,.92,1],u_pop_color:[.1,.1,.12,1],u_weave:0}}]};export{Bh as $,Ra as $a,L as $c,zs as $i,zd as $n,Rr as $o,zl as $r,Lt as $s,Bp as $t,Mg as A,jo as Aa,ke as Ac,jc as Ai,Mf as An,Ai as Ao,ju as Ar,An as As,Mm as At,fg as B,uo as Ba,le as Bc,dc as Bi,ff as Bn,ui as Bo,du as Br,un as Bs,fm as Bt,Kg as C,Go as Ca,Ue as Cc,Gc as Ci,Kf as Cn,Wi as Co,Gu as Cr,Wn as Cs,Km as Ct,Rg as D,Lo as Da,Fe as Dc,Lc as Di,Rf as Dn,Ii as Do,Lu as Dr,In as Ds,Rm as Dt,Bg as E,zo as Ea,Le as Ec,zc as Ei,Bf as En,Ri as Eo,zu as Er,Rn as Es,Bm as Et,Sg as F,xo as Fa,ye as Fc,xc as Fi,Sf as Fn,bi as Fo,xu as Fr,bn as Fs,Sm as Ft,ng as G,eo as Ga,$ as Gc,tc as Gi,tf as Gn,ei as Go,tu as Gr,$t as Gs,nm as Gt,cg as H,oo as Ha,ae as Hc,sc as Hi,cf as Hn,oi as Ho,su as Hr,on as Hs,cm as Ht,bg as I,yo as Ia,_e as Ic,yc as Ii,bf as In,vi as Io,yu as Ir,vn as Is,bm as It,Xh as J,Ja,q as Jc,Ys as Ji,Yd as Jn,Jr as Jo,Yl as Jr,qt as Js,Xp as Jt,eg as K,Qa as Ka,Z as Kc,$s as Ki,$d as Kn,Qr as Ko,$l as Kr,Zt as Ks,em as Kt,vg as L,_o as La,he as Lc,_c as Li,vf as Ln,gi as Lo,_u as Lr,gn as Ls,vm as Lt,Og as M,Do as Ma,Te as Mc,Dc as Mi,Of as Mn,Ei as Mo,Du as Mr,En as Ms,Om as Mt,Eg as N,To as Na,Ce as Nc,Tc as Ni,Ef as Nn,wi as No,Tu as Nr,wn as Ns,Em as Nt,Ig as O,Fo as Oa,Ne as Oc,Fc as Oi,If as On,Pi as Oo,Fu as Or,Pn as Os,Im as Ot,wg as P,Co as Pa,xe as Pc,Cc as Pi,wf as Pn,Si as Po,Cu as Pr,Sn as Ps,wm as Pt,Hh as Q,Ba as Qa,z as Qc,Vs as Qi,Vd as Qn,Br as Qo,Vl as Qr,zt as Qs,Hp as Qt,gg as R,ho as Ra,pe as Rc,hc as Ri,gf as Rn,mi as Ro,hu as Rr,mn as Rs,gm as Rt,Jg as S,qo as Sa,Ge as Sc,qc as Si,Jf as Sn,Ki as So,qu as Sr,Kn as Ss,Jm as St,Hg as T,Vo as Ta,ze as Tc,Vc as Ti,Hf as Tn,Bi as To,Vu as Tr,Bn as Ts,Hm as Tt,og as U,io as Ua,re as Uc,ac as Ui,of as Un,ii as Uo,au as Ur,rn as Us,om as Ut,ug as V,co as Va,se as Vc,lc as Vi,uf as Vn,ci as Vo,lu as Vr,cn as Vs,um as Vt,ig as W,no as Wa,te as Wc,rc as Wi,rf as Wn,ni as Wo,ru as Wr,tn as Ws,im as Wt,Kh as X,Wa as Xa,U as Xc,Gs as Xi,Gd as Xn,Wr as Xo,Gl as Xr,Ut as Xs,Kp as Xt,Jh as Y,Ka as Ya,G as Yc,qs as Yi,qd as Yn,Kr as Yo,ql as Yr,Gt as Ys,Jp as Yt,Wh as Z,Ha as Za,V as Zc,Us as Zi,Ud as Zn,Hr as Zo,Ul as Zr,Vt as Zs,Wp as Zt,i_ as _,rs as _a,tt as _c,rl as _i,t as _l,ip as _n,na as _o,rd as _r,nr as _s,ih as _t,O_ as a,Ds as aa,Tt as ac,Dl as ai,T as al,Op as an,Ea as ao,Dd as ar,Er as as,Oh as at,Qg as b,Zo as ba,Ye as bc,Zc as bi,Qf as bn,Xi as bo,Zu as br,Xn as bs,Qm as bt,S_ as c,xs as ca,yt as cc,xl as ci,y as cl,Sp as cn,ba as co,xd as cr,br as cs,Sh as ct,g_ as d,hs as da,pt as dc,hl as di,p as dl,gp as dn,ma as do,hd as dr,mr as ds,gh as dt,Ls as ea,Ft as ec,Ll as ei,F as el,Rp as en,Ia as eo,Ld as er,Ir as es,Rh as et,m_ as f,ps as fa,dt as fc,pl as fi,d as fl,mp as fn,fa as fo,pd as fr,fr as fs,mh as ft,o_ as g,as as ga,rt as gc,al as gi,r as gl,op as gn,ia as go,ad as gr,ir as gs,oh as gt,c_ as h,ss as ha,at as hc,sl as hi,a as hl,cp as hn,oa as ho,sd as hr,or as hs,ch as ht,A_ as i,ks as ia,Dt as ic,kl as ii,D as il,Ap as in,Oa as io,kd as ir,Or as is,Ah as it,Ag as j,ko as ja,De as jc,kc as ji,Af as jn,Oi as jo,ku as jr,On as js,Am as jt,Pg as k,No as ka,je as kc,Nc as ki,Pf as kn,Mi as ko,Nu as kr,Mn as ks,Pm as kt,b_ as l,ys as la,_t as lc,yl as li,_ as ll,bp as ln,va as lo,yd as lr,vr as ls,bh as lt,u_ as m,ls as ma,st as mc,ll as mi,s as ml,up as mn,ca as mo,ld as mr,cr as ms,uh as mt,P_ as n,Ns as na,jt as nc,Nl as ni,j as nl,Pp as nn,Ma as no,Nd as nr,Mr as ns,Ph as nt,E_ as o,Ts as oa,Ct as oc,Tl as oi,C as ol,Ep as on,wa as oo,Td as or,wr as os,Eh as ot,f_ as p,ds as pa,lt as pc,dl as pi,l as pl,fp as pn,ua as po,dd as pr,ur as ps,fh as pt,Qh as q,Xa as qa,Y as qc,Zs as qi,Zd as qn,Xr as qo,Zl as qr,Yt as qs,Qp as qt,M_ as r,js as ra,kt as rc,jl as ri,k as rl,Mp as rn,Aa as ro,jd as rr,Ar as rs,Mh as rt,w_ as s,Cs as sa,xt as sc,Cl as si,x as sl,wp as sn,Sa as so,Cd as sr,Sr as ss,wh as st,I_ as t,Fs as ta,Nt as tc,Fl as ti,N as tl,Ip as tn,Pa as to,Fd as tr,Pr as ts,Ih as tt,v_ as u,_s as ua,ht as uc,_l as ui,h as ul,vp as un,ga as uo,_d as ur,gr as us,vh as ut,n_ as v,ts as va,$e as vc,tl as vi,np as vn,ea as vo,td as vr,er as vs,nh as vt,Wg as w,Uo as wa,Ve as wc,Uc as wi,Wf as wn,Hi as wo,Uu as wr,Hn as ws,Wm as wt,Xg as x,Yo as xa,qe as xc,Yc as xi,Xf as xn,Ji as xo,Yu as xr,Jn as xs,Xm as xt,e_ as y,$o as ya,Ze as yc,$c as yi,ep as yn,Qi as yo,$u as yr,Qn as ys,eh as yt,mg as z,po as za,de as zc,pc as zi,mf as zn,fi as zo,pu as zr,fn as zs,mm as zt};
+  `,uniforms:[{id:`u_scale`,name:`Row Density`,type:`float`,min:2,max:20,default:7},{id:`u_freq`,name:`Zig Frequency`,type:`float`,min:.25,max:2,default:.7},{id:`u_peak`,name:`Peak Height`,type:`float`,min:.2,max:2,default:.8},{id:`u_weave`,name:`Stitch Texture`,type:`float`,min:0,max:1,default:.3},{id:`u_rotate`,name:`Rotation`,type:`float`,min:0,max:90,default:0},{id:`u_primary_color`,name:`Band 1`,type:`color`,default:[.9,.85,.78,1]},{id:`u_accent_color`,name:`Band 2`,type:`color`,default:[.85,.45,.2,1]},{id:`u_secondary_color`,name:`Band 3`,type:`color`,default:[.25,.3,.4,1]},{id:`u_pop_color`,name:`Band 4`,type:`color`,default:[.6,.65,.6,1]}],variants:[{name:`Missoni Knit`,uniforms:{u_primary_color:[.9,.85,.78,1],u_accent_color:[.85,.45,.2,1],u_secondary_color:[.25,.3,.4,1],u_pop_color:[.6,.65,.6,1],u_weave:.6}},{name:`Bargello Jewel`,uniforms:{u_primary_color:[.45,.12,.35,1],u_accent_color:[.8,.3,.35,1],u_secondary_color:[.2,.3,.55,1],u_pop_color:[.9,.7,.25,1],u_weave:.8}},{name:`Clean Mod`,uniforms:{u_primary_color:[.95,.94,.92,1],u_accent_color:[.1,.1,.12,1],u_secondary_color:[.95,.94,.92,1],u_pop_color:[.1,.1,.12,1],u_weave:0}}]};export{ng as $,eo as $a,$ as $c,tc as $i,tf as $n,ei as $o,tu as $r,$t as $s,nm as $t,Jg as A,qo as Aa,Ge as Ac,qc as Ai,Jf as An,Ki as Ao,qu as Ar,Kn as As,Jm as At,Og as B,Do as Ba,Te as Bc,Dc as Bi,Of as Bn,Ei as Bo,Du as Br,En as Bs,Om as Bt,c_ as C,ss as Ca,at as Cc,sl as Ci,a as Cl,cp as Cn,oa as Co,sd as Cr,or as Cs,ch as Ct,e_ as D,$o as Da,Ze as Dc,$c as Di,ep as Dn,Qi as Do,$u as Dr,Qn as Ds,eh as Dt,n_ as E,ts as Ea,$e as Ec,tl as Ei,np as En,ea as Eo,td as Er,er as Es,nh as Et,Rg as F,Lo as Fa,Fe as Fc,Lc as Fi,Rf as Fn,Ii as Fo,Lu as Fr,In as Fs,Rm as Ft,vg as G,_o as Ga,he as Gc,_c as Gi,vf as Gn,gi as Go,_u as Gr,gn as Gs,vm as Gt,wg as H,Co as Ha,xe as Hc,Cc as Hi,wf as Hn,Si as Ho,Cu as Hr,Sn as Hs,wm as Ht,Ig as I,Fo as Ia,Ne as Ic,Fc as Ii,If as In,Pi as Io,Fu as Ir,Pn as Is,Im as It,fg as J,uo as Ja,le as Jc,dc as Ji,ff as Jn,ui as Jo,du as Jr,un as Js,fm as Jt,gg as K,ho as Ka,pe as Kc,hc as Ki,gf as Kn,mi as Ko,hu as Kr,mn as Ks,gm as Kt,Pg as L,No as La,je as Lc,Nc as Li,Pf as Ln,Mi as Lo,Nu as Lr,Mn as Ls,Pm as Lt,Wg as M,Uo as Ma,Ve as Mc,Uc as Mi,Wf as Mn,Hi as Mo,Uu as Mr,Hn as Ms,Wm as Mt,Hg as N,Vo as Na,ze as Nc,Vc as Ni,Hf as Nn,Bi as No,Vu as Nr,Bn as Ns,Hm as Nt,Qg as O,Zo as Oa,Ye as Oc,Zc as Oi,Qf as On,Xi as Oo,Zu as Or,Xn as Os,Qm as Ot,Bg as P,zo as Pa,Le as Pc,zc as Pi,Bf as Pn,Ri as Po,zu as Pr,Rn as Ps,Bm as Pt,ig as Q,no as Qa,te as Qc,rc as Qi,rf as Qn,ni as Qo,ru as Qr,tn as Qs,im as Qt,Mg as R,jo as Ra,ke as Rc,jc as Ri,Mf as Rn,Ai as Ro,ju as Rr,An as Rs,Mm as Rt,u_ as S,ls as Sa,st as Sc,ll as Si,s as Sl,up as Sn,ca as So,ld as Sr,cr as Ss,uh as St,i_ as T,rs as Ta,tt as Tc,rl as Ti,t as Tl,ip as Tn,na as To,rd as Tr,nr as Ts,ih as Tt,Sg as U,xo as Ua,ye as Uc,xc as Ui,Sf as Un,bi as Uo,xu as Ur,bn as Us,Sm as Ut,Eg as V,To as Va,Ce as Vc,Tc as Vi,Ef as Vn,wi as Vo,Tu as Vr,wn as Vs,Em as Vt,bg as W,yo as Wa,_e as Wc,yc as Wi,bf as Wn,vi as Wo,yu as Wr,vn as Ws,bm as Wt,cg as X,oo as Xa,ae as Xc,sc as Xi,cf as Xn,oi as Xo,su as Xr,on as Xs,cm as Xt,ug as Y,co as Ya,se as Yc,lc as Yi,uf as Yn,ci as Yo,lu as Yr,cn as Ys,um as Yt,og as Z,io as Za,re as Zc,ac as Zi,of as Zn,ii as Zo,au as Zr,rn as Zs,om as Zt,b_ as _,ys as _a,_t as _c,yl as _i,_ as _l,bp as _n,va as _o,yd as _r,vr as _s,bh as _t,W_ as a,Us as aa,Vt as ac,Ul as ai,V as al,Wp as an,Ha as ao,Ud as ar,Hr as as,Wh as at,m_ as b,ps as ba,dt as bc,pl as bi,d as bl,mp as bn,fa as bo,pd as br,fr as bs,mh as bt,R_ as c,Ls as ca,Ft as cc,Ll as ci,F as cl,Rp as cn,Ia as co,Ld as cr,Ir as cs,Rh as ct,M_ as d,js as da,kt as dc,jl as di,k as dl,Mp as dn,Aa as do,jd as dr,Ar as ds,Mh as dt,$s as ea,Zt as ec,$l as ei,Z as el,em as en,Qa as eo,$d as er,Qr as es,eg as et,A_ as f,ks as fa,Dt as fc,kl as fi,D as fl,Ap as fn,Oa as fo,kd as fr,Or as fs,Ah as ft,S_ as g,xs as ga,yt as gc,xl as gi,y as gl,Sp as gn,ba as go,xd as gr,br as gs,Sh as gt,w_ as h,Cs as ha,xt as hc,Cl as hi,x as hl,wp as hn,Sa as ho,Cd as hr,Sr as hs,wh as ht,K_ as i,Gs as ia,Ut as ic,Gl as ii,U as il,Kp as in,Wa as io,Gd as ir,Wr as is,Kh as it,Kg as j,Go as ja,Ue as jc,Gc as ji,Kf as jn,Wi as jo,Gu as jr,Wn as js,Km as jt,Xg as k,Yo as ka,qe as kc,Yc as ki,Xf as kn,Ji as ko,Yu as kr,Jn as ks,Xm as kt,I_ as l,Fs as la,Nt as lc,Fl as li,N as ll,Ip as ln,Pa as lo,Fd as lr,Pr as ls,Ih as lt,E_ as m,Ts as ma,Ct as mc,Tl as mi,C as ml,Ep as mn,wa as mo,Td as mr,wr as ms,Eh as mt,X_ as n,Ys as na,qt as nc,Yl as ni,q as nl,Xp as nn,Ja as no,Yd as nr,Jr as ns,Xh as nt,H_ as o,Vs as oa,zt as oc,Vl as oi,z as ol,Hp as on,Ba as oo,Vd as or,Br as os,Hh as ot,O_ as p,Ds as pa,Tt as pc,Dl as pi,T as pl,Op as pn,Ea as po,Dd as pr,Er as ps,Oh as pt,mg as q,po as qa,de as qc,pc as qi,mf as qn,fi as qo,pu as qr,fn as qs,mm as qt,J_ as r,qs as ra,Gt as rc,ql as ri,G as rl,Jp as rn,Ka as ro,qd as rr,Kr as rs,Jh as rt,B_ as s,zs as sa,Lt as sc,zl as si,L as sl,Bp as sn,Ra as so,zd as sr,Rr as ss,Bh as st,Q_ as t,Zs as ta,Yt as tc,Zl as ti,Y as tl,Qp as tn,Xa as to,Zd as tr,Xr as ts,Qh as tt,P_ as u,Ns as ua,jt as uc,Nl as ui,j as ul,Pp as un,Ma as uo,Nd as ur,Mr as us,Ph as ut,v_ as v,_s as va,ht as vc,_l as vi,h as vl,vp as vn,ga as vo,_d as vr,gr as vs,vh as vt,o_ as w,as as wa,rt as wc,al as wi,r as wl,op as wn,ia as wo,ad as wr,ir as ws,oh as wt,f_ as x,ds as xa,lt as xc,dl as xi,l as xl,fp as xn,ua as xo,dd as xr,ur as xs,fh as xt,g_ as y,hs as ya,pt as yc,hl as yi,p as yl,gp as yn,ma as yo,hd as yr,mr as ys,gh as yt,Ag as z,ko as za,De as zc,kc as zi,Af as zn,Oi as zo,ku as zr,On as zs,Am as zt};
