@@ -7,6 +7,28 @@ import pkg from '../package.json';
 
 const APP_VERSION = pkg.version;
 
+// Built-in seamless materials (FLUX-generated, shipped in public/textures).
+// Loaded into the Custom Image pattern — every tool (tiling, spec/normal map,
+// adjustments) then works on them.
+const STUDIO_TEXTURES = [
+  { id: 'carbon-twill', name: 'Carbon Twill' },
+  { id: 'forged-carbon', name: 'Forged Carbon' },
+  { id: 'woodland-camo', name: 'Woodland Camo' },
+  { id: 'desert-camo', name: 'Desert Camo' },
+  { id: 'digital-camo', name: 'Digital Camo' },
+  { id: 'urban-camo', name: 'Urban Camo' },
+  { id: 'brushed-alu', name: 'Brushed Aluminium' },
+  { id: 'diamond-plate', name: 'Diamond Plate' },
+  { id: 'hammered-ti', name: 'Hammered Titanium' },
+  { id: 'hydro-dip', name: 'Hydro Dip' },
+  { id: 'liquid-marble', name: 'Liquid Marble' },
+  { id: 'galaxy', name: 'Galaxy Nebula' },
+  { id: 'geo-facets', name: 'Geo Facets' },
+  { id: 'snakeskin', name: 'Snakeskin' },
+  { id: 'cracked-lava', name: 'Cracked Lava' },
+  { id: 'circuit', name: 'Circuit Board' },
+];
+
 // Patterns added within the last 21 days get a NEW badge
 const NEW_BADGE_CUTOFF = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
 
@@ -392,6 +414,22 @@ function App() {
       setImageName(null);
     } finally {
       URL.revokeObjectURL(url);
+    }
+  };
+
+  // Built-in materials: seamless textures shipped with the app (generated
+  // locally with FLUX) — one click loads them through the same image pipeline.
+  const loadBuiltinTexture = async (tex) => {
+    if (!engineRef.current) return;
+    try {
+      const img = new Image();
+      img.src = `textures/full/${tex.id}.webp`;
+      await img.decode();
+      engineRef.current.setTexture('u_image', img);
+      engineRef.current.render({});
+      setImageName(tex.name);
+    } catch {
+      setImageName(null);
     }
   };
 
@@ -822,6 +860,24 @@ function App() {
                     Your image never leaves the browser. It lasts for this session — all
                     exports work on it: seamless tiling, spec map, and normal map.
                   </p>
+                  <div className="builtin-materials">
+                    <div className="control-label" style={{ margin: '4px 0 6px' }}>
+                      <span>Built-in materials</span>
+                    </div>
+                    <div className="material-grid">
+                      {STUDIO_TEXTURES.map((tex) => (
+                        <button
+                          key={tex.id}
+                          className="material-swatch"
+                          title={`Load "${tex.name}"`}
+                          onClick={() => loadBuiltinTexture(tex)}
+                          style={{ backgroundImage: `url(textures/thumb/${tex.id}.jpg)` }}
+                        >
+                          <span>{tex.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
