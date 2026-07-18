@@ -27,6 +27,22 @@ const STUDIO_TEXTURES = [
   { id: 'snakeskin', name: 'Snakeskin' },
   { id: 'cracked-lava', name: 'Cracked Lava' },
   { id: 'circuit', name: 'Circuit Board' },
+  { id: 'candy-flake', name: 'Candy Flake' },
+  { id: 'pearl-white', name: 'Pearl White' },
+  { id: 'chameleon', name: 'Chameleon' },
+  { id: 'liquid-chrome', name: 'Liquid Chrome' },
+  { id: 'kevlar-weave', name: 'Kevlar Weave' },
+  { id: 'red-carbon', name: 'Red Carbon' },
+  { id: 'carbon-kevlar', name: 'Carbon-Kevlar' },
+  { id: 'tiger-camo', name: 'Tiger Stripe' },
+  { id: 'arctic-camo', name: 'Arctic Camo' },
+  { id: 'splinter-camo', name: 'Splinter Camo' },
+  { id: 'damascus', name: 'Damascus Steel' },
+  { id: 'rose-gold', name: 'Rose Gold' },
+  { id: 'gunmetal-hex', name: 'Gunmetal Hex' },
+  { id: 'holographic', name: 'Holographic' },
+  { id: 'plasma', name: 'Plasma' },
+  { id: 'rust-patina', name: 'Rust Patina' },
 ];
 
 // Patterns added within the last 21 days get a NEW badge
